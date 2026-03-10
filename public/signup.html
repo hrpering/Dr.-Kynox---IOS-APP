@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hesap Oluştur - MedCase</title>
+    <link rel="prefetch" href="/index.html" />
+    <link rel="prefetch" href="/onboarding-profile.html" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main class="mobile-page auth-page form-auth-page">
+      <section class="auth-brand-block">
+        <div class="brand-logo">MC</div>
+        <h1>Hesap oluştur</h1>
+        <p>Hemen başla ve klinik karar verme becerilerini düzenli olarak geliştir.</p>
+      </section>
+
+      <form id="signupForm" class="auth-form" novalidate>
+        <label for="signupName">Ad Soyad</label>
+        <div class="auth-input-wrap">
+          <input id="signupName" type="text" placeholder="Ad Soyad" autocomplete="name" required />
+        </div>
+
+        <label for="signupEmail">E-posta adresi</label>
+        <div class="auth-input-wrap">
+          <input id="signupEmail" type="email" placeholder="örnek@eposta.com" autocomplete="email" required />
+        </div>
+
+        <label for="signupPassword">Şifre</label>
+        <div class="auth-input-wrap auth-password-wrap">
+          <input
+            id="signupPassword"
+            type="password"
+            placeholder="Şifren"
+            autocomplete="new-password"
+            required
+          />
+          <button id="toggleSignupPassword" type="button" class="password-toggle">Göster</button>
+        </div>
+        <p class="auth-helper">En az 8 karakter, bir büyük harf ve bir rakam.</p>
+
+        <label class="auth-checkbox-row" for="termsCheck">
+          <input id="termsCheck" type="checkbox" required />
+          <span>Kullanım Koşulları ve Gizlilik Politikasını okudum ve kabul ediyorum.</span>
+        </label>
+
+        <label class="auth-checkbox-row" for="marketingCheck">
+          <input id="marketingCheck" type="checkbox" />
+          <span>Eğitim içerikleri ve güncellemeler hakkında bilgilendirme almak istiyorum.</span>
+        </label>
+
+        <button id="signupSubmitBtn" type="submit" class="primary-cta auth-primary">Hesap oluştur</button>
+      </form>
+
+      <div class="social-sep"><span>veya</span></div>
+
+      <section class="social-grid">
+        <button id="googleSignupBtn" type="button" class="social-btn">Google</button>
+        <button id="appleSignupBtn" type="button" class="social-btn">Apple</button>
+      </section>
+
+      <p class="auth-switch-text">
+        Zaten hesabın var mı?
+        <a href="/login.html">Giriş yap</a>
+      </p>
+
+      <p id="signupStatus" class="auth-status" hidden></p>
+    </main>
+
+    <script type="module" src="/signup.js"></script>
+  </body>
+</html>

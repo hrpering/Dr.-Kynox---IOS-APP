@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutorial - Geri Bildirim</title>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="prefetch" href="/tutorial-permission.html" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main class="mobile-page tutorial-page">
+      <header class="tutorial-top">
+        <div class="tutorial-progress-bars">
+          <span class="active"></span>
+          <span class="active"></span>
+          <span class="active"></span>
+          <span></span>
+        </div>
+        <p>Adım 3 / 4</p>
+      </header>
+
+      <section class="tutorial-hero-card score">
+        <img
+          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=960&q=62"
+          alt="Analiz paneli"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+        <div class="tutorial-score-badge">
+          <strong>92</strong>
+          <span>Puan</span>
+        </div>
+      </section>
+
+      <section class="tutorial-title-block">
+        <h1>Geri bildirim ve puanını al</h1>
+        <p>
+          Her vaka sonunda detaylı performans analizini gör. Yapay zekâ destekli geri bildirimler güçlü
+          yönlerini ve gelişim alanlarını net bir şekilde gösterir.
+        </p>
+      </section>
+
+      <section class="tutorial-feedback-card positive">
+        <h3>Güçlü yönler</h3>
+        <p>Açık uçlu sorularla güçlü anamnez toplama</p>
+      </section>
+
+      <section class="tutorial-feedback-card neutral">
+        <h3>Gelişim alanı</h3>
+        <p>Aile geçmişini daha erken sorun</p>
+      </section>
+
+      <section class="tutorial-feedback-card danger">
+        <h3>Kaçan nokta</h3>
+        <p>Seyahat geçmişi sorulmadı</p>
+      </section>
+
+      <section class="tutorial-note-card info">
+        <ul>
+          <li>Beceri bazlı analiz</li>
+          <li>Yapay zekâ destekli öneriler</li>
+          <li>Kişiselleştirilmiş hedefler</li>
+        </ul>
+      </section>
+
+      <button id="tutorialStep3NextBtn" type="button" class="primary-cta onboarding-cta">İleri</button>
+    </main>
+
+    <script type="module" src="/onboarding-guard.js"></script>
+    <script type="module" src="/tutorial-step3.js"></script>
+  </body>
+</html>

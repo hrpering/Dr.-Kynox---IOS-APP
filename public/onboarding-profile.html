@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding - Profil</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main class="mobile-page onboarding-page">
+      <header class="onboarding-head profile-head">
+        <button id="onboardingBackBtn" class="icon-square" type="button" aria-label="Geri dön">
+          <span aria-hidden="true">&larr;</span>
+        </button>
+        <span class="onboarding-step-badge">1 / 4</span>
+      </header>
+
+      <section class="onboarding-card profile-card">
+        <div class="profile-icon" aria-hidden="true">PROFİL</div>
+        <h1>Sizi tanıyalım</h1>
+        <p>Size özel bir öğrenme deneyimi oluşturmamıza yardımcı olun.</p>
+
+        <label for="fullNameInput">Ad Soyad *</label>
+        <div class="auth-input-wrap">
+          <input id="fullNameInput" type="text" placeholder="Adınız ve soyadınız" autocomplete="name" required />
+        </div>
+
+        <label for="phoneInput">Telefon numarası *</label>
+        <div class="auth-input-wrap">
+          <input id="phoneInput" type="tel" placeholder="05xx xxx xx xx" autocomplete="tel" required />
+        </div>
+
+        <p class="onboarding-label">Yaş aralığı *</p>
+        <div id="ageRangeGrid" class="chip-grid"></div>
+      </section>
+
+      <p id="onboardingProfileStatus" class="auth-status" hidden></p>
+
+      <button id="onboardingProfileContinueBtn" type="button" class="primary-cta onboarding-cta">
+        Devam et
+      </button>
+    </main>
+
+    <script type="module" src="/onboarding-guard.js"></script>
+    <script type="module" src="/onboarding-profile.js"></script>
+  </body>
+</html>

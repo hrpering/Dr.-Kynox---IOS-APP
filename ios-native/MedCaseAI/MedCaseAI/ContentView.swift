@@ -1,0 +1,99 @@
+import SwiftUI
+import AVFoundation
+import AVKit
+import SafariServices
+import UIKit
+import Sentry
+
+struct RootView: View {
+    @EnvironmentObject private var state: AppState
+    @Environment(\.scenePhase) private var scenePhase
+
+    var body: some View {
+        Group {
+            switch state.route {
+            case .loading:
+                LoadingScreen()
+            case .auth:
+                AuthFlowView()
+            case .onboarding:
+                OnboardingView()
+            case .home:
+                MainTabView()
+            }
+        }
+        .background(AppColor.background.ignoresSafeArea())
+        .tint(AppColor.primary)
+        .onAppear {
+            UISoundEngine.shared.preloadIfNeeded()
+            trackRouteChange(state.route)
+        }
+        .onChange(of: state.route) { route in
+            trackRouteChange(route)
+        }
+        .onOpenURL { url in
+            state.handleDeepLink(url)
+        }
+        .onChange(of: scenePhase) { phase in
+            guard phase == .active else { return }
+            Task {
+                await state.onAppDidBecomeActive()
+            }
+        }
+    }
+
+    private func trackRouteChange(_ route: AppState.Route) {
+        let crumb = Breadcrumb()
+        crumb.category = "navigation"
+        crumb.type = "navigation"
+        crumb.level = .info
+        crumb.message = "route_changed"
+        crumb.data = ["route": route.sentryName]
+        SentrySDK.addBreadcrumb(crumb)
+        SentrySDK.configureScope { scope in
+            scope.setTag(value: route.sentryName, key: "app.route")
+        }
+    }
+}
+
+private extension AppState.Route {
+    var sentryName: String {
+        switch self {
+        case .loading:
+            return "loading"
+        case .auth:
+            return "auth"
+        case .onboarding:
+            return "onboarding"
+        case .home:
+            return "home"
+        }
+    }
+}
+
+private struct LoadingScreen: View {
+    var body: some View {
+        VStack(spacing: 18) {
+            IntroMotionCard(variant: .short)
+                .frame(height: 212)
+                .frame(maxWidth: .infinity)
+
+            Text("Dr.Kynox")
+                .font(AppFont.title)
+                .foregroundStyle(AppColor.textPrimary)
+
+            Text("Klinik çalışma alanın hazırlanıyor")
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
+                .multilineTextAlignment(.center)
+
+            ProgressView()
+                .controlSize(.regular)
+                .tint(AppColor.primary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppColor.background)
+    }
+}
+

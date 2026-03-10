@@ -1,0 +1,748 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A11B22C033D44E5500000001 /* MedCaseAIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000001 /* MedCaseAIApp.swift */; };
+		A11B22C033D44E5500000002 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000002 /* AppState.swift */; };
+		A11B22C033D44E5500000003 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000003 /* APIClient.swift */; };
+		A11B22C033D44E5500000004 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000004 /* ContentView.swift */; };
+		A11B22C033D44E5500000005 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000005 /* Models.swift */; };
+		A11B22C033D44E5500000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000006 /* Assets.xcassets */; };
+		A11B22C033D44E5500000009 /* intro.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000009 /* intro.mp4 */; };
+		B11B22C033D44E5500000001 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11B22C133D44E5500000001 /* SupabaseService.swift */; };
+		B11B22C033D44E5500000002 /* AgentConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11B22C133D44E5500000002 /* AgentConversationViewModel.swift */; };
+		B11B22C033D44E5500000003 /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11B22C133D44E5500000003 /* ColorPalette.swift */; };
+		B11B22C033D44E5500000004 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11B22C133D44E5500000004 /* Typography.swift */; };
+		C11B22C033D44E5500000001 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = C11B22C133D44E5500000001 /* Supabase */; };
+		C11B22C033D44E5500000002 /* ElevenLabs in Frameworks */ = {isa = PBXBuildFile; productRef = C11B22C133D44E5500000002 /* ElevenLabs */; };
+		D11B22C033D44E5500000001 /* DrKynoxWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11B22C133D44E5500000001 /* DrKynoxWidgets.swift */; };
+		D11B22C033D44E5500000002 /* DrKynoxWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D11B22C133D44E5500000003 /* DrKynoxWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E11B22C033D44E5500000001 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = E11B22C133D44E5500000001 /* Sentry */; };
+		F11B22C033D44E5500000001 /* WeeklyGoalSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000001 /* WeeklyGoalSystem.swift */; };
+		F11B22C033D44E5500000002 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000002 /* DesignSystem.swift */; };
+		F11B22C033D44E5500000003 /* MotionAudioKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000003 /* MotionAudioKit.swift */; };
+		F11B22C033D44E5500000004 /* Media/intro_short.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000004 /* Media/intro_short.mp4 */; };
+		F11B22C033D44E5500000005 /* Media/intro_long.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000005 /* Media/intro_long.mp4 */; };
+		F11B22C033D44E5500000006 /* Media/Sounds/ui_tap.wav in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000006 /* Media/Sounds/ui_tap.wav */; };
+		F11B22C033D44E5500000007 /* Media/Sounds/ui_success.wav in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000007 /* Media/Sounds/ui_success.wav */; };
+		F11B22C033D44E5500000008 /* Media/Sounds/ui_error.wav in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000008 /* Media/Sounds/ui_error.wav */; };
+		F11B22C033D44E5500000009 /* Media/Sounds/ambient_bed.wav in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000009 /* Media/Sounds/ambient_bed.wav */; };
+		F11B22C033D44E5500000010 /* Media/Lottie/intro_orb_short.json in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000010 /* Media/Lottie/intro_orb_short.json */; };
+		F11B22C033D44E5500000011 /* Media/Lottie/intro_orb_long.json in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000011 /* Media/Lottie/intro_orb_long.json */; };
+		F11B22C033D44E5500000012 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = F11B22C133D44E5500000012 /* Lottie */; };
+		F11B22C033D44E5500000013 /* PushNotificationBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000013 /* PushNotificationBridge.swift */; };
+		A11B22C033D44E5500000101 /* Features/Auth/AuthFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000101 /* Features/Auth/AuthFlowView.swift */; };
+		A11B22C033D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift */; };
+		A11B22C033D44E5500000103 /* Features/Dashboard/MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000103 /* Features/Dashboard/MainTabView.swift */; };
+		A11B22C033D44E5500000104 /* Features/Analysis/AnalysisHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000104 /* Features/Analysis/AnalysisHubView.swift */; };
+		A11B22C033D44E5500000105 /* Features/Session/CaseSessionFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000105 /* Features/Session/CaseSessionFlow.swift */; };
+		A11B22C033D44E5500000106 /* Features/Results/ResultsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000106 /* Features/Results/ResultsViews.swift */; };
+		A11B22C033D44E5500000107 /* Features/Flashcards/FlashcardViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000107 /* Features/Flashcards/FlashcardViews.swift */; };
+		A11B22C033D44E5500000108 /* Features/History/HistoryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000108 /* Features/History/HistoryViews.swift */; };
+		A11B22C033D44E5500000109 /* Features/Profile/ProfileViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */; };
+		A11B22C033D44E5500000110 /* Shared/Components/SharedUIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */; };
+		C33D44E550000030000000101 /* Features/Dashboard/InAppBroadcastBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */; };
+		C33D44E550000030000000102 /* Features/Dashboard/DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */; };
+		C33D44E550000030000000103 /* Features/Generator/GeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */; };
+		C33D44E550000030000000104 /* Features/Dashboard/StudyPlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000004 /* Features/Dashboard/StudyPlanDetailView.swift */; };
+		C33D44E550000030000000105 /* Features/Dashboard/WeeklyGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000005 /* Features/Dashboard/WeeklyGoalDetailView.swift */; };
+		C33D44E550000030000000106 /* Features/Dashboard/ConfettiBurstView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000006 /* Features/Dashboard/ConfettiBurstView.swift */; };
+		C33D44E550000030000000107 /* Features/Analysis/WeakAreaAnalysisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000007 /* Features/Analysis/WeakAreaAnalysisView.swift */; };
+		C33D44E550000030000000108 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000008 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift */; };
+		C33D44E550000030000000109 /* Features/Analysis/WeakAreaRadarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000009 /* Features/Analysis/WeakAreaRadarChart.swift */; };
+		B22C33D44E55000002000001 /* State/Auth/AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C33D44E55000002000101 /* State/Auth/AuthViewModel.swift */; };
+		B22C33D44E55000002000002 /* State/Dashboard/DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C33D44E55000002000102 /* State/Dashboard/DashboardViewModel.swift */; };
+		B22C33D44E55000002000003 /* State/Flashcards/FlashcardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C33D44E55000002000103 /* State/Flashcards/FlashcardViewModel.swift */; };
+		B22C33D44E55000002000004 /* State/Notifications/NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C33D44E55000002000104 /* State/Notifications/NotificationManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D11B22CB33D44E5500000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A11B22C633D44E5500000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D11B22C433D44E5500000001;
+			remoteInfo = DrKynoxWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D11B22C233D44E5500000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D11B22C033D44E5500000002 /* DrKynoxWidgets.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A11B22C133D44E5500000001 /* MedCaseAIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedCaseAIApp.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000002 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000003 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000005 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A11B22C133D44E5500000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A11B22C133D44E5500000008 /* MedCaseAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MedCaseAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A11B22C133D44E5500000009 /* intro.mp4 */ = {isa = PBXFileReference; lastKnownFileType = video.mp4; path = intro.mp4; sourceTree = "<group>"; };
+		B11B22C133D44E5500000001 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
+		B11B22C133D44E5500000002 /* AgentConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationViewModel.swift; sourceTree = "<group>"; };
+		B11B22C133D44E5500000003 /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
+		B11B22C133D44E5500000004 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		D11B22C133D44E5500000001 /* DrKynoxWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrKynoxWidgets.swift; sourceTree = "<group>"; };
+		D11B22C133D44E5500000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D11B22C133D44E5500000003 /* DrKynoxWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = DrKynoxWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F11B22C133D44E5500000001 /* WeeklyGoalSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyGoalSystem.swift; sourceTree = "<group>"; };
+		F11B22C133D44E5500000002 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		F11B22C133D44E5500000003 /* MotionAudioKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionAudioKit.swift; sourceTree = "<group>"; };
+		F11B22C133D44E5500000004 /* Media/intro_short.mp4 */ = {isa = PBXFileReference; lastKnownFileType = video.mp4; path = Media/intro_short.mp4; sourceTree = "<group>"; };
+		F11B22C133D44E5500000005 /* Media/intro_long.mp4 */ = {isa = PBXFileReference; lastKnownFileType = video.mp4; path = Media/intro_long.mp4; sourceTree = "<group>"; };
+		F11B22C133D44E5500000006 /* Media/Sounds/ui_tap.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Media/Sounds/ui_tap.wav; sourceTree = "<group>"; };
+		F11B22C133D44E5500000007 /* Media/Sounds/ui_success.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Media/Sounds/ui_success.wav; sourceTree = "<group>"; };
+		F11B22C133D44E5500000008 /* Media/Sounds/ui_error.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Media/Sounds/ui_error.wav; sourceTree = "<group>"; };
+		F11B22C133D44E5500000009 /* Media/Sounds/ambient_bed.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Media/Sounds/ambient_bed.wav; sourceTree = "<group>"; };
+		F11B22C133D44E5500000010 /* Media/Lottie/intro_orb_short.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Media/Lottie/intro_orb_short.json; sourceTree = "<group>"; };
+		F11B22C133D44E5500000011 /* Media/Lottie/intro_orb_long.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Media/Lottie/intro_orb_long.json; sourceTree = "<group>"; };
+		F11B22C133D44E5500000013 /* PushNotificationBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationBridge.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000101 /* Features/Auth/AuthFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Auth/AuthFlowView.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Onboarding/OnboardingFlow.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000103 /* Features/Dashboard/MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/MainTabView.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000104 /* Features/Analysis/AnalysisHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Analysis/AnalysisHubView.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000105 /* Features/Session/CaseSessionFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Session/CaseSessionFlow.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000106 /* Features/Results/ResultsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Results/ResultsViews.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000107 /* Features/Flashcards/FlashcardViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Flashcards/FlashcardViews.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000108 /* Features/History/HistoryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/History/HistoryViews.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Profile/ProfileViews.swift; sourceTree = "<group>"; };
+		A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Components/SharedUIComponents.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/InAppBroadcastBanner.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/DashboardView.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Generator/GeneratorView.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000004 /* Features/Dashboard/StudyPlanDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/StudyPlanDetailView.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000005 /* Features/Dashboard/WeeklyGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/WeeklyGoalDetailView.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000006 /* Features/Dashboard/ConfettiBurstView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/ConfettiBurstView.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000007 /* Features/Analysis/WeakAreaAnalysisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Analysis/WeakAreaAnalysisView.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000008 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Analysis/WeakAreaSpecialtyDetailView.swift; sourceTree = "<group>"; };
+		C33D44E550000030000000009 /* Features/Analysis/WeakAreaRadarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Analysis/WeakAreaRadarChart.swift; sourceTree = "<group>"; };
+		B22C33D44E55000002000101 /* State/Auth/AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State/Auth/AuthViewModel.swift; sourceTree = "<group>"; };
+		B22C33D44E55000002000102 /* State/Dashboard/DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State/Dashboard/DashboardViewModel.swift; sourceTree = "<group>"; };
+		B22C33D44E55000002000103 /* State/Flashcards/FlashcardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State/Flashcards/FlashcardViewModel.swift; sourceTree = "<group>"; };
+		B22C33D44E55000002000104 /* State/Notifications/NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State/Notifications/NotificationManager.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A11B22C233D44E5500000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C11B22C033D44E5500000001 /* Supabase in Frameworks */,
+				C11B22C033D44E5500000002 /* ElevenLabs in Frameworks */,
+				E11B22C033D44E5500000001 /* Sentry in Frameworks */,
+				F11B22C033D44E5500000012 /* Lottie in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D11B22C233D44E5500000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A11B22C333D44E5500000001 = {
+			isa = PBXGroup;
+			children = (
+				A11B22C333D44E5500000002 /* MedCaseAI */,
+				D11B22C333D44E5500000001 /* DrKynoxWidgets */,
+				A11B22C333D44E5500000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A11B22C333D44E5500000002 /* MedCaseAI */ = {
+			isa = PBXGroup;
+			children = (
+				A11B22C133D44E5500000001 /* MedCaseAIApp.swift */,
+				A11B22C133D44E5500000002 /* AppState.swift */,
+				B22C33D44E55000002000101 /* State/Auth/AuthViewModel.swift */,
+				B22C33D44E55000002000102 /* State/Dashboard/DashboardViewModel.swift */,
+				B22C33D44E55000002000103 /* State/Flashcards/FlashcardViewModel.swift */,
+				B22C33D44E55000002000104 /* State/Notifications/NotificationManager.swift */,
+				A11B22C133D44E5500000003 /* APIClient.swift */,
+				B11B22C133D44E5500000001 /* SupabaseService.swift */,
+				B11B22C133D44E5500000002 /* AgentConversationViewModel.swift */,
+				B11B22C133D44E5500000003 /* ColorPalette.swift */,
+				B11B22C133D44E5500000004 /* Typography.swift */,
+				F11B22C133D44E5500000002 /* DesignSystem.swift */,
+				F11B22C133D44E5500000001 /* WeeklyGoalSystem.swift */,
+				F11B22C133D44E5500000003 /* MotionAudioKit.swift */,
+				F11B22C133D44E5500000013 /* PushNotificationBridge.swift */,
+				A11B22C133D44E5500000004 /* ContentView.swift */,
+				A11B22C133D44E5500000101 /* Features/Auth/AuthFlowView.swift */,
+				A11B22C133D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift */,
+				A11B22C133D44E5500000103 /* Features/Dashboard/MainTabView.swift */,
+				A11B22C133D44E5500000104 /* Features/Analysis/AnalysisHubView.swift */,
+				C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */,
+				C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */,
+				C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */,
+				C33D44E550000030000000004 /* Features/Dashboard/StudyPlanDetailView.swift */,
+				C33D44E550000030000000005 /* Features/Dashboard/WeeklyGoalDetailView.swift */,
+				C33D44E550000030000000006 /* Features/Dashboard/ConfettiBurstView.swift */,
+				C33D44E550000030000000007 /* Features/Analysis/WeakAreaAnalysisView.swift */,
+				C33D44E550000030000000008 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift */,
+				C33D44E550000030000000009 /* Features/Analysis/WeakAreaRadarChart.swift */,
+				A11B22C133D44E5500000105 /* Features/Session/CaseSessionFlow.swift */,
+				A11B22C133D44E5500000106 /* Features/Results/ResultsViews.swift */,
+				A11B22C133D44E5500000107 /* Features/Flashcards/FlashcardViews.swift */,
+				A11B22C133D44E5500000108 /* Features/History/HistoryViews.swift */,
+				A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */,
+				A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */,
+				A11B22C133D44E5500000005 /* Models.swift */,
+				A11B22C133D44E5500000006 /* Assets.xcassets */,
+				A11B22C133D44E5500000009 /* intro.mp4 */,
+				F11B22C133D44E5500000004 /* Media/intro_short.mp4 */,
+				F11B22C133D44E5500000005 /* Media/intro_long.mp4 */,
+				F11B22C133D44E5500000010 /* Media/Lottie/intro_orb_short.json */,
+				F11B22C133D44E5500000011 /* Media/Lottie/intro_orb_long.json */,
+				F11B22C133D44E5500000006 /* Media/Sounds/ui_tap.wav */,
+				F11B22C133D44E5500000007 /* Media/Sounds/ui_success.wav */,
+				F11B22C133D44E5500000008 /* Media/Sounds/ui_error.wav */,
+				F11B22C133D44E5500000009 /* Media/Sounds/ambient_bed.wav */,
+				A11B22C133D44E5500000007 /* Info.plist */,
+			);
+			path = MedCaseAI;
+			sourceTree = "<group>";
+		};
+		A11B22C333D44E5500000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A11B22C133D44E5500000008 /* MedCaseAI.app */,
+				D11B22C133D44E5500000003 /* DrKynoxWidgets.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D11B22C333D44E5500000001 /* DrKynoxWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				D11B22C133D44E5500000001 /* DrKynoxWidgets.swift */,
+				D11B22C133D44E5500000002 /* Info.plist */,
+			);
+			path = DrKynoxWidgets;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A11B22C433D44E5500000001 /* MedCaseAI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A11B22C533D44E5500000001 /* Build configuration list for PBXNativeTarget "MedCaseAI" */;
+			buildPhases = (
+				A11B22C233D44E5500000002 /* Sources */,
+				A11B22C233D44E5500000001 /* Frameworks */,
+				D11B22C233D44E5500000001 /* Embed App Extensions */,
+				A11B22C233D44E5500000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D11B22CA33D44E5500000001 /* PBXTargetDependency */,
+			);
+			name = MedCaseAI;
+			packageProductDependencies = (
+				C11B22C133D44E5500000001 /* Supabase */,
+				C11B22C133D44E5500000002 /* ElevenLabs */,
+				E11B22C133D44E5500000001 /* Sentry */,
+				F11B22C133D44E5500000012 /* Lottie */,
+			);
+			productName = MedCaseAI;
+			productReference = A11B22C133D44E5500000008 /* MedCaseAI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D11B22C433D44E5500000001 /* DrKynoxWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D11B22C533D44E5500000001 /* Build configuration list for PBXNativeTarget "DrKynoxWidgets" */;
+			buildPhases = (
+				D11B22C233D44E5500000004 /* Sources */,
+				D11B22C233D44E5500000002 /* Frameworks */,
+				D11B22C233D44E5500000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DrKynoxWidgets;
+			packageProductDependencies = (
+			);
+			productName = DrKynoxWidgets;
+			productReference = D11B22C133D44E5500000003 /* DrKynoxWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A11B22C633D44E5500000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					A11B22C433D44E5500000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					D11B22C433D44E5500000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A11B22C533D44E5500000002 /* Build configuration list for PBXProject "MedCaseAI" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = tr;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				tr,
+			);
+			mainGroup = A11B22C333D44E5500000001;
+			packageReferences = (
+				C11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				C11B22C233D44E5500000002 /* XCRemoteSwiftPackageReference "elevenlabs-swift-sdk" */,
+				E11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				F11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+			);
+			productRefGroup = A11B22C333D44E5500000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A11B22C433D44E5500000001 /* MedCaseAI */,
+				D11B22C433D44E5500000001 /* DrKynoxWidgets */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A11B22C233D44E5500000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A11B22C033D44E5500000006 /* Assets.xcassets in Resources */,
+				A11B22C033D44E5500000009 /* intro.mp4 in Resources */,
+				F11B22C033D44E5500000004 /* Media/intro_short.mp4 in Resources */,
+				F11B22C033D44E5500000005 /* Media/intro_long.mp4 in Resources */,
+				F11B22C033D44E5500000010 /* Media/Lottie/intro_orb_short.json in Resources */,
+				F11B22C033D44E5500000011 /* Media/Lottie/intro_orb_long.json in Resources */,
+				F11B22C033D44E5500000006 /* Media/Sounds/ui_tap.wav in Resources */,
+				F11B22C033D44E5500000007 /* Media/Sounds/ui_success.wav in Resources */,
+				F11B22C033D44E5500000008 /* Media/Sounds/ui_error.wav in Resources */,
+				F11B22C033D44E5500000009 /* Media/Sounds/ambient_bed.wav in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D11B22C233D44E5500000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A11B22C233D44E5500000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A11B22C033D44E5500000001 /* MedCaseAIApp.swift in Sources */,
+				A11B22C033D44E5500000002 /* AppState.swift in Sources */,
+				B22C33D44E55000002000001 /* State/Auth/AuthViewModel.swift in Sources */,
+				B22C33D44E55000002000002 /* State/Dashboard/DashboardViewModel.swift in Sources */,
+				B22C33D44E55000002000003 /* State/Flashcards/FlashcardViewModel.swift in Sources */,
+				B22C33D44E55000002000004 /* State/Notifications/NotificationManager.swift in Sources */,
+				A11B22C033D44E5500000003 /* APIClient.swift in Sources */,
+				B11B22C033D44E5500000001 /* SupabaseService.swift in Sources */,
+				B11B22C033D44E5500000002 /* AgentConversationViewModel.swift in Sources */,
+				B11B22C033D44E5500000003 /* ColorPalette.swift in Sources */,
+				B11B22C033D44E5500000004 /* Typography.swift in Sources */,
+				F11B22C033D44E5500000002 /* DesignSystem.swift in Sources */,
+				F11B22C033D44E5500000001 /* WeeklyGoalSystem.swift in Sources */,
+				F11B22C033D44E5500000003 /* MotionAudioKit.swift in Sources */,
+				F11B22C033D44E5500000013 /* PushNotificationBridge.swift in Sources */,
+				A11B22C033D44E5500000004 /* ContentView.swift in Sources */,
+				A11B22C033D44E5500000101 /* Features/Auth/AuthFlowView.swift in Sources */,
+				A11B22C033D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift in Sources */,
+				A11B22C033D44E5500000103 /* Features/Dashboard/MainTabView.swift in Sources */,
+				A11B22C033D44E5500000104 /* Features/Analysis/AnalysisHubView.swift in Sources */,
+				C33D44E550000030000000103 /* Features/Generator/GeneratorView.swift in Sources */,
+				C33D44E550000030000000101 /* Features/Dashboard/InAppBroadcastBanner.swift in Sources */,
+				C33D44E550000030000000102 /* Features/Dashboard/DashboardView.swift in Sources */,
+				C33D44E550000030000000104 /* Features/Dashboard/StudyPlanDetailView.swift in Sources */,
+				C33D44E550000030000000105 /* Features/Dashboard/WeeklyGoalDetailView.swift in Sources */,
+				C33D44E550000030000000106 /* Features/Dashboard/ConfettiBurstView.swift in Sources */,
+				C33D44E550000030000000107 /* Features/Analysis/WeakAreaAnalysisView.swift in Sources */,
+				C33D44E550000030000000108 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift in Sources */,
+				C33D44E550000030000000109 /* Features/Analysis/WeakAreaRadarChart.swift in Sources */,
+				A11B22C033D44E5500000105 /* Features/Session/CaseSessionFlow.swift in Sources */,
+				A11B22C033D44E5500000106 /* Features/Results/ResultsViews.swift in Sources */,
+				A11B22C033D44E5500000107 /* Features/Flashcards/FlashcardViews.swift in Sources */,
+				A11B22C033D44E5500000108 /* Features/History/HistoryViews.swift in Sources */,
+				A11B22C033D44E5500000109 /* Features/Profile/ProfileViews.swift in Sources */,
+				A11B22C033D44E5500000110 /* Shared/Components/SharedUIComponents.swift in Sources */,
+				A11B22C033D44E5500000005 /* Models.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D11B22C233D44E5500000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D11B22C033D44E5500000001 /* DrKynoxWidgets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D11B22CA33D44E5500000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D11B22C433D44E5500000001 /* DrKynoxWidgets */;
+			targetProxy = D11B22CB33D44E5500000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A11B22C733D44E5500000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A11B22C733D44E5500000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A11B22C733D44E5500000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D69AG4A34W;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MedCaseAI/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medcaseai.native;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A11B22C733D44E5500000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MedCaseAI/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medcaseai.native;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D11B22C733D44E5500000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = D69AG4A34W;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DrKynoxWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medcaseai.native.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		D11B22C733D44E5500000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DEVELOPMENT_TEAM = D69AG4A34W;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DrKynoxWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medcaseai.native.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A11B22C533D44E5500000001 /* Build configuration list for PBXNativeTarget "MedCaseAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A11B22C733D44E5500000003 /* Debug */,
+				A11B22C733D44E5500000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A11B22C533D44E5500000002 /* Build configuration list for PBXProject "MedCaseAI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A11B22C733D44E5500000001 /* Debug */,
+				A11B22C733D44E5500000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D11B22C533D44E5500000001 /* Build configuration list for PBXNativeTarget "DrKynoxWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D11B22C733D44E5500000001 /* Debug */,
+				D11B22C733D44E5500000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		C11B22C233D44E5500000002 /* XCRemoteSwiftPackageReference "elevenlabs-swift-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/elevenlabs/elevenlabs-swift-sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.16;
+			};
+		};
+		E11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.6.0;
+			};
+		};
+		F11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C11B22C133D44E5500000001 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		C11B22C133D44E5500000002 /* ElevenLabs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C11B22C233D44E5500000002 /* XCRemoteSwiftPackageReference "elevenlabs-swift-sdk" */;
+			productName = ElevenLabs;
+		};
+		E11B22C133D44E5500000001 /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		F11B22C133D44E5500000012 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F11B22C233D44E5500000001 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A11B22C633D44E5500000001 /* Project object */;
+}

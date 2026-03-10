@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rastgele Vaka Üreticisi</title>
+    <link rel="prefetch" href="/voice.html" />
+    <link rel="prefetch" href="/text.html" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main class="mobile-page generator-page">
+      <header class="topbar">
+        <button id="goBackBtn" class="icon-square" type="button" aria-label="Geri dön">
+          <span aria-hidden="true">&larr;</span>
+        </button>
+        <h1 id="generatorPageTitle">Rastgele Vaka Üreticisi</h1>
+      </header>
+
+      <section class="generator-hero">
+        <div class="hero-orb-wrap" aria-hidden="true">
+          <span class="hero-dot dot-a"></span>
+          <span class="hero-dot dot-b"></span>
+          <span class="hero-dot dot-c"></span>
+          <span class="hero-dot dot-d"></span>
+          <div class="hero-orb">
+            <div class="hero-orb-inner">
+              <span class="dice-dot d1"></span>
+              <span class="dice-dot d2"></span>
+              <span class="dice-dot d3"></span>
+              <span class="dice-dot d4"></span>
+              <span class="dice-dot d5"></span>
+            </div>
+          </div>
+        </div>
+        <h2 id="generatorHeroTitle">Yeni Bir Vaka Üret</h2>
+        <p id="generatorHeroText">
+          Tercihlerine göre şekillenen benzersiz bir klinik senaryo al.
+          Farklı zorluklarda sürpriz vakalarla klinik refleksini güçlendir.
+        </p>
+      </section>
+
+      <section class="note-card note-info">
+        <p id="generatorInfoText">Her vaka, gerçek klinik örüntüler temel alınarak benzersiz olarak üretilir.</p>
+      </section>
+
+      <section class="note-card note-warn">
+        <p id="generatorWarnText">Rastgele vakalarda tamamlanma istatistikleri veya topluluk verisi bulunmaz.</p>
+      </section>
+
+      <section class="case-preferences" aria-label="Vaka tercihleri">
+        <h3>Önce Vaka Ayarını Seç</h3>
+        <p class="case-preferences-text">
+          Agent başlamadan önce bölüm ve zorluk seçimini yap. Oturum doğrudan bu ayarlarla başlar.
+        </p>
+
+        <div class="preference-group" id="specialtyPreferenceGroup">
+          <div class="preference-group-head">
+            <h4>Bölüm</h4>
+          </div>
+          <label class="sr-only" for="specialtySelect">Bölüm seçimi</label>
+          <select id="specialtySelect" class="pref-select" aria-label="Bölüm seçimi"></select>
+        </div>
+
+        <div class="preference-group" id="difficultyPreferenceGroup">
+          <div class="preference-group-head">
+            <h4>Zorluk</h4>
+            <span id="selectedDifficultyBadge" class="preference-badge">Random</span>
+          </div>
+          <div id="difficultyOptions" class="pref-chip-grid" role="group" aria-label="Zorluk seçimi">
+            <button type="button" class="pref-chip selected" data-type="difficulty" data-value="Random">
+              Random
+            </button>
+            <button type="button" class="pref-chip" data-type="difficulty" data-value="Kolay">
+              Kolay
+            </button>
+            <button type="button" class="pref-chip" data-type="difficulty" data-value="Orta">
+              Orta
+            </button>
+            <button type="button" class="pref-chip" data-type="difficulty" data-value="Zor">
+              Zor
+            </button>
+          </div>
+        </div>
+
+        <p id="preferenceLockedText" class="preference-locked" hidden>
+          Bugünün meydan okumasında bölüm ve zorluk sabittir.
+        </p>
+      </section>
+
+      <section class="mode-selector" aria-label="Öğrenme modu seç">
+        <h3>Öğrenme Modunu Seç</h3>
+
+        <button type="button" class="mode-card selected" data-mode="voice" id="voiceModeCard">
+          <div class="mode-icon">SES</div>
+          <div class="mode-card-content">
+            <h4>Sesli Mod</h4>
+            <p>Vakayı sesli asistan ile görüşerek ilerlet</p>
+            <span class="recommended-pill">Önerilen</span>
+          </div>
+          <span class="mode-check" aria-hidden="true">SEÇİLİ</span>
+        </button>
+
+        <button type="button" class="mode-card" data-mode="text" id="textModeCard">
+          <div class="mode-icon">YAZ</div>
+          <div class="mode-card-content">
+            <h4>Yazı Modu</h4>
+            <p>Vakayı yazılı yanıtlarla adım adım ilerlet</p>
+          </div>
+        </button>
+      </section>
+
+      <button id="generateCaseBtn" type="button" class="primary-cta">Vakayı Başlat</button>
+    </main>
+
+    <script type="module" src="/auth-guard.js"></script>
+    <script type="module" src="/generator.js"></script>
+  </body>
+</html>

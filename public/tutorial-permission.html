@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tutorial - Mikrofon İzni</title>
+    <link rel="prefetch" href="/index.html" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main class="mobile-page tutorial-page permission-page">
+      <section class="permission-hero">
+        <div class="permission-mic-icon" aria-hidden="true">MİKROFON</div>
+        <h1>Sesli erişimi etkinleştir</h1>
+        <p>
+          Klinik vakaları doğal şekilde pratik etmek için mikrofon erişimine ihtiyacımız var. Ses
+          verilerin güvenli şekilde korunur ve paylaşılmaz.
+        </p>
+      </section>
+
+      <section class="permission-benefit-card">
+        <h3>Özel ve güvenli</h3>
+        <p>Konuşmaların şifrelenir ve güvenli şekilde saklanır.</p>
+      </section>
+
+      <section class="permission-benefit-card">
+        <h3>Sadece öğrenme için</h3>
+        <p>Ses verisi yalnızca klinik pratik deneyimini iyileştirmek için işlenir.</p>
+      </section>
+
+      <section class="permission-benefit-card">
+        <h3>Kontrol sende</h3>
+        <p>İzin ayarlarını istediğin zaman cihaz ayarlarından değiştirebilirsin.</p>
+      </section>
+
+      <section class="tutorial-note-card info permission-info-box">
+        Ses kullanmak istemezsen yalnızca yazı modu ile de devam edebilirsin.
+      </section>
+
+      <p id="permissionStatus" class="auth-status" hidden></p>
+
+      <button id="allowMicBtn" type="button" class="primary-cta onboarding-cta">
+        Mikrofon erişimine izin ver
+      </button>
+      <button id="skipMicBtn" type="button" class="auth-link-btn permission-skip-btn">
+        Şimdilik geç
+      </button>
+    </main>
+
+    <script type="module" src="/onboarding-guard.js"></script>
+    <script type="module" src="/tutorial-permission.js"></script>
+  </body>
+</html>

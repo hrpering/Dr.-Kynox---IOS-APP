@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding - Seviye</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main class="mobile-page onboarding-page">
+      <header class="onboarding-head">
+        <button id="levelBackBtn" class="icon-square" type="button" aria-label="Geri dön">
+          <span aria-hidden="true">&larr;</span>
+        </button>
+      </header>
+
+      <div class="onboarding-progress">
+        <span style="width: 100%"></span>
+      </div>
+      <p class="onboarding-step-text">Adım 4 / 4</p>
+
+      <section class="onboarding-title-block">
+        <h1>Öğrenme seviyeni seç</h1>
+        <p>Vaka zorluğu ve yönlendirme seviyesi bu seçime göre ayarlanacak.</p>
+      </section>
+
+      <section id="levelCards" class="level-card-list"></section>
+
+      <div class="onboarding-info-box info-blue">
+        Seviyeni dilediğin zaman profil sayfasından güncelleyebilirsin.
+      </div>
+
+      <p id="levelStatus" class="auth-status" hidden></p>
+
+      <button id="levelContinueBtn" type="button" class="primary-cta onboarding-cta">Devam et →</button>
+    </main>
+
+    <script type="module" src="/onboarding-guard.js"></script>
+    <script type="module" src="/onboarding-level.js"></script>
+  </body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedCase - Ana Sayfa</title>
+    <link rel="prefetch" href="/generator.html" />
+    <link rel="prefetch" href="/case-history.html" />
+    <link rel="prefetch" href="/profile.html" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main id="dashboardMain" class="mobile-page dashboard-page is-loading" aria-busy="true">
+      <header class="dashboard-top">
+        <div>
+          <p id="dashboardGreeting" class="dashboard-greet">Merhaba,</p>
+          <h1 id="dashboardName" data-dynamic></h1>
+        </div>
+      </header>
+
+      <section class="dashboard-search-wrap">
+        <input id="dashboardSearchInput" type="search" placeholder="Vaka veya konu ara..." />
+      </section>
+
+      <section class="streak-card" id="streakCard">
+        <div class="streak-main">
+          <div class="streak-icon" aria-hidden="true">SERİ</div>
+          <div>
+            <h2 id="streakTitle" data-dynamic></h2>
+            <p id="streakText" data-dynamic></p>
+          </div>
+        </div>
+        <div id="streakBar" class="streak-bar"></div>
+      </section>
+
+      <section class="random-generator-card">
+        <h2>Rastgele Vaka Üreticisi</h2>
+        <p>Sürpriz bir vaka ile kendini test et.</p>
+        <button id="openGeneratorBtn" type="button" class="random-generator-btn">Rastgele Vaka Oluştur</button>
+      </section>
+
+      <section class="challenge-card">
+        <div class="challenge-head">
+          <h3>Bugünün Vaka Meydan Okuması</h3>
+          <span id="challengeTimeLeft" data-dynamic>Hesaplanıyor...</span>
+        </div>
+        <div class="challenge-tags">
+          <span id="challengeSpecialtyTag" data-dynamic></span>
+          <span id="challengeDifficultyTag" data-dynamic></span>
+        </div>
+        <p id="challengeText" data-dynamic></p>
+        <div class="challenge-meta">
+          <span id="challengeDuration" data-dynamic>15 dk</span>
+          <span id="challengeBonus" data-dynamic>+50 puan</span>
+          <span id="challengeParticipants" data-dynamic>0 kişi tamamladı</span>
+          <span id="challengeAverage" data-dynamic>Ortalama: -</span>
+        </div>
+        <button id="startChallengeBtn" type="button" class="challenge-start-btn">Vakayı Başlat</button>
+      </section>
+
+      <section class="dashboard-section-head">
+        <h3>İlerlemen</h3>
+        <button id="openHistoryBtn" type="button">Tümünü Gör</button>
+      </section>
+
+      <section class="progress-grid">
+        <article class="progress-card">
+          <h4 id="casesCompletedValue" data-dynamic></h4>
+          <p>Tamamlanan Vaka</p>
+          <small id="casesCompletedSub" data-dynamic></small>
+        </article>
+        <article class="progress-card">
+          <h4 id="accuracyValue" data-dynamic></h4>
+          <p>Ortalama Başarı</p>
+          <small id="accuracySub" data-dynamic></small>
+        </article>
+      </section>
+
+      <section class="dashboard-section-head">
+        <h3>Öğrenmeye Devam Et</h3>
+        <button id="openHistoryBtn2" type="button">Tümünü Gör</button>
+      </section>
+
+      <section id="continueLearningList" class="continue-list" data-dynamic></section>
+
+      <nav class="dashboard-bottom-nav" aria-label="Alt menü">
+        <button class="active" type="button">Anasayfa</button>
+        <button id="casesNavBtn" type="button">Vakalar</button>
+        <button id="newCaseNavBtn" type="button" class="fab">+</button>
+        <button id="statsNavBtn" type="button">İstatistik</button>
+        <button id="profileNavBtn" type="button">Profil</button>
+      </nav>
+    </main>
+
+    <script>
+      (function () {
+        try {
+          const raw = localStorage.getItem("dashboard_snapshot_v1");
+          if (!raw) return;
+          const snap = JSON.parse(raw);
+          if (!snap || typeof snap !== "object") return;
+
+          const setText = function (id, value) {
+            if (!value) return;
+            var el = document.getElementById(id);
+            if (el) el.textContent = value;
+          };
+
+          setText("dashboardName", snap.name);
+          setText("streakTitle", snap.streakTitle);
+          setText("streakText", snap.streakText);
+          setText("challengeSpecialtyTag", snap.challengeSpecialty);
+          setText("challengeDifficultyTag", snap.challengeDifficulty);
+          setText("challengeText", snap.challengeText);
+          setText("challengeTimeLeft", snap.challengeTimeLeft);
+          setText("challengeDuration", snap.challengeDuration);
+          setText("challengeBonus", snap.challengeBonus);
+          setText("challengeParticipants", snap.challengeParticipants);
+          setText("challengeAverage", snap.challengeAverage);
+          setText("casesCompletedValue", snap.casesCompletedValue);
+          setText("casesCompletedSub", snap.casesCompletedSub);
+          setText("accuracyValue", snap.accuracyValue);
+          setText("accuracySub", snap.accuracySub);
+
+          var main = document.getElementById("dashboardMain");
+          if (main) {
+            main.classList.remove("is-loading");
+            main.setAttribute("aria-busy", "false");
+          }
+        } catch (e) {
+          // no-op
+        }
+      })();
+    </script>
+    <script type="module" src="/auth-guard.js"></script>
+    <script type="module" src="/dashboard.js"></script>
+  </body>
+</html>

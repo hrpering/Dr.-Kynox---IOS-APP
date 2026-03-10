@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-shell">
+    <main class="mobile-page profile-page">
+      <header class="topbar results-topbar">
+        <button id="profileBackBtn" class="icon-square" type="button" aria-label="Geri dön">
+          <span aria-hidden="true">&larr;</span>
+        </button>
+        <h1>Profil</h1>
+      </header>
+
+      <section class="profile-main-card">
+        <div class="profile-avatar">PR</div>
+        <h2 id="profileName">-</h2>
+        <p id="profileEmail">-</p>
+        <p id="profilePhone">-</p>
+
+        <div class="profile-tag-grid">
+          <span id="profileRoleTag" class="profile-tag">Rol: -</span>
+          <span id="profileLevelTag" class="profile-tag">Seviye: -</span>
+        </div>
+      </section>
+
+      <section class="profile-panel">
+        <h3>İlgi Alanları</h3>
+        <div id="profileInterests" class="profile-chip-list"></div>
+      </section>
+
+      <section class="profile-actions">
+        <button id="profileHistoryBtn" type="button" class="auth-outline-btn">Vaka geçmişini gör</button>
+        <button id="profileLogoutBtn" type="button" class="primary-cta">Çıkış yap</button>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        try {
+          var raw = localStorage.getItem("profile_cache_v1");
+          if (!raw) return;
+          var profile = JSON.parse(raw);
+          if (!profile || typeof profile !== "object") return;
+          var nameEl = document.getElementById("profileName");
+          var emailEl = document.getElementById("profileEmail");
+          var phoneEl = document.getElementById("profilePhone");
+          if (nameEl && profile.full_name) nameEl.textContent = profile.full_name;
+          if (emailEl && profile.email) emailEl.textContent = profile.email;
+          if (phoneEl && profile.phone_number) phoneEl.textContent = profile.phone_number;
+        } catch (e) {
+          // no-op
+        }
+      })();
+    </script>
+    <script type="module" src="/auth-guard.js"></script>
+    <script type="module" src="/profile.js"></script>
+  </body>
+</html>
