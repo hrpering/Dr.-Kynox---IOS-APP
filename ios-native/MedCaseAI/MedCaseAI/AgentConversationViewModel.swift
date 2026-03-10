@@ -100,6 +100,7 @@ final class AgentConversationViewModel: ObservableObject {
 
     private let voiceSessionTranscriptCharacterLimit = 7000
     private let sessionHeartbeatIntervalSec: UInt64 = 8
+    private let nearTextDuplicateWindowSeconds: TimeInterval = 2.5
 
     private let voiceAgentId = "agent_3701kj62fctpe75v3a0tca39fy26"
     private let textAgentId = "agent_3701kj62fctpe75v3a0tca39fy26"
@@ -155,7 +156,7 @@ final class AgentConversationViewModel: ObservableObject {
         }
 #endif
         cancellables.removeAll()
-        stopVoiceSessionHeartbeat()
+        stopSessionHeartbeat()
         isFinalized = false
         endRequestedByUser = false
         connectedAt = nil
@@ -243,14 +244,14 @@ final class AgentConversationViewModel: ObservableObject {
             setupObservers(runId: runId, conversation: startedConversation)
             connectionState = .connecting
             statusLine = "Bağlantı doğrulanıyor..."
-            startVoiceSessionHeartbeatIfNeeded()
+            startSessionHeartbeatIfNeeded()
             print("[connect] attempt=\(attempt) startConversation returned")
         } catch {
             isConversationActive = false
             connectionState = .failed
             statusLine = "Bağlantı başarısız"
             errorText = "Bağlantı kurulamadı: \(error.localizedDescription)"
-            stopVoiceSessionHeartbeat()
+            stopSessionHeartbeat()
             await releaseElevenSessionLock()
             print("[connect] attempt=\(attempt) failed error=\(String(reflecting: error))")
         }
@@ -426,6 +427,15 @@ final class AgentConversationViewModel: ObservableObject {
                 guard self.activeConnectionRunId == runId else { return }
                 switch state {
                 case .idle:
+                    // Text modda SDK yanitlar arasi `idle` durumuna dusebilir; bu kopus degildir.
+                    if self.activeMode == .text,
+                       self.connectionState == .connecting || self.connectionState == .connected {
+                        print("[connect-state] idle(text) keep-connected runId=\(runId.uuidString) prev=\(self.connectionState)")
+                        self.isConversationActive = true
+                        self.connectionState = .connected
+                        self.statusLine = "Hazır"
+                        break
+                    }
                     self.isConversationActive = false
                     if self.connectionState != .ending {
                         self.connectionState = .idle
@@ -450,7 +460,7 @@ final class AgentConversationViewModel: ObservableObject {
                             print("[audio] active-state prepare failed error=\(String(reflecting: error))")
                         }
                     }
-                    self.startVoiceSessionHeartbeatIfNeeded()
+                    self.startSessionHeartbeatIfNeeded()
                     Task { [weak self] in
                         await self?.touchSessionLockIfPossible(reason: "state_active")
                     }
@@ -465,7 +475,7 @@ final class AgentConversationViewModel: ObservableObject {
                     self.statusLine = self.statusTextForEnd(reason)
                     let shouldFinalize = self.endRequestedByUser
                     self.connectionState = .ended
-                    self.stopVoiceSessionHeartbeat()
+                    self.stopSessionHeartbeat()
                     if shouldFinalize {
                         Task {
                             await self.flushConversationMessages()
@@ -485,7 +495,7 @@ final class AgentConversationViewModel: ObservableObject {
                     self.connectionState = .failed
                     self.statusLine = "Bağlantı hatası"
                     self.errorText = "Bağlantı hatası: \(error.localizedDescription)"
-                    self.stopVoiceSessionHeartbeat()
+                    self.stopSessionHeartbeat()
                     Task {
                         await self.releaseElevenSessionLock()
                         self.deactivateVoiceAudioSessionIfNeeded()
@@ -602,13 +612,8 @@ final class AgentConversationViewModel: ObservableObject {
         guard !isStoppingUnexpectedly else { return }
         isStoppingUnexpectedly = true
         defer { isStoppingUnexpectedly = false }
-        if let conversation {
-            let stateDesc = String(describing: conversation.state).lowercased()
-            if stateDesc.contains("active") || stateDesc.contains("connecting") {
-                markLocalEnd(source: "stop_after_unexpected_end")
-                await conversation.endConversation()
-            }
-        }
+        // `ended`/`error` callback pathinda SDK zaten kapanis durumuna gecmis olabilir.
+        // Ayni conversation icin tekrar `endConversation()` cagirmayi onlemek daha guvenlidir.
         conversation = nil
 #endif
         cancellables.removeAll()
@@ -682,7 +687,7 @@ final class AgentConversationViewModel: ObservableObject {
     private func releaseElevenSessionLock() async -> Bool {
         guard !elevenSessionReleased else { return true }
         guard let appState, let agentId = connectedAgentId else { return false }
-        stopVoiceSessionHeartbeat()
+        stopSessionHeartbeat()
         let released = await appState.endElevenLabsSession(
             agentId: agentId,
             sessionWindowToken: sessionWindowToken
@@ -696,10 +701,15 @@ final class AgentConversationViewModel: ObservableObject {
         return released
     }
 
-    private func startVoiceSessionHeartbeatIfNeeded() {
+    // Session window lock'i hem voice hem text modunda canli tutar.
+    // Text oturumlarda SDK'nin `active` durumuna gecisi gecikirse `connecting` asamasinda da touch atmaya devam eder.
+    private func startSessionHeartbeatIfNeeded() {
         guard heartbeatTask == nil else { return }
         guard connectedAgentId != nil else { return }
         let intervalNs = sessionHeartbeatIntervalSec * 1_000_000_000
+        Task { [weak self] in
+            await self?.touchSessionLockIfPossible(reason: "heartbeat_start")
+        }
         heartbeatTask = Task { [weak self] in
             while !Task.isCancelled {
                 do {
@@ -709,8 +719,9 @@ final class AgentConversationViewModel: ObservableObject {
                 }
                 guard !Task.isCancelled else { break }
                 guard let self else { break }
-                guard self.connectionState == .connected else { continue }
-                await self.touchSessionLockIfPossible(reason: "heartbeat")
+                guard self.connectionState == .connected || self.connectionState == .connecting else { continue }
+                let reason = self.connectionState == .connecting ? "heartbeat_connecting" : "heartbeat"
+                await self.touchSessionLockIfPossible(reason: reason)
             }
         }
     }
@@ -729,7 +740,7 @@ final class AgentConversationViewModel: ObservableObject {
         print("[session-lock] touch reason=\(reason) agentId=\(agentId)")
     }
 
-    private func stopVoiceSessionHeartbeat() {
+    private func stopSessionHeartbeat() {
         heartbeatTask?.cancel()
         heartbeatTask = nil
     }
@@ -1046,8 +1057,9 @@ final class AgentConversationViewModel: ObservableObject {
         guard !sessionLimitReached else { return }
         guard voiceUserTranscriptCharacterCount >= voiceSessionTranscriptCharacterLimit else { return }
         sessionLimitReached = true
-        errorText = "Session transcript limit reached."
-        statusLine = "Session transcript limit reached."
+        let message = "Oturum transkript limiti doldu."
+        errorText = message
+        statusLine = message
         Task { [weak self] in
             await self?.end()
         }
@@ -1072,7 +1084,7 @@ final class AgentConversationViewModel: ObservableObject {
             seenById.insert(item.id)
 
             let fingerprint = "\(item.source)|\(normalize(item.text))"
-            if let last = seenNearText[fingerprint], abs(item.timestamp.timeIntervalSince(last)) < 0.9 {
+            if let last = seenNearText[fingerprint], abs(item.timestamp.timeIntervalSince(last)) < nearTextDuplicateWindowSeconds {
                 continue
             }
             seenNearText[fingerprint] = item.timestamp
@@ -1099,7 +1111,7 @@ final class AgentConversationViewModel: ObservableObject {
 
     func cleanup() {
         activeConnectionRunId = UUID()
-        stopVoiceSessionHeartbeat()
+        stopSessionHeartbeat()
         removeVoiceAudioObservers()
         deactivateVoiceAudioSessionIfNeeded()
         stopNetworkMonitor()

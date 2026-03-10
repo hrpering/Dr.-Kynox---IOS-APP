@@ -26,6 +26,7 @@ struct CaseSessionView: View {
     @State private var hasRequestedInitialMic = false
     @State private var isTextFallbackMode = false
     @State private var isKeyboardVisible = false
+    @State private var showEndSessionConfirmation = false
     @FocusState private var isComposerFocused: Bool
 
     init(config: CaseLaunchConfig) {
@@ -58,8 +59,7 @@ struct CaseSessionView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Kapat") {
                         if hasStarted {
-                            markUserRequestedEnd()
-                            Task { await finalizeCase() }
+                            requestEndSessionConfirmation()
                         } else {
                             vm.cleanup()
                             dismiss()
@@ -84,9 +84,7 @@ struct CaseSessionView: View {
 
                     if hasStarted {
                         Button("Bitir") {
-                            isComposerFocused = false
-                            markUserRequestedEnd()
-                            Task { await finalizeCase() }
+                            requestEndSessionConfirmation()
                         }
                         .foregroundStyle(AppColor.error)
                         .accessibilityLabel("Vakayı Bitir")
@@ -156,6 +154,18 @@ struct CaseSessionView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
                 isKeyboardVisible = false
+            }
+            .confirmationDialog(
+                "Vakayı bitir?",
+                isPresented: $showEndSessionConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Vakayı bitir", role: .destructive) {
+                    confirmEndSession()
+                }
+                Button("Devam et", role: .cancel) { }
+            } message: {
+                Text("Bu işlem görüşmeyi sonlandırır ve sonuç ekranına geçer.")
             }
         }
     }
@@ -242,6 +252,7 @@ struct CaseSessionView: View {
                     if !vm.errorText.isEmpty {
                         ErrorStateCard(message: vm.errorText) {
                             if vm.connectionState == .ended || vm.connectionState == .failed {
+                                resetSessionForRetry()
                                 triggerStartSession()
                             } else {
                                 vm.errorText = ""
@@ -441,9 +452,7 @@ struct CaseSessionView: View {
 
                 if !(config.mode == .text || isTextFallbackMode) || !isKeyboardVisible {
                     Button {
-                        isComposerFocused = false
-                        markUserRequestedEnd()
-                        Task { await finalizeCase() }
+                        requestEndSessionConfirmation()
                     } label: {
                         Text("Vaka Sonlandır")
                             .font(AppFont.bodyMedium)
@@ -534,8 +543,7 @@ struct CaseSessionView: View {
                 .accessibilityHint("Sesli konuşmayı başlatır veya durdurur")
 
                 Button {
-                    markUserRequestedEnd()
-                    Task { await finalizeCase() }
+                    requestEndSessionConfirmation()
                 } label: {
                     Image(systemName: "stop.fill")
                         .font(.system(size: 18, weight: .semibold))
@@ -821,6 +829,32 @@ struct CaseSessionView: View {
     private func markUserRequestedEnd() {
         userRequestedEnd = true
         vm.markUserRequestedEnd()
+    }
+
+    private func resetSessionForRetry() {
+        isComposerFocused = false
+        showEndSessionConfirmation = false
+        startSessionTask?.cancel()
+        startSessionTask = nil
+        isStartingSession = false
+        userRequestedEnd = false
+        wasSessionEnded = false
+        hasStarted = false
+        finishedTranscript = []
+        vm.cleanup()
+    }
+
+    private func requestEndSessionConfirmation() {
+        guard hasStarted else { return }
+        guard !vm.isEnding, !wasSessionEnded else { return }
+        showEndSessionConfirmation = true
+    }
+
+    private func confirmEndSession() {
+        guard !vm.isEnding, !wasSessionEnded else { return }
+        isComposerFocused = false
+        markUserRequestedEnd()
+        Task { await finalizeCase() }
     }
 
     private var hasMeaningfulTranscript: Bool {

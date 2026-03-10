@@ -19,6 +19,7 @@ final class AuthViewModel: ObservableObject {
 
     private let supabase: SupabaseService
     private let defaults: UserDefaults
+    private var busyOperationCount: Int = 0
 
     private static let sessionHintKey = "drkynox.session_hint"
 
@@ -55,8 +56,8 @@ final class AuthViewModel: ObservableObject {
     }
 
     func signIn(email: String, password: String) async throws -> RouteHint {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
 
         let token = try await supabase.signIn(email: email, password: password)
         accessToken = token
@@ -67,8 +68,8 @@ final class AuthViewModel: ObservableObject {
     }
 
     func signUp(email: String, password: String) async throws -> SignUpOutcome {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
 
         let signUpResult = try await supabase.signUp(email: email, password: password)
         switch signUpResult {
@@ -89,8 +90,8 @@ final class AuthViewModel: ObservableObject {
     }
 
     func verifyEmailOTP(email: String, code: String) async throws {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
 
         let token = try await supabase.verifyEmailOTP(email: email, code: code)
         accessToken = token
@@ -102,26 +103,26 @@ final class AuthViewModel: ObservableObject {
     }
 
     func completeOnboarding(payload: OnboardingPayload) async throws {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
         profile = try await supabase.submitOnboarding(payload)
     }
 
     func sendPasswordReset(email: String) async throws {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
         try await supabase.sendPasswordReset(email: email)
     }
 
     func verifyPasswordResetOTP(email: String, code: String) async throws {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
         try await supabase.verifyPasswordResetOTP(email: email, code: code)
     }
 
     func completePasswordReset(newPassword: String) async throws {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
         try await supabase.updatePasswordAfterRecovery(newPassword)
         await supabase.signOut()
         clearSession()
@@ -159,5 +160,15 @@ final class AuthViewModel: ObservableObject {
 
     private func setSessionHint(_ hasSession: Bool) {
         defaults.set(hasSession, forKey: Self.sessionHintKey)
+    }
+
+    private func beginBusyOperation() {
+        busyOperationCount += 1
+        isBusy = busyOperationCount > 0
+    }
+
+    private func endBusyOperation() {
+        busyOperationCount = max(0, busyOperationCount - 1)
+        isBusy = busyOperationCount > 0
     }
 }

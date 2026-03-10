@@ -390,42 +390,6 @@ final class AppState: ObservableObject {
         }
     }
 
-    func startTextAgentSession(difficulty: String,
-                               specialty: String,
-                               dynamicVariables: [String: String]) async throws -> TextAgentStartResponse {
-        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
-            throw AppError.sessionMissing
-        }
-
-        authViewModel.updateSessionToken(token)
-        return try await api.startTextAgentSession(
-            accessToken: token,
-            difficulty: difficulty,
-            specialty: specialty,
-            dynamicVariables: dynamicVariables
-        )
-    }
-
-    func sendTextAgentMessage(difficulty: String,
-                              specialty: String,
-                              conversation: [ConversationLine],
-                              userMessage: String,
-                              dynamicVariables: [String: String]) async throws -> TextAgentReplyResponse {
-        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
-            throw AppError.sessionMissing
-        }
-
-        authViewModel.updateSessionToken(token)
-        return try await api.sendTextAgentMessage(
-            accessToken: token,
-            difficulty: difficulty,
-            specialty: specialty,
-            conversation: conversation,
-            userMessage: userMessage,
-            dynamicVariables: dynamicVariables
-        )
-    }
-
     func scoreConversation(mode: String,
                            transcript: [ConversationLine],
                            wrapup: String) async throws -> ScoreResponse {

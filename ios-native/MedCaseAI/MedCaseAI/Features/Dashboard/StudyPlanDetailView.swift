@@ -26,7 +26,7 @@ struct StudyPlanDetailView: View {
             .padding(.bottom, AppSpacing.x1)
         }
         .background(AppColor.background.ignoresSafeArea())
-        .navigationTitle("Study Plan")
+        .navigationTitle("Çalışma Planı")
         .navigationBarTitleDisplayMode(.inline)
         .refreshable {
             await refreshLoopState()
@@ -262,4 +262,3 @@ struct StudyPlanDetailView: View {
         }
     }
 }
-

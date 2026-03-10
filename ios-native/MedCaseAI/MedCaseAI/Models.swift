@@ -561,17 +561,6 @@ struct ElevenLabsSessionAuthResponse: Decodable {
     }
 }
 
-struct TextAgentStartResponse: Decodable {
-    let ok: Bool?
-    let openingMessage: String?
-}
-
-struct TextAgentReplyResponse: Decodable {
-    let ok: Bool?
-    let reply: String?
-    let shouldEnd: Bool?
-}
-
 struct ConversationLine: Codable {
     let source: String
     let message: String

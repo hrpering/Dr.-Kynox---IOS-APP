@@ -252,6 +252,40 @@ enum WeeklyGoalCalculator {
         summary.solvedDayKeysThisWeek.contains(dayKey(for: now))
     }
 
+    static func currentStreakDays(from history: [CaseSession], now: Date = Date()) -> Int {
+        let solvedDayKeys = Set(
+            history
+                .filter { isCompletedSession($0) }
+                .compactMap { sessionDate($0) }
+                .map { dayKey(for: $0) }
+        )
+        guard !solvedDayKeys.isEmpty else { return 0 }
+
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: now)
+        guard let yesterday = calendar.date(byAdding: .day, value: -1, to: today) else { return 0 }
+
+        let startDay: Date
+        if solvedDayKeys.contains(dayKey(for: today)) {
+            startDay = today
+        } else if solvedDayKeys.contains(dayKey(for: yesterday)) {
+            startDay = yesterday
+        } else {
+            return 0
+        }
+
+        var streak = 0
+        var cursor = startDay
+
+        while solvedDayKeys.contains(dayKey(for: cursor)) {
+            streak += 1
+            guard let previousDay = calendar.date(byAdding: .day, value: -1, to: cursor) else { break }
+            cursor = previousDay
+        }
+
+        return streak
+    }
+
     static func dayKey(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = trLocale

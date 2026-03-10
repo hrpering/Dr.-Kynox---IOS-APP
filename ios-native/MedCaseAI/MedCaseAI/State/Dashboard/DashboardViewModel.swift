@@ -33,6 +33,7 @@ final class DashboardViewModel: ObservableObject {
 
     private var lastInAppFetchAt: Date?
     private var seenBannerIds = Set<String>()
+    private var busyOperationCount: Int = 0
 
     private static let weakAreaAppliedSignatureKey = "drkynox.weekly_goal.ai_applied_signature"
     private static let studyPlanAppliedSignatureKey = "drkynox.study_plan.applied_signature"
@@ -53,11 +54,11 @@ final class DashboardViewModel: ObservableObject {
 
     func refreshDashboard(showBusy: Bool = true, routeIsHome: Bool = true) async throws -> RefreshResult {
         if showBusy {
-            isBusy = true
+            beginBusyOperation()
         }
         defer {
             if showBusy {
-                isBusy = false
+                endBusyOperation()
             }
         }
 
@@ -90,12 +91,13 @@ final class DashboardViewModel: ObservableObject {
         weeklyGoalSummary = .empty
         lastInAppFetchAt = nil
         seenBannerIds.removeAll()
+        busyOperationCount = 0
         isBusy = false
     }
 
     func deleteMyData() async throws -> DeleteDataResult {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
 
         guard let token = try await supabase.currentAccessToken(), !token.isEmpty else {
             throw AppError.sessionMissing
@@ -124,8 +126,8 @@ final class DashboardViewModel: ObservableObject {
     func submitContentReport(caseSession: CaseSession?,
                              category: String,
                              details: String) async throws -> String {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
 
         guard let token = try await supabase.currentAccessToken(), !token.isEmpty else {
             throw AppError.sessionMissing
@@ -145,8 +147,8 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func submitUserFeedback(topic: String, message: String) async throws -> String {
-        isBusy = true
-        defer { isBusy = false }
+        beginBusyOperation()
+        defer { endBusyOperation() }
 
         guard let token = try await supabase.currentAccessToken(), !token.isEmpty else {
             throw AppError.sessionMissing
@@ -266,6 +268,16 @@ final class DashboardViewModel: ObservableObject {
         Task {
             await WeeklyGoalNotificationManager.shared.configureNotifications(summary: weeklyGoalSummary)
         }
+    }
+
+    private func beginBusyOperation() {
+        busyOperationCount += 1
+        isBusy = busyOperationCount > 0
+    }
+
+    private func endBusyOperation() {
+        busyOperationCount = max(0, busyOperationCount - 1)
+        isBusy = busyOperationCount > 0
     }
 
     private func refreshWeakAreaState(cases: [CaseSession], token: String?) async {

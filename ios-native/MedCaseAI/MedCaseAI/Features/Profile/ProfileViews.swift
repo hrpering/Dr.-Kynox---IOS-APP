@@ -18,7 +18,7 @@ struct ProfileView: View {
                     HStack(spacing: 10) {
                         miniStat(title: "Vaka", value: "\(state.caseHistory.count)")
                         miniStat(title: "Skor", value: averageScore)
-                        miniStat(title: "Seri", value: "\(min(state.caseHistory.count, 30))")
+                        miniStat(title: "Seri", value: "\(streakDays)")
                     }
 
                     sectionTitle("Çalışma")
@@ -256,6 +256,10 @@ struct ProfileView: View {
         guard !values.isEmpty else { return "--" }
         let avg = values.reduce(0, +) / Double(values.count)
         return String(format: "%.0f", avg)
+    }
+
+    private var streakDays: Int {
+        WeeklyGoalCalculator.currentStreakDays(from: state.caseHistory)
     }
 
     private var initials: String {
@@ -614,7 +618,7 @@ struct ProfilePerformanceView: View {
                     profileStat(title: "Toplam Vaka", value: "\(state.caseHistory.count)")
                     profileStat(title: "Ortalama Skor", value: averageScore)
                     profileStat(title: "En İyi Bölüm", value: bestSpecialty)
-                    profileStat(title: "Günlük Seri", value: "\(min(state.caseHistory.count, 30))")
+                    profileStat(title: "Günlük Seri", value: "\(streakDays)")
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -639,7 +643,7 @@ struct ProfilePerformanceView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 10) {
                             BadgePill(title: "İlk Vaka", icon: "sparkles", unlocked: state.caseHistory.count >= 1, accent: AppColor.primary)
-                            BadgePill(title: "7 Gün Serisi", icon: "flame.fill", unlocked: state.caseHistory.count >= 7, accent: AppColor.warning)
+                            BadgePill(title: "7 Gün Serisi", icon: "flame.fill", unlocked: streakDays >= 7, accent: AppColor.warning)
                             BadgePill(title: "Mükemmel Skor", icon: "rosette", unlocked: hasExcellentScore, accent: AppColor.success)
                             BadgePill(title: "Disiplinli Hekim", icon: "medal.fill", unlocked: state.weeklyGoalSummary.disciplineBadgeUnlocked, accent: AppColor.primaryDark)
                         }
@@ -717,6 +721,10 @@ struct ProfilePerformanceView: View {
         state.caseHistory.contains { ($0.score?.overallScore ?? 0) >= 90 }
     }
 
+    private var streakDays: Int {
+        WeeklyGoalCalculator.currentStreakDays(from: state.caseHistory)
+    }
+
     private var scoredCaseCount: Int {
         state.caseHistory.filter { $0.score != nil }.count
     }
@@ -724,6 +732,9 @@ struct ProfilePerformanceView: View {
     private func metricCount(for title: String) -> Int {
         if title == "Ortalama Skor" {
             return scoredCaseCount
+        }
+        if title == "Günlük Seri" {
+            return streakDays
         }
         return state.caseHistory.count
     }
@@ -751,6 +762,7 @@ struct ProfilePerformanceView: View {
         let target = max(1, goalTarget(for: title))
         return min(1, Double(metricCount(for: title)) / Double(target))
     }
+
 }
 
 struct ProfileSupportView: View {
@@ -1328,4 +1340,3 @@ struct ContentReportSheet: View {
         }
     }
 }
-

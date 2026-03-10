@@ -157,64 +157,6 @@ final class APIClient {
         )
     }
 
-    func startTextAgentSession(accessToken: String,
-                               difficulty: String,
-                               specialty: String,
-                               dynamicVariables: [String: String]) async throws -> TextAgentStartResponse {
-        let url = try buildURL(path: "/api/text-agent/start")
-        struct Payload: Encodable {
-            let difficulty: String
-            let specialty: String
-            let dynamicVariables: [String: String]
-        }
-
-        return try await request(
-            url: url,
-            method: "POST",
-            headers: [
-                "Authorization": "Bearer \(accessToken)",
-                "Content-Type": "application/json"
-            ],
-            body: Payload(
-                difficulty: difficulty,
-                specialty: specialty,
-                dynamicVariables: dynamicVariables
-            )
-        )
-    }
-
-    func sendTextAgentMessage(accessToken: String,
-                              difficulty: String,
-                              specialty: String,
-                              conversation: [ConversationLine],
-                              userMessage: String,
-                              dynamicVariables: [String: String]) async throws -> TextAgentReplyResponse {
-        let url = try buildURL(path: "/api/text-agent/reply")
-        struct Payload: Encodable {
-            let difficulty: String
-            let specialty: String
-            let conversation: [ConversationLine]
-            let userMessage: String
-            let dynamicVariables: [String: String]
-        }
-
-        return try await request(
-            url: url,
-            method: "POST",
-            headers: [
-                "Authorization": "Bearer \(accessToken)",
-                "Content-Type": "application/json"
-            ],
-            body: Payload(
-                difficulty: difficulty,
-                specialty: specialty,
-                conversation: conversation,
-                userMessage: userMessage,
-                dynamicVariables: dynamicVariables
-            )
-        )
-    }
-
     func ensureDailyChallengeGenerated() async throws {
         let url = try buildURL(path: "/api/challenge/today")
         let _: BasicResponse = try await request(url: url, method: "GET")
