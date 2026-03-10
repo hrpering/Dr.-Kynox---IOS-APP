@@ -53,9 +53,24 @@ struct HistoryView: View {
             .refreshable {
                 await state.refreshDashboard()
             }
-            .fullScreenCover(item: $selectedSession) { item in
-                HistorySessionDetailView(item: item)
-                    .environmentObject(state)
+            .navigationDestination(
+                isPresented: Binding(
+                    get: { selectedSession != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            selectedSession = nil
+                        }
+                    }
+                )
+            ) {
+                Group {
+                    if let item = selectedSession {
+                        HistorySessionDetailView(item: item)
+                            .environmentObject(state)
+                    } else {
+                        EmptyView()
+                    }
+                }
             }
         }
     }
@@ -68,67 +83,65 @@ struct HistorySessionDetailView: View {
     let item: CaseSession
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if let score = item.score {
-                    ResultsView(
-                        result: score,
-                        config: historyConfig,
-                        transcript: item.transcript ?? [],
-                        sessionId: item.sessionId,
-                        onClose: {
-                            state.selectedMainTab = "home"
-                            dismiss()
-                        },
-                        onRetry: {
-                            state.generatorReplayContext = GeneratorReplayContext(
-                                specialty: historyConfig.specialty,
-                                difficulty: historyConfig.difficulty
-                            )
-                            state.selectedMainTab = "generator"
-                            dismiss()
-                        }
-                    )
-                } else if item.status == "pending" || item.status == "pending_score" {
-                    VStack(spacing: 14) {
-                        ProgressView()
-                            .controlSize(.large)
-                        Text("Skor ve geri bildirim hazırlanıyor...")
-                            .font(AppFont.body)
-                            .foregroundStyle(AppColor.textSecondary)
-                        Button("Yenile") {
-                            Task { await state.refreshDashboard(showBusy: false) }
-                        }
-                        .appSecondaryButton()
-                    }
-                    .padding(24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(AppColor.background.ignoresSafeArea())
-                } else {
-                    VStack(spacing: 12) {
-                        Text("Bu oturum için skor henüz yok.")
-                            .font(AppFont.body)
-                            .foregroundStyle(AppColor.textSecondary)
-                            .lineSpacing(4)
-                        Button("Kapat") {
-                            dismiss()
-                        }
-                        .appPrimaryButton()
-                    }
-                    .padding(24)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(AppColor.background.ignoresSafeArea())
-                }
-            }
-            .navigationTitle("Vaka Detayı")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Kapat") {
+        Group {
+            if let score = item.score {
+                ResultsView(
+                    result: score,
+                    config: historyConfig,
+                    transcript: item.transcript ?? [],
+                    sessionId: item.sessionId,
+                    onClose: {
                         state.selectedMainTab = "home"
                         dismiss()
+                    },
+                    onRetry: {
+                        state.generatorReplayContext = GeneratorReplayContext(
+                            specialty: historyConfig.specialty,
+                            difficulty: historyConfig.difficulty
+                        )
+                        state.selectedMainTab = "generator"
+                        dismiss()
                     }
-                        .foregroundStyle(AppColor.primary)
+                )
+            } else if item.status == "pending" || item.status == "pending_score" {
+                VStack(spacing: 14) {
+                    ProgressView()
+                        .controlSize(.large)
+                    Text("Skor ve geri bildirim hazırlanıyor...")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                    Button("Yenile") {
+                        Task { await state.refreshDashboard(showBusy: false) }
+                    }
+                    .appSecondaryButton()
                 }
+                .padding(24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(AppColor.background.ignoresSafeArea())
+            } else {
+                VStack(spacing: 12) {
+                    Text("Bu oturum için skor henüz yok.")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineSpacing(4)
+                    Button("Kapat") {
+                        dismiss()
+                    }
+                    .appPrimaryButton()
+                }
+                .padding(24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(AppColor.background.ignoresSafeArea())
+            }
+        }
+        .navigationTitle("Vaka Detayı")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Kapat") {
+                    state.selectedMainTab = "home"
+                    dismiss()
+                }
+                    .foregroundStyle(AppColor.primary)
             }
         }
     }
@@ -151,4 +164,3 @@ struct HistorySessionDetailView: View {
         )
     }
 }
-

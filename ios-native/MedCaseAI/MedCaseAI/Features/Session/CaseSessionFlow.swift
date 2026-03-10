@@ -27,6 +27,7 @@ struct CaseSessionView: View {
     @State private var isTextFallbackMode = false
     @State private var isKeyboardVisible = false
     @State private var showEndSessionConfirmation = false
+    @State private var isMicPulsing = false
     @FocusState private var isComposerFocused: Bool
 
     init(config: CaseLaunchConfig) {
@@ -110,7 +111,7 @@ struct CaseSessionView: View {
                     return
                 }
 
-                if newState == .ended, hasMeaningfulTranscript {
+                if newState == .ended {
                     Task { await finalizeCase() }
                     return
                 }
@@ -531,10 +532,10 @@ struct CaseSessionView: View {
                                 .font(.system(size: 28, weight: .semibold))
                                 .foregroundStyle(.white)
                         )
-                        .scaleEffect(!vm.isMicMuted && !reduceMotion ? 1.04 : 1.0)
+                        .scaleEffect(isMicPulsing && !reduceMotion ? 1.04 : 1.0)
                         .animation(
                             reduceMotion ? nil : .easeInOut(duration: 0.9).repeatForever(autoreverses: true),
-                            value: !vm.isMicMuted
+                            value: isMicPulsing
                         )
                 }
                 .buttonStyle(PressableButtonStyle())
@@ -575,6 +576,18 @@ struct CaseSessionView: View {
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
 #endif
+        }
+        .onAppear {
+            isMicPulsing = !reduceMotion && !vm.isMicMuted
+        }
+        .onChange(of: vm.isMicMuted) { muted in
+            isMicPulsing = !reduceMotion && !muted
+        }
+        .onChange(of: reduceMotion) { shouldReduceMotion in
+            isMicPulsing = !shouldReduceMotion && !vm.isMicMuted
+        }
+        .onDisappear {
+            isMicPulsing = false
         }
     }
 
@@ -857,17 +870,6 @@ struct CaseSessionView: View {
         Task { await finalizeCase() }
     }
 
-    private var hasMeaningfulTranscript: Bool {
-        let userMessages = vm.messages.filter {
-            $0.source == "user" &&
-            !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }.count
-        let totalMessages = vm.messages.filter {
-            !$0.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        }.count
-        return userMessages > 0 && totalMessages >= 2
-    }
-
     private var activeHeadline: String {
         let trimmedTitle = config.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !trimmedTitle.isEmpty {
@@ -909,6 +911,8 @@ struct CaseResultFlowView: View {
     @State private var loadingFactIndex = 0
     @State private var pendingStartedAt: Date?
     @State private var scoringTranscript: [ConversationLine] = []
+    @State private var loadingTickerTask: Task<Void, Never>?
+    private static let iso8601 = ISO8601DateFormatter()
 
     private let loadingMessages = [
         "Performansın analiz ediliyor...",
@@ -1032,12 +1036,50 @@ struct CaseResultFlowView: View {
             .task {
                 await runScoringFlow()
             }
-            .onReceive(Timer.publish(every: 2.3, on: .main, in: .common).autoconnect()) { _ in
-                guard isLoading || pendingScore else { return }
+            .onAppear {
+                updateLoadingTickerState()
+            }
+            .onChange(of: isLoading) { _ in
+                updateLoadingTickerState()
+            }
+            .onChange(of: pendingScore) { _ in
+                updateLoadingTickerState()
+            }
+            .onDisappear {
+                stopLoadingTicker()
+            }
+        }
+    }
+
+    private func updateLoadingTickerState() {
+        if isLoading || pendingScore {
+            startLoadingTickerIfNeeded()
+        } else {
+            stopLoadingTicker()
+        }
+    }
+
+    private func startLoadingTickerIfNeeded() {
+        guard loadingTickerTask == nil else { return }
+        loadingTickerTask = Task { @MainActor in
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(nanoseconds: 2_300_000_000)
+                } catch {
+                    break
+                }
+                guard !Task.isCancelled else { break }
+                guard isLoading || pendingScore else { break }
                 loadingMessageIndex = (loadingMessageIndex + 1) % loadingMessages.count
                 loadingFactIndex = (loadingFactIndex + 1) % loadingFacts.count
             }
+            loadingTickerTask = nil
         }
+    }
+
+    private func stopLoadingTicker() {
+        loadingTickerTask?.cancel()
+        loadingTickerTask = nil
     }
 
     private func runScoringFlow(force: Bool = false) async {
@@ -1173,8 +1215,8 @@ struct CaseResultFlowView: View {
             sessionId: config.id,
             mode: mode.rawValue,
             status: status,
-            startedAt: ISO8601DateFormatter().string(from: startedAt),
-            endedAt: ISO8601DateFormatter().string(from: endedAt),
+            startedAt: Self.iso8601.string(from: startedAt),
+            endedAt: Self.iso8601.string(from: endedAt),
             durationMin: duration,
             messageCount: transcript.count,
             difficulty: config.difficulty,

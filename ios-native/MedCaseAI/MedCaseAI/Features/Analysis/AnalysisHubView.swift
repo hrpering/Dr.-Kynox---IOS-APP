@@ -114,14 +114,27 @@ struct AnalysisHubView: View {
                     destination = .flashcards
                 }
             }
-            .fullScreenCover(item: $destination) { item in
-                switch item {
-                case .weakArea:
-                    WeakAreaAnalysisView()
-                        .environmentObject(state)
-                case .flashcards:
-                    FlashcardsHubView()
-                        .environmentObject(state)
+            .navigationDestination(
+                isPresented: Binding(
+                    get: { destination != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            destination = nil
+                        }
+                    }
+                )
+            ) {
+                Group {
+                    switch destination {
+                    case .weakArea:
+                        WeakAreaAnalysisView()
+                            .environmentObject(state)
+                    case .flashcards:
+                        FlashcardsHubView()
+                            .environmentObject(state)
+                    case .none:
+                        EmptyView()
+                    }
                 }
             }
         }
@@ -492,4 +505,3 @@ struct AnalysisHubView: View {
         .accessibilityHint(subtitle)
     }
 }
-

@@ -7,55 +7,53 @@ struct WeakAreaAnalysisView: View {
     @State private var selectedSpecialty: WeakAreaSpecialtyStat?
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    if loading && state.weakAreaAnalysis == nil {
-                        ShimmerView()
-                            .frame(height: 230)
-                        ShimmerView()
-                            .frame(height: 220)
-                        ShimmerView()
-                            .frame(height: 160)
-                    } else if let analysis = state.weakAreaAnalysis, analysis.hasData {
-                        summaryHeader(analysis)
-                        scoreMapCard(analysis)
-                        specialtyBreakdownCard(analysis)
-                        aiRecommendationCard(analysis)
-                    } else {
-                        DSEmptyState(
-                            icon: "chart.bar.doc.horizontal",
-                            title: "Henüz analiz oluşturmak için yeterli veri yok.",
-                            subtitle: "3 vaka tamamladığında zayıf alan haritan burada görünecek."
-                        )
-                        Button {
-                            state.selectedMainTab = "generator"
-                            dismiss()
-                            Haptic.selection()
-                        } label: {
-                            Text("Yeni vaka başlat")
-                                .appPrimaryButtonLabel()
-                        }
-                        .buttonStyle(PressableButtonStyle())
-                        .accessibilityLabel("Yeni vaka başlat")
-                        .accessibilityHint("Vaka seçim ekranına döner")
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                if loading && state.weakAreaAnalysis == nil {
+                    ShimmerView()
+                        .frame(height: 230)
+                    ShimmerView()
+                        .frame(height: 220)
+                    ShimmerView()
+                        .frame(height: 160)
+                } else if let analysis = state.weakAreaAnalysis, analysis.hasData {
+                    summaryHeader(analysis)
+                    scoreMapCard(analysis)
+                    specialtyBreakdownCard(analysis)
+                    aiRecommendationCard(analysis)
+                } else {
+                    DSEmptyState(
+                        icon: "chart.bar.doc.horizontal",
+                        title: "Henüz analiz oluşturmak için yeterli veri yok.",
+                        subtitle: "3 vaka tamamladığında zayıf alan haritan burada görünecek."
+                    )
+                    Button {
+                        state.selectedMainTab = "generator"
+                        dismiss()
+                        Haptic.selection()
+                    } label: {
+                        Text("Yeni vaka başlat")
+                            .appPrimaryButtonLabel()
                     }
-                }
-                .padding(16)
-            }
-            .background(AppColor.background.ignoresSafeArea())
-            .navigationTitle("Zayıf Alan Analizi")
-            .navigationBarTitleDisplayMode(.inline)
-            .refreshable { await refresh() }
-            .task {
-                if state.weakAreaAnalysis == nil {
-                    await refresh()
+                    .buttonStyle(PressableButtonStyle())
+                    .accessibilityLabel("Yeni vaka başlat")
+                    .accessibilityHint("Vaka seçim ekranına döner")
                 }
             }
-            .sheet(item: $selectedSpecialty) { item in
-                NavigationStack {
-                    WeakAreaSpecialtyDetailView(item: item)
-                }
+            .padding(16)
+        }
+        .background(AppColor.background.ignoresSafeArea())
+        .navigationTitle("Zayıf Alan Analizi")
+        .navigationBarTitleDisplayMode(.inline)
+        .refreshable { await refresh() }
+        .task {
+            if state.weakAreaAnalysis == nil {
+                await refresh()
+            }
+        }
+        .sheet(item: $selectedSpecialty) { item in
+            NavigationStack {
+                WeakAreaSpecialtyDetailView(item: item)
             }
         }
     }
@@ -146,7 +144,7 @@ struct WeakAreaAnalysisView: View {
 
     private func specialtyBreakdownCard(_ analysis: WeakAreaAnalysisResponse) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionHeader(title: "Specialty Bazlı Breakdown")
+            sectionHeader(title: "Branş Bazlı Analiz")
 
             ForEach(analysis.specialtyBreakdown) { item in
                 Button {
@@ -349,4 +347,3 @@ struct WeakAreaAnalysisView: View {
         return clean
     }
 }
-

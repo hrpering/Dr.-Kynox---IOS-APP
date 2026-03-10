@@ -104,6 +104,7 @@ final class AgentConversationViewModel: ObservableObject {
 
     private let voiceAgentId = "agent_3701kj62fctpe75v3a0tca39fy26"
     private let textAgentId = "agent_3701kj62fctpe75v3a0tca39fy26"
+    private static let iso8601 = ISO8601DateFormatter()
 
     init(config: CaseLaunchConfig, saveHandler: (() async throws -> Void)? = nil) {
         self.config = config
@@ -239,7 +240,24 @@ final class AgentConversationViewModel: ObservableObject {
             print("[connect] attempt=\(attempt) session-auth ok token=\(!((auth.conversationToken ?? "").isEmpty)) signed=\(!((auth.signedUrl ?? "").isEmpty))")
             startConversationCallCounter += 1
             print("[connect] attempt=\(attempt) startConversation call=\(startConversationCallCounter)")
-            let startedConversation = try await startConversation(auth: auth, config: runtimeConfig)
+            let startedConversation: Conversation
+            do {
+                startedConversation = try await startConversation(auth: auth, config: runtimeConfig)
+            } catch {
+                guard shouldRetryConversationStart(after: error) else {
+                    throw error
+                }
+                print("[connect] attempt=\(attempt) startConversation handshake failed; refreshing session-auth once")
+                let retryAuth = try await fetchSessionAuth(agentId: agentId, dynamicVariables: runtimeDynamicVariables)
+                let retryResponseAgentId = retryAuth.agentId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                if !retryResponseAgentId.isEmpty, retryResponseAgentId != agentId {
+                    throw AppError.httpError("Session auth agent uyuşmuyor. Beklenen: \(agentId), gelen: \(retryResponseAgentId)")
+                }
+                print("[connect] attempt=\(attempt) session-auth retry ok token=\(!((retryAuth.conversationToken ?? "").isEmpty)) signed=\(!((retryAuth.signedUrl ?? "").isEmpty))")
+                startConversationCallCounter += 1
+                print("[connect] attempt=\(attempt) startConversation retry call=\(startConversationCallCounter)")
+                startedConversation = try await startConversation(auth: retryAuth, config: runtimeConfig)
+            }
             conversation = startedConversation
             setupObservers(runId: runId, conversation: startedConversation)
             connectionState = .connecting
@@ -646,7 +664,15 @@ final class AgentConversationViewModel: ObservableObject {
         }
 
         let queryItems = components.queryItems ?? []
-        let keys = ["conversation_token", "conversationToken", "token"]
+        let keys = [
+            "conversation_token",
+            "conversationToken",
+            "token",
+            "access_token",
+            "accessToken",
+            "conversation_signature",
+            "conversationSignature"
+        ]
         for key in keys {
             if let value = queryItems.first(where: { $0.name == key })?.value?.trimmingCharacters(in: .whitespacesAndNewlines),
                !value.isEmpty {
@@ -654,6 +680,24 @@ final class AgentConversationViewModel: ObservableObject {
             }
         }
         return nil
+    }
+
+    private func shouldRetryConversationStart(after error: Error) -> Bool {
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain, nsError.code == -1011 {
+            return true
+        }
+
+        let haystack = "\(nsError.domain) \(nsError.code) \(nsError.localizedDescription) \(String(reflecting: error))"
+            .lowercased()
+        let markers = [
+            "websockethandshake",
+            "websocket handshake",
+            "nserrordomain code=-1011",
+            "sunucudan geçersiz bir yanıt alındı",
+            "invalid response from server"
+        ]
+        return markers.contains(where: { haystack.contains($0) })
     }
 
     private func finalizeIfNeeded() async {
@@ -968,8 +1012,8 @@ final class AgentConversationViewModel: ObservableObject {
             sessionId: config.id,
             mode: activeMode.rawValue,
             status: status,
-            startedAt: ISO8601DateFormatter().string(from: startedAt),
-            endedAt: ISO8601DateFormatter().string(from: endedAt),
+            startedAt: Self.iso8601.string(from: startedAt),
+            endedAt: Self.iso8601.string(from: endedAt),
             durationMin: max(1, Int(endedAt.timeIntervalSince(startedAt) / 60)),
             messageCount: transcript.count,
             difficulty: config.difficulty,

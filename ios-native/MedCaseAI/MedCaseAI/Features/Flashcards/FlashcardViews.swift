@@ -58,55 +58,53 @@ struct FlashcardsHubView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    todayReviewCard
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                todayReviewCard
 
-                    filterSection
+                filterSection
 
-                    if loading {
-                        VStack(spacing: 10) {
-                            ShimmerView().frame(height: 86)
-                            ShimmerView().frame(height: 86)
-                            ShimmerView().frame(height: 86)
-                        }
-                    } else if filteredCollectionCards.isEmpty {
-                        if collectionCards.isEmpty {
-                            emptyCollectionShowcase
-                        } else {
-                            noFilterResultCard
-                        }
-                    } else {
-                        ForEach(filteredCollectionCards.prefix(120)) { card in
-                            flashcardRow(card)
-                        }
+                if loading {
+                    VStack(spacing: 10) {
+                        ShimmerView().frame(height: 86)
+                        ShimmerView().frame(height: 86)
+                        ShimmerView().frame(height: 86)
                     }
-
-                    if !errorText.isEmpty {
-                        ErrorStateCard(message: errorText) {
-                            Task { await loadData(force: true) }
-                        }
+                } else if filteredCollectionCards.isEmpty {
+                    if collectionCards.isEmpty {
+                        emptyCollectionShowcase
+                    } else {
+                        noFilterResultCard
+                    }
+                } else {
+                    ForEach(filteredCollectionCards.prefix(120)) { card in
+                        flashcardRow(card)
                     }
                 }
-                .padding(16)
-                .padding(.bottom, 10)
+
+                if !errorText.isEmpty {
+                    ErrorStateCard(message: errorText) {
+                        Task { await loadData(force: true) }
+                    }
+                }
             }
-            .background(AppColor.background.ignoresSafeArea())
-            .navigationTitle("Kartlar")
-            .refreshable {
+            .padding(16)
+            .padding(.bottom, 10)
+        }
+        .background(AppColor.background.ignoresSafeArea())
+        .navigationTitle("Kartlar")
+        .refreshable {
+            await loadData(force: true)
+        }
+        .task {
+            await loadData()
+        }
+        .fullScreenCover(isPresented: $showStudy) {
+            FlashcardStudyView(cards: todayCards) { card, rating in
+                _ = try? await state.reviewFlashcard(cardId: card.id, rating: rating)
                 await loadData(force: true)
             }
-            .task {
-                await loadData()
-            }
-            .fullScreenCover(isPresented: $showStudy) {
-                FlashcardStudyView(cards: todayCards) { card, rating in
-                    _ = try? await state.reviewFlashcard(cardId: card.id, rating: rating)
-                    await loadData(force: true)
-                }
-                .environmentObject(state)
-            }
+            .environmentObject(state)
         }
     }
 
@@ -582,4 +580,3 @@ struct FlashcardFlipCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
-

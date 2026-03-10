@@ -238,28 +238,21 @@ final class DashboardViewModel: ObservableObject {
     }
 
     func saveCase(payload: SaveCasePayload) async throws {
-        do {
-            if let token = try await supabase.currentAccessToken(), !token.isEmpty {
-                try await api.saveCase(accessToken: token, payload: payload)
-            } else {
-                try await supabase.saveCase(payload)
-            }
-            caseHistory = try await supabase.fetchCaseList(limit: 80)
-            refreshWeeklyGoalState()
-            let token = try? await supabase.currentAccessToken()
-            await refreshWeakAreaState(cases: caseHistory, token: token ?? nil)
-        } catch {
+        if let token = try await supabase.currentAccessToken(), !token.isEmpty {
             do {
+                try await api.saveCase(accessToken: token, payload: payload)
+            } catch {
                 // Backend gecici hatasinda dogrudan Supabase yazimini fallback tut.
                 try await supabase.saveCase(payload)
-                caseHistory = try await supabase.fetchCaseList(limit: 80)
-                refreshWeeklyGoalState()
-                let token = try? await supabase.currentAccessToken()
-                await refreshWeakAreaState(cases: caseHistory, token: token ?? nil)
-            } catch {
-                throw error
             }
+        } else {
+            try await supabase.saveCase(payload)
         }
+
+        caseHistory = try await supabase.fetchCaseList(limit: 80)
+        refreshWeeklyGoalState()
+        let token = try? await supabase.currentAccessToken()
+        await refreshWeakAreaState(cases: caseHistory, token: token ?? nil)
     }
 
     private func refreshWeeklyGoalState() {

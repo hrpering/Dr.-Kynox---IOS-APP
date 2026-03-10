@@ -654,7 +654,7 @@ struct ModeSelectionPage: View {
                 .accessibilityHint("Önceki ekrana döner")
             }
         }
-        .sheet(item: $activeCase) { config in
+        .fullScreenCover(item: $activeCase) { config in
             CaseSessionView(config: config)
         }
     }
