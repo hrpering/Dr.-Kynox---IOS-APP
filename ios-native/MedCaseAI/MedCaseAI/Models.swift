@@ -547,6 +547,7 @@ struct ElevenLabsSessionAuthResponse: Decodable {
     let agentId: String?
     let conversationToken: String?
     let signedUrl: String?
+    let traceId: String?
     let expiresInSeconds: Int?
     let sessionWindowToken: String?
     let sessionWindowExpiresAt: String?
@@ -556,6 +557,7 @@ struct ElevenLabsSessionAuthResponse: Decodable {
         case agentId
         case conversationToken
         case signedUrl
+        case traceId
         case expiresInSeconds
         case sessionWindowToken
         case sessionWindowExpiresAt

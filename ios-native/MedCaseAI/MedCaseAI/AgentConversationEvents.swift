@@ -121,13 +121,20 @@ extension AgentConversationViewModel {
             if !responseAgentId.isEmpty, responseAgentId != agentId {
                 throw AppError.httpError("Session auth agent uyuşmuyor. Beklenen: \(agentId), gelen: \(responseAgentId)")
             }
-            logInfo("[connect] attempt=\(attempt) session-auth ok token=\(!((auth.conversationToken ?? "").isEmpty)) signed=\(!((auth.signedUrl ?? "").isEmpty))")
+            let traceId = auth.traceId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "-"
+            logInfo("[connect] attempt=\(attempt) session-auth ok traceId=\(traceId.isEmpty ? "-" : traceId) token=\(!((auth.conversationToken ?? "").isEmpty)) signed=\(!((auth.signedUrl ?? "").isEmpty))")
             startConversationCallCounter += 1
             logDebug("[connect] attempt=\(attempt) startConversation call=\(startConversationCallCounter)")
             let startedConversation: Conversation
             do {
                 startedConversation = try await startConversation(auth: auth, config: runtimeConfig)
             } catch {
+                logConversationHandshakeFailure(
+                    error: error,
+                    auth: auth,
+                    attempt: attempt,
+                    stage: "initial"
+                )
                 guard shouldRetryConversationStart(after: error) else {
                     throw error
                 }
@@ -141,10 +148,21 @@ extension AgentConversationViewModel {
                 if !retryResponseAgentId.isEmpty, retryResponseAgentId != agentId {
                     throw AppError.httpError("Session auth agent uyuşmuyor. Beklenen: \(agentId), gelen: \(retryResponseAgentId)")
                 }
-                logInfo("[connect] attempt=\(attempt) session-auth retry ok token=\(!((retryAuth.conversationToken ?? "").isEmpty)) signed=\(!((retryAuth.signedUrl ?? "").isEmpty))")
+                let retryTraceId = retryAuth.traceId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "-"
+                logInfo("[connect] attempt=\(attempt) session-auth retry ok traceId=\(retryTraceId.isEmpty ? "-" : retryTraceId) token=\(!((retryAuth.conversationToken ?? "").isEmpty)) signed=\(!((retryAuth.signedUrl ?? "").isEmpty))")
                 startConversationCallCounter += 1
                 logDebug("[connect] attempt=\(attempt) startConversation retry call=\(startConversationCallCounter)")
-                startedConversation = try await startConversation(auth: retryAuth, config: runtimeConfig)
+                do {
+                    startedConversation = try await startConversation(auth: retryAuth, config: runtimeConfig)
+                } catch {
+                    logConversationHandshakeFailure(
+                        error: error,
+                        auth: retryAuth,
+                        attempt: attempt,
+                        stage: "retry"
+                    )
+                    throw error
+                }
             }
             conversation = startedConversation
             setupObservers(runId: runId, conversation: startedConversation)
