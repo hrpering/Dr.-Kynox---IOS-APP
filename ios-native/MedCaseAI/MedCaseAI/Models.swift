@@ -1223,6 +1223,7 @@ struct SaveCasePayload: Encodable {
     let caseContext: CaseContext
     let transcript: [ConversationLine]
     let score: ScoreResponse?
+    let textRuntime: TextRuntime?
 
     struct CaseContext: Codable {
         let title: String
@@ -1240,6 +1241,11 @@ struct SaveCasePayload: Encodable {
             case challengeType = "challenge_type"
             case expectedDiagnosis = "expected_diagnosis"
         }
+    }
+
+    struct TextRuntime: Codable {
+        let didReachActiveState: Bool
+        let disconnectDiagnostic: String?
     }
 }
 

@@ -14,6 +14,7 @@ create table if not exists public.case_sessions (
   case_context jsonb,
   transcript jsonb,
   score jsonb,
+  text_runtime jsonb not null default '{}'::jsonb,
   usage_metrics jsonb not null default '{}'::jsonb,
   cost_metrics jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
@@ -22,6 +23,7 @@ create table if not exists public.case_sessions (
 );
 
 alter table public.case_sessions
+  add column if not exists text_runtime jsonb not null default '{}'::jsonb,
   add column if not exists usage_metrics jsonb not null default '{}'::jsonb,
   add column if not exists cost_metrics jsonb not null default '{}'::jsonb;
 

@@ -336,7 +336,8 @@ struct CaseResultFlowView: View {
                 expectedDiagnosis: score?.trueDiagnosis ?? config.expectedDiagnosis
             ),
             transcript: transcript,
-            score: score
+            score: score,
+            textRuntime: nil
         )
     }
 }

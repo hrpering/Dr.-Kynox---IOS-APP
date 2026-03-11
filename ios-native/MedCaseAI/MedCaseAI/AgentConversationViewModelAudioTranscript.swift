@@ -246,7 +246,13 @@ extension AgentConversationViewModel {
                 expectedDiagnosis: score?.trueDiagnosis ?? config.expectedDiagnosis
             ),
             transcript: transcript,
-            score: score
+            score: score,
+            textRuntime: activeMode == .text
+                ? .init(
+                    didReachActiveState: didReachActiveState,
+                    disconnectDiagnostic: lastDisconnectDiagnostic
+                )
+                : nil
         )
     }
 

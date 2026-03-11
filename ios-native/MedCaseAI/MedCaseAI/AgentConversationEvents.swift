@@ -31,6 +31,7 @@ extension AgentConversationViewModel {
                 logInfo("[connect] attempt=\(attempt) duplicate connect ignored existingState=\(existingConversation.state)")
                 statusLine = "Oturum zaten aktif."
                 connectionState = stateDesc.contains("connecting") ? .connecting : .connected
+                didReachActiveState = stateDesc.contains("active")
                 return
             }
             conversation = nil
@@ -45,6 +46,7 @@ extension AgentConversationViewModel {
         lastNetworkRecoveryAt = nil
         localEndCounter = 0
         lastLocalEndSource = nil
+        lastDisconnectDiagnostic = nil
         transcriptBuffer = []
         textUserCharacterCount = 0
         textUserMessageCount = 0
@@ -54,6 +56,8 @@ extension AgentConversationViewModel {
         voiceUserTranscriptMessageCount = 0
         sessionLimitReached = false
         isConversationActive = false
+        didReachActiveState = false
+        resetToolAccessoryState()
         messages = []
         errorText = ""
         statusLine = "Agent'a bağlanıyor..."
@@ -189,8 +193,8 @@ extension AgentConversationViewModel {
         guard activeMode == .text else { return }
         let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !clean.isEmpty else { return }
-        guard connectionState == .connected, isConversationActive else {
-            throw AppError.httpError("Önce vakayı başlatın.")
+        guard connectionState == .connected, isConversationActive, didReachActiveState else {
+            throw AppError.httpError("Text oturumu henüz hazır değil. Birkaç saniye sonra tekrar deneyin.")
         }
 
 #if canImport(ElevenLabs)
@@ -244,6 +248,7 @@ extension AgentConversationViewModel {
         endRequestedByUser = true
         connectionState = .ending
         statusLine = "Oturum kapatılıyor..."
+        resetToolAccessoryState()
         refreshTranscriptBuffer()
 
 #if canImport(ElevenLabs)

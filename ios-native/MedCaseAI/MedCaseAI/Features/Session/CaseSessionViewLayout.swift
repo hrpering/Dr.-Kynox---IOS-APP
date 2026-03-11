@@ -73,7 +73,11 @@ extension CaseSessionView {
                     }
 
                     ForEach(vm.messages) { row in
-                        MessageBubble(row: row)
+                        MessageBubble(
+                            row: row,
+                            accessories: accessories(for: row),
+                            onAccessoryTap: handleMessageAccessoryTap
+                        )
                             .id(row.id)
                     }
 
@@ -152,8 +156,8 @@ extension CaseSessionView {
 
             Button {
                 let text = textInput
-                textInput = ""
                 Task {
+                    guard !isSendingTextMessage else { return }
                     guard canSendText else {
                         vm.errorText = "Oturum şu an kapanıyor, lütfen bekle."
                         Haptic.error()
@@ -163,16 +167,19 @@ extension CaseSessionView {
                     guard !clean.isEmpty else { return }
                     if !hasStarted || vm.connectionState == .idle || vm.connectionState == .ended || vm.connectionState == .failed {
                         vm.errorText = "Önce vakayı başlatın."
-                        textInput = text
                         Haptic.error()
                         return
                     }
+                    isSendingTextMessage = true
+                    defer { isSendingTextMessage = false }
                     do {
                         try await vm.sendMessage(clean)
-                        isComposerFocused = false
+                        await MainActor.run {
+                            textInput = ""
+                            isComposerFocused = false
+                        }
                     } catch {
                         vm.errorText = error.localizedDescription
-                        textInput = text
                         Haptic.error()
                     }
                 }
@@ -185,7 +192,12 @@ extension CaseSessionView {
                     .clipShape(Circle())
             }
             .buttonStyle(PressableButtonStyle())
-            .disabled(textInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || vm.isEnding || wasSessionEnded)
+            .disabled(
+                textInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    || vm.isEnding
+                    || wasSessionEnded
+                    || isSendingTextMessage
+            )
             .accessibilityLabel("Gönder")
             .accessibilityHint("Mesajı vakaya gönderir")
         }
@@ -656,6 +668,7 @@ extension CaseSessionView {
     func finalizeCase() async {
         if wasSessionEnded { return }
         wasSessionEnded = true
+        activeToolSheetRoute = nil
         let snapshotBeforeEnd = vm.stableTranscript
         finishedTranscript = snapshotBeforeEnd
         if finishedTranscript.isEmpty, !vm.messages.isEmpty {
@@ -681,6 +694,7 @@ extension CaseSessionView {
 
     func resetSessionForRetry() {
         isComposerFocused = false
+        activeToolSheetRoute = nil
         showEndSessionConfirmation = false
         startSessionTask?.cancel()
         startSessionTask = nil
@@ -725,5 +739,568 @@ extension CaseSessionView {
             return complaint
         }
         return nil
+    }
+
+    func accessories(for row: AgentConversationViewModel.Message) -> [MessageBubbleAccessory] {
+        vm.messageAccessoriesByMessageId[row.id] ?? []
+    }
+
+    func handleMessageAccessoryTap(_ accessory: MessageBubbleAccessory) {
+        switch accessory.action {
+        case .openToolResult(let toolCallId):
+            guard vm.resultsByToolCallId[toolCallId] != nil else {
+                vm.errorText = "Sonuçlar henüz hazır değil."
+                Haptic.error()
+                return
+            }
+            activeToolSheetRoute = .tool(toolCallId: toolCallId)
+            Haptic.selection()
+        case .openImagingResults(let anchorToolCallId):
+            guard !imagingSheetItems(anchorToolCallId: anchorToolCallId).isEmpty else {
+                vm.errorText = "Görüntüleme sonuçları henüz hazır değil."
+                Haptic.error()
+                return
+            }
+            activeToolSheetRoute = .imaging(anchorToolCallId: anchorToolCallId)
+            Haptic.selection()
+        }
+    }
+
+    func selectedToolSheetPayload(toolCallId: String) -> (descriptor: ToolDescriptor, payload: ToolResultPayload)? {
+        guard let toolName = vm.toolCallNameMap[toolCallId],
+              let descriptor = ToolDescriptor.byName[toolName],
+              let payload = vm.resultsByToolCallId[toolCallId] else {
+            return nil
+        }
+        return (descriptor: descriptor, payload: payload)
+    }
+
+    func imagingSheetItems(anchorToolCallId: String) -> [ImagingSheetItem] {
+        guard let messageId = vm.toolCallMessageIdMap[anchorToolCallId] else { return [] }
+        let toolCallIds = vm.toolCallMessageIdMap
+            .filter { $0.value == messageId }
+            .map(\.key)
+            .sorted()
+        return toolCallIds.compactMap { toolCallId in
+            guard let toolName = vm.toolCallNameMap[toolCallId],
+                  let descriptor = ToolDescriptor.byName[toolName],
+                  descriptor.category == .imaging,
+                  let payload = vm.resultsByToolCallId[toolCallId],
+                  case .imaging(let imaging) = payload else {
+                return nil
+            }
+            return ImagingSheetItem(toolCallId: toolCallId, descriptor: descriptor, result: imaging)
+        }
+    }
+
+    func imagingInitialSegment(anchorToolCallId: String) -> ImagingResultSegment {
+        guard let toolName = vm.toolCallNameMap[anchorToolCallId],
+              let descriptor = ToolDescriptor.byName[toolName],
+              let segment = descriptor.imagingSegment else {
+            return .all
+        }
+        return segment
+    }
+}
+
+struct ImagingSheetItem: Identifiable {
+    let toolCallId: String
+    let descriptor: ToolDescriptor
+    let result: ImagingToolResult
+    var id: String { toolCallId }
+}
+
+struct ToolResultSheetView: View {
+    let config: CaseLaunchConfig
+    let descriptor: ToolDescriptor
+    let payload: ToolResultPayload
+    let onContinue: () -> Void
+
+    var body: some View {
+        switch payload {
+        case .panel(let result):
+            PanelToolResultsSheetView(config: config, descriptor: descriptor, result: result, onContinue: onContinue)
+        case .vitals(let result):
+            VitalsToolResultsSheetView(config: config, descriptor: descriptor, result: result, onContinue: onContinue)
+        case .imaging(let result):
+            CombinedImagingResultsSheetView(
+                config: config,
+                items: [ImagingSheetItem(toolCallId: "single-\(descriptor.toolName)", descriptor: descriptor, result: result)],
+                initialSegment: result.segment,
+                onContinue: onContinue
+            )
+        }
+    }
+}
+
+struct PanelToolResultsSheetView: View {
+    let config: CaseLaunchConfig
+    let descriptor: ToolDescriptor
+    let result: PanelToolResult
+    let onContinue: () -> Void
+
+    var body: some View {
+        ToolSheetScaffold(config: config, onContinue: onContinue) {
+            ToolSheetHeaderCard(config: config)
+            VStack(alignment: .leading, spacing: 10) {
+                ToolSectionTitle(icon: descriptor.iconSystemName, tint: descriptor.tint, title: result.title)
+                if result.metrics.isEmpty {
+                    Text("Sonuç metrikleri bulunamadı.")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                } else {
+                    VStack(spacing: 10) {
+                        ForEach(result.metrics) { metric in
+                            PanelMetricCard(metric: metric)
+                        }
+                    }
+                }
+            }
+            .toolCardStyle()
+            ToolSummaryCard(text: result.verbalSummary)
+        }
+    }
+}
+
+struct VitalsToolResultsSheetView: View {
+    let config: CaseLaunchConfig
+    let descriptor: ToolDescriptor
+    let result: VitalsToolResult
+    let onContinue: () -> Void
+
+    private let columns = [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)]
+
+    var body: some View {
+        ToolSheetScaffold(config: config, onContinue: onContinue) {
+            ToolSheetHeaderCard(config: config)
+            VStack(alignment: .leading, spacing: 10) {
+                ToolSectionTitle(icon: descriptor.iconSystemName, tint: descriptor.tint, title: result.title)
+                if result.metrics.isEmpty {
+                    Text("Vital bulgu verisi bulunamadı.")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                } else {
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(result.metrics) { metric in
+                            VitalsMetricCard(metric: metric)
+                        }
+                    }
+                }
+            }
+            .toolCardStyle()
+            ToolSummaryCard(text: result.verbalSummary)
+        }
+    }
+}
+
+struct CombinedImagingResultsSheetView: View {
+    let config: CaseLaunchConfig
+    let items: [ImagingSheetItem]
+    let initialSegment: ImagingResultSegment
+    let onContinue: () -> Void
+
+    @State private var selectedSegment: ImagingResultSegment = .all
+
+    var body: some View {
+        ToolSheetScaffold(config: config, onContinue: onContinue) {
+            ToolSheetHeaderCard(config: config)
+            segmentSelector
+            if filteredItems.isEmpty {
+                Text("Görüntüleme bulgusu bulunamadı.")
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .padding(.horizontal, 8)
+            } else {
+                ForEach(filteredItems) { item in
+                    VStack(alignment: .leading, spacing: 10) {
+                        ToolSectionTitle(icon: item.descriptor.iconSystemName, tint: item.descriptor.tint, title: item.descriptor.displayTitle)
+                        if !item.result.metadata.isEmpty {
+                            HStack(spacing: 8) {
+                                ForEach(item.result.metadata) { metadata in
+                                    Text("\(metadata.title): \(metadata.value)")
+                                        .font(AppFont.caption)
+                                        .foregroundStyle(AppColor.textSecondary)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(AppColor.surfaceAlt)
+                                        .clipShape(Capsule())
+                                }
+                            }
+                        }
+                        if item.result.findings.isEmpty {
+                            Text("Bulgular bulunamadı.")
+                                .font(AppFont.body)
+                                .foregroundStyle(AppColor.textSecondary)
+                        } else {
+                            VStack(spacing: 8) {
+                                ForEach(item.result.findings) { finding in
+                                    ImagingFindingCard(finding: finding)
+                                }
+                            }
+                        }
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Radiologist Report")
+                                .font(AppFont.bodyMedium)
+                                .foregroundStyle(AppColor.textPrimary)
+                            Text(item.result.impression.isEmpty ? "İzlenim bulunamadı." : item.result.impression)
+                                .font(AppFont.body)
+                                .foregroundStyle(AppColor.textSecondary)
+                                .lineSpacing(4)
+                        }
+                        .padding(10)
+                        .background(AppColor.surfaceAlt)
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                    .toolCardStyle()
+                }
+            }
+            ToolSummaryCard(text: combinedSummaryText)
+        }
+        .onAppear {
+            selectedSegment = initialSegment
+        }
+    }
+
+    var filteredItems: [ImagingSheetItem] {
+        if selectedSegment == .all {
+            return items
+        }
+        return items.filter { $0.result.segment == selectedSegment }
+    }
+
+    var combinedSummaryText: String {
+        items
+            .map(\.result.verbalSummary)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first(where: { !$0.isEmpty }) ?? ""
+    }
+
+    var segmentSelector: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(availableSegments) { segment in
+                    Button {
+                        selectedSegment = segment
+                    } label: {
+                        Text(segment.title)
+                            .font(AppFont.caption)
+                            .foregroundStyle(selectedSegment == segment ? AppColor.primary : AppColor.textSecondary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .background(selectedSegment == segment ? AppColor.primaryLight : AppColor.surfaceAlt)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(selectedSegment == segment ? AppColor.primary.opacity(0.3) : AppColor.border, lineWidth: 1)
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(2)
+        }
+        .padding(8)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    var availableSegments: [ImagingResultSegment] {
+        var segments: [ImagingResultSegment] = [.all]
+        let fromItems = Set(items.map(\.result.segment))
+        segments.append(contentsOf: ImagingResultSegment.allCases.filter { fromItems.contains($0) })
+        return segments
+    }
+}
+
+struct ToolSheetScaffold<Content: View>: View {
+    let config: CaseLaunchConfig
+    let onContinue: () -> Void
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    content()
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 12)
+            }
+            Button {
+                onContinue()
+            } label: {
+                HStack(spacing: 8) {
+                    Text("Vakaya Devam")
+                        .font(AppFont.bodyMedium)
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 14, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .background(AppColor.primary)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+            .buttonStyle(PressableButtonStyle())
+            .padding(.horizontal, 16)
+            .padding(.top, 6)
+            .padding(.bottom, 14)
+            .background(AppColor.surface)
+        }
+        .background(AppColor.background.ignoresSafeArea())
+    }
+}
+
+struct ToolSheetHeaderCard: View {
+    let config: CaseLaunchConfig
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "cross.case.fill")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(AppColor.primary)
+                .frame(width: 34, height: 34)
+                .background(AppColor.primaryLight)
+                .clipShape(Circle())
+            VStack(alignment: .leading, spacing: 4) {
+                Text(config.toolSheetPatientLine)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                Text(config.toolSheetCaseLine)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+struct ToolSectionTitle: View {
+    let icon: String
+    let tint: Color
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(tint)
+            Text(title)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+        }
+    }
+}
+
+struct PanelMetricCard: View {
+    let metric: PanelMetric
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 8) {
+                Text(metric.title)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                Spacer(minLength: 0)
+                Image(systemName: metric.status.iconSystemName)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 24, height: 24)
+                    .background(metric.status.accentColor)
+                    .clipShape(Circle())
+            }
+            if let reference = metric.referenceRange, !reference.isEmpty {
+                Text("Referans: \(reference)")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(metric.valueText)
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(metric.status.accentColor)
+                if !metric.unit.isEmpty {
+                    Text(metric.unit)
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+            }
+        }
+        .padding(12)
+        .background(metric.status.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(metric.status.accentColor.opacity(metric.status.severityScore == 0 ? 0.24 : 0.52), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+struct VitalsMetricCard: View {
+    let metric: VitalsMetric
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: iconName(for: metric.id))
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(metric.status.accentColor)
+                Spacer(minLength: 0)
+                Image(systemName: metric.status.iconSystemName)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 20, height: 20)
+                    .background(metric.status.accentColor)
+                    .clipShape(Circle())
+            }
+            Text(metric.title)
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+            Text(metric.valueText)
+                .font(.system(size: 38, weight: .bold, design: .rounded))
+                .foregroundStyle(AppColor.textPrimary)
+            if !metric.unit.isEmpty {
+                Text(metric.unit)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(metric.status.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(metric.status.accentColor.opacity(metric.status.severityScore == 0 ? 0.22 : 0.45), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    func iconName(for key: String) -> String {
+        switch key {
+        case "blood_pressure":
+            return "heart.fill"
+        case "heart_rate":
+            return "waveform.path.ecg"
+        case "respiratory_rate":
+            return "lungs.fill"
+        case "oxygen_saturation":
+            return "drop.fill"
+        case "temperature":
+            return "thermometer.medium"
+        case "gcs":
+            return "brain.head.profile"
+        case "pain_score":
+            return "exclamationmark.circle"
+        default:
+            return "cross.case"
+        }
+    }
+}
+
+struct ImagingFindingCard: View {
+    let finding: ImagingFinding
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Text(finding.title)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                Spacer(minLength: 0)
+                Image(systemName: finding.status.iconSystemName)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 20, height: 20)
+                    .background(finding.status.accentColor)
+                    .clipShape(Circle())
+            }
+            Text(finding.detail)
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
+        }
+        .padding(10)
+        .background(finding.status.cardBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(finding.status.accentColor.opacity(0.42), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+}
+
+struct ToolSummaryCard: View {
+    let text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "stethoscope")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(AppColor.primary)
+                Text("Clinical Insights")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+            }
+            Text(summaryText)
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
+        }
+        .padding(12)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppColor.primary.opacity(0.3), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    var summaryText: String {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "Özet bulunamadı." : trimmed
+    }
+}
+
+extension View {
+    func toolCardStyle() -> some View {
+        self
+            .padding(12)
+            .background(AppColor.surface)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(AppColor.border, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+}
+
+extension CaseLaunchConfig {
+    var toolSheetPatientLine: String {
+        let gender = patientGender?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let age = patientAge.map { "\($0)Y" } ?? ""
+        let fragments = [gender, age].filter { !$0.isEmpty }
+        if fragments.isEmpty {
+            return "Hasta: Bilgi paylaşılmadı"
+        }
+        return "Hasta: \(fragments.joined(separator: ", "))"
+    }
+
+    var toolSheetCaseLine: String {
+        let challenge = challengeId?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !challenge.isEmpty {
+            return "Case #\(challenge)"
+        }
+        return "Case #\(String(id.prefix(8)).uppercased())"
     }
 }

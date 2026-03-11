@@ -43,6 +43,7 @@ extension AgentConversationViewModel {
         launchModeOverride = nil
         activeMode = config.mode
         transcriptBuffer = []
+        resetToolAccessoryState()
         textUserCharacterCount = 0
         textUserMessageCount = 0
         textAICharacterCount = 0
@@ -51,6 +52,8 @@ extension AgentConversationViewModel {
         voiceUserTranscriptMessageCount = 0
         sessionLimitReached = false
         isConversationActive = false
+        didReachActiveState = false
+        lastDisconnectDiagnostic = nil
         isStoppingUnexpectedly = false
     }
 
@@ -65,6 +68,7 @@ extension AgentConversationViewModel {
 #endif
         cancellables.removeAll()
         activeConnectionRunId = UUID()
+        resetToolAccessoryState()
     }
 
     func finalizeIfNeeded() async {
