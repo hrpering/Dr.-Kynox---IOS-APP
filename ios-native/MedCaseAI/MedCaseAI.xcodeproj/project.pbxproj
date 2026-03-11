@@ -44,11 +44,21 @@
 		A11B22C033D44E5500000106 /* Features/Results/ResultsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000106 /* Features/Results/ResultsViews.swift */; };
 		A11B22C033D44E5500000107 /* Features/Flashcards/FlashcardViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000107 /* Features/Flashcards/FlashcardViews.swift */; };
 		A11B22C033D44E5500000108 /* Features/History/HistoryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000108 /* Features/History/HistoryViews.swift */; };
-		A11B22C033D44E5500000109 /* Features/Profile/ProfileViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */; };
-		A11B22C033D44E5500000110 /* Shared/Components/SharedUIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */; };
-		C33D44E550000030000000101 /* Features/Dashboard/InAppBroadcastBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */; };
-		C33D44E550000030000000102 /* Features/Dashboard/DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */; };
-		C33D44E550000030000000103 /* Features/Generator/GeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */; };
+			A11B22C033D44E5500000109 /* Features/Profile/ProfileViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */; };
+			A11B22C033D44E5500000110 /* Shared/Components/SharedUIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */; };
+			A11B22C033D44E5500000111 /* SentryRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000111 /* SentryRuntime.swift */; };
+			F089B37234D8A8EBBE1A2426 /* Features/Onboarding/OnboardingStepViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A42C275F4BF521DABF542FC /* Features/Onboarding/OnboardingStepViews.swift */; };
+			FD8FD8C8A71A9D2BABCFD358 /* Features/Profile/ProfileSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE25EE189E0BCA43CA9BCAD /* Features/Profile/ProfileSections.swift */; };
+			73ECF162BB0CDA611DB3632D /* Shared/Components/SharedUIComponentsExtras.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A0B7D8405700623B31FAE7 /* Shared/Components/SharedUIComponentsExtras.swift */; };
+			B057AF85A3E9C5D47BDE34FA /* Features/Session/CaseResultFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 389165FA9188CF9C603989B2 /* Features/Session/CaseResultFlowView.swift */; };
+			5ACC833576280C162E9CA996 /* Features/Session/CaseSessionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E17102598A277F02C6777810 /* Features/Session/CaseSessionViewLayout.swift */; };
+			DA26E7F6B78896FF9FB492FE /* Features/Auth/AuthFlowViewScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C38D5586CE8F7E7B0B64B2C /* Features/Auth/AuthFlowViewScreens.swift */; };
+			6DA08CC8D615431B9F235621 /* Features/Auth/AuthFlowViewActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152D51B760AC04C17EED57DC /* Features/Auth/AuthFlowViewActions.swift */; };
+			1C139DD139DDAC09E7F0FEF3 /* AgentConversationViewModelConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F7C46B2D488B67C19CD7B8 /* AgentConversationViewModelConnection.swift */; };
+			1B6D54D56034C13C5FA66B77 /* AgentConversationViewModelAudioTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E452D69BBEAF0E5EC401988 /* AgentConversationViewModelAudioTranscript.swift */; };
+			C33D44E550000030000000101 /* Features/Dashboard/InAppBroadcastBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */; };
+			C33D44E550000030000000102 /* Features/Dashboard/DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */; };
+			C33D44E550000030000000103 /* Features/Generator/GeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */; };
 		C33D44E550000030000000104 /* Features/Dashboard/StudyPlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000004 /* Features/Dashboard/StudyPlanDetailView.swift */; };
 		C33D44E550000030000000105 /* Features/Dashboard/WeeklyGoalDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000005 /* Features/Dashboard/WeeklyGoalDetailView.swift */; };
 		C33D44E550000030000000106 /* Features/Dashboard/ConfettiBurstView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000006 /* Features/Dashboard/ConfettiBurstView.swift */; };
@@ -122,11 +132,21 @@
 		A11B22C133D44E5500000106 /* Features/Results/ResultsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Results/ResultsViews.swift; sourceTree = "<group>"; };
 		A11B22C133D44E5500000107 /* Features/Flashcards/FlashcardViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Flashcards/FlashcardViews.swift; sourceTree = "<group>"; };
 		A11B22C133D44E5500000108 /* Features/History/HistoryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/History/HistoryViews.swift; sourceTree = "<group>"; };
-		A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Profile/ProfileViews.swift; sourceTree = "<group>"; };
-		A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Components/SharedUIComponents.swift; sourceTree = "<group>"; };
-		C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/InAppBroadcastBanner.swift; sourceTree = "<group>"; };
-		C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/DashboardView.swift; sourceTree = "<group>"; };
-		C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Generator/GeneratorView.swift; sourceTree = "<group>"; };
+			A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Profile/ProfileViews.swift; sourceTree = "<group>"; };
+			A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Components/SharedUIComponents.swift; sourceTree = "<group>"; };
+			A11B22C133D44E5500000111 /* SentryRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryRuntime.swift; sourceTree = "<group>"; };
+			8A42C275F4BF521DABF542FC /* Features/Onboarding/OnboardingStepViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Onboarding/OnboardingStepViews.swift; sourceTree = "<group>"; };
+			6CE25EE189E0BCA43CA9BCAD /* Features/Profile/ProfileSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Profile/ProfileSections.swift; sourceTree = "<group>"; };
+			A7A0B7D8405700623B31FAE7 /* Shared/Components/SharedUIComponentsExtras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Components/SharedUIComponentsExtras.swift; sourceTree = "<group>"; };
+			389165FA9188CF9C603989B2 /* Features/Session/CaseResultFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Session/CaseResultFlowView.swift; sourceTree = "<group>"; };
+			E17102598A277F02C6777810 /* Features/Session/CaseSessionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Session/CaseSessionViewLayout.swift; sourceTree = "<group>"; };
+			2C38D5586CE8F7E7B0B64B2C /* Features/Auth/AuthFlowViewScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Auth/AuthFlowViewScreens.swift; sourceTree = "<group>"; };
+			152D51B760AC04C17EED57DC /* Features/Auth/AuthFlowViewActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Auth/AuthFlowViewActions.swift; sourceTree = "<group>"; };
+			01F7C46B2D488B67C19CD7B8 /* AgentConversationViewModelConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationViewModelConnection.swift; sourceTree = "<group>"; };
+			5E452D69BBEAF0E5EC401988 /* AgentConversationViewModelAudioTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationViewModelAudioTranscript.swift; sourceTree = "<group>"; };
+			C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/InAppBroadcastBanner.swift; sourceTree = "<group>"; };
+			C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/DashboardView.swift; sourceTree = "<group>"; };
+			C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Generator/GeneratorView.swift; sourceTree = "<group>"; };
 		C33D44E550000030000000004 /* Features/Dashboard/StudyPlanDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/StudyPlanDetailView.swift; sourceTree = "<group>"; };
 		C33D44E550000030000000005 /* Features/Dashboard/WeeklyGoalDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/WeeklyGoalDetailView.swift; sourceTree = "<group>"; };
 		C33D44E550000030000000006 /* Features/Dashboard/ConfettiBurstView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/ConfettiBurstView.swift; sourceTree = "<group>"; };
@@ -137,6 +157,10 @@
 		B22C33D44E55000002000102 /* State/Dashboard/DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State/Dashboard/DashboardViewModel.swift; sourceTree = "<group>"; };
 		B22C33D44E55000002000103 /* State/Flashcards/FlashcardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State/Flashcards/FlashcardViewModel.swift; sourceTree = "<group>"; };
 		B22C33D44E55000002000104 /* State/Notifications/NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State/Notifications/NotificationManager.swift; sourceTree = "<group>"; };
+		9F2A1CFA8B6E4D0187C1A102 /* App-Dev.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/App-Dev.xcconfig; sourceTree = SOURCE_ROOT; };
+		9F2A1CFA8B6E4D0187C1A103 /* App-Staging.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/App-Staging.xcconfig; sourceTree = SOURCE_ROOT; };
+		9F2A1CFA8B6E4D0187C1A104 /* App-Prod.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/App-Prod.xcconfig; sourceTree = SOURCE_ROOT; };
+		9F2A1CFA8B6E4D0187C1A105 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Common.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,7 +191,19 @@
 				A11B22C333D44E5500000002 /* MedCaseAI */,
 				D11B22C333D44E5500000001 /* DrKynoxWidgets */,
 				A11B22C333D44E5500000003 /* Products */,
+				9F2A1CFA8B6E4D0187C1A101 /* Config */,
 			);
+			sourceTree = "<group>";
+		};
+		9F2A1CFA8B6E4D0187C1A101 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				9F2A1CFA8B6E4D0187C1A102 /* App-Dev.xcconfig */,
+				9F2A1CFA8B6E4D0187C1A103 /* App-Staging.xcconfig */,
+				9F2A1CFA8B6E4D0187C1A104 /* App-Prod.xcconfig */,
+				9F2A1CFA8B6E4D0187C1A105 /* Common.xcconfig */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 		A11B22C333D44E5500000002 /* MedCaseAI */ = {
@@ -180,18 +216,24 @@
 				B22C33D44E55000002000103 /* State/Flashcards/FlashcardViewModel.swift */,
 				B22C33D44E55000002000104 /* State/Notifications/NotificationManager.swift */,
 				A11B22C133D44E5500000003 /* APIClient.swift */,
-				B11B22C133D44E5500000001 /* SupabaseService.swift */,
-				B11B22C133D44E5500000002 /* AgentConversationViewModel.swift */,
-				B11B22C133D44E5500000003 /* ColorPalette.swift */,
-				B11B22C133D44E5500000004 /* Typography.swift */,
+					B11B22C133D44E5500000001 /* SupabaseService.swift */,
+					B11B22C133D44E5500000002 /* AgentConversationViewModel.swift */,
+					01F7C46B2D488B67C19CD7B8 /* AgentConversationViewModelConnection.swift */,
+					5E452D69BBEAF0E5EC401988 /* AgentConversationViewModelAudioTranscript.swift */,
+					B11B22C133D44E5500000003 /* ColorPalette.swift */,
+					B11B22C133D44E5500000004 /* Typography.swift */,
+					A11B22C133D44E5500000111 /* SentryRuntime.swift */,
 				F11B22C133D44E5500000002 /* DesignSystem.swift */,
 				F11B22C133D44E5500000001 /* WeeklyGoalSystem.swift */,
 				F11B22C133D44E5500000003 /* MotionAudioKit.swift */,
 				F11B22C133D44E5500000013 /* PushNotificationBridge.swift */,
-				A11B22C133D44E5500000004 /* ContentView.swift */,
-				A11B22C133D44E5500000101 /* Features/Auth/AuthFlowView.swift */,
-				A11B22C133D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift */,
-				A11B22C133D44E5500000103 /* Features/Dashboard/MainTabView.swift */,
+					A11B22C133D44E5500000004 /* ContentView.swift */,
+					A11B22C133D44E5500000101 /* Features/Auth/AuthFlowView.swift */,
+					2C38D5586CE8F7E7B0B64B2C /* Features/Auth/AuthFlowViewScreens.swift */,
+					152D51B760AC04C17EED57DC /* Features/Auth/AuthFlowViewActions.swift */,
+					A11B22C133D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift */,
+					8A42C275F4BF521DABF542FC /* Features/Onboarding/OnboardingStepViews.swift */,
+					A11B22C133D44E5500000103 /* Features/Dashboard/MainTabView.swift */,
 				A11B22C133D44E5500000104 /* Features/Analysis/AnalysisHubView.swift */,
 				C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */,
 				C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */,
@@ -199,16 +241,20 @@
 				C33D44E550000030000000004 /* Features/Dashboard/StudyPlanDetailView.swift */,
 				C33D44E550000030000000005 /* Features/Dashboard/WeeklyGoalDetailView.swift */,
 				C33D44E550000030000000006 /* Features/Dashboard/ConfettiBurstView.swift */,
-				C33D44E550000030000000007 /* Features/Analysis/WeakAreaAnalysisView.swift */,
-				C33D44E550000030000000008 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift */,
-				C33D44E550000030000000009 /* Features/Analysis/WeakAreaRadarChart.swift */,
-				A11B22C133D44E5500000105 /* Features/Session/CaseSessionFlow.swift */,
-				A11B22C133D44E5500000106 /* Features/Results/ResultsViews.swift */,
-				A11B22C133D44E5500000107 /* Features/Flashcards/FlashcardViews.swift */,
-				A11B22C133D44E5500000108 /* Features/History/HistoryViews.swift */,
-				A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */,
-				A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */,
-				A11B22C133D44E5500000005 /* Models.swift */,
+					C33D44E550000030000000007 /* Features/Analysis/WeakAreaAnalysisView.swift */,
+					C33D44E550000030000000008 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift */,
+					C33D44E550000030000000009 /* Features/Analysis/WeakAreaRadarChart.swift */,
+					A11B22C133D44E5500000105 /* Features/Session/CaseSessionFlow.swift */,
+					E17102598A277F02C6777810 /* Features/Session/CaseSessionViewLayout.swift */,
+					389165FA9188CF9C603989B2 /* Features/Session/CaseResultFlowView.swift */,
+					A11B22C133D44E5500000106 /* Features/Results/ResultsViews.swift */,
+					A11B22C133D44E5500000107 /* Features/Flashcards/FlashcardViews.swift */,
+					A11B22C133D44E5500000108 /* Features/History/HistoryViews.swift */,
+					A11B22C133D44E5500000109 /* Features/Profile/ProfileViews.swift */,
+					6CE25EE189E0BCA43CA9BCAD /* Features/Profile/ProfileSections.swift */,
+					A11B22C133D44E5500000110 /* Shared/Components/SharedUIComponents.swift */,
+					A7A0B7D8405700623B31FAE7 /* Shared/Components/SharedUIComponentsExtras.swift */,
+					A11B22C133D44E5500000005 /* Models.swift */,
 				A11B22C133D44E5500000006 /* Assets.xcassets */,
 				A11B22C133D44E5500000009 /* intro.mp4 */,
 				F11B22C133D44E5500000004 /* Media/intro_short.mp4 */,
@@ -372,18 +418,23 @@
 				B22C33D44E55000002000003 /* State/Flashcards/FlashcardViewModel.swift in Sources */,
 				B22C33D44E55000002000004 /* State/Notifications/NotificationManager.swift in Sources */,
 				A11B22C033D44E5500000003 /* APIClient.swift in Sources */,
-				B11B22C033D44E5500000001 /* SupabaseService.swift in Sources */,
-				B11B22C033D44E5500000002 /* AgentConversationViewModel.swift in Sources */,
-				B11B22C033D44E5500000003 /* ColorPalette.swift in Sources */,
-				B11B22C033D44E5500000004 /* Typography.swift in Sources */,
+					B11B22C033D44E5500000001 /* SupabaseService.swift in Sources */,
+					B11B22C033D44E5500000002 /* AgentConversationViewModel.swift in Sources */,
+					1C139DD139DDAC09E7F0FEF3 /* AgentConversationViewModelConnection.swift in Sources */,
+					1B6D54D56034C13C5FA66B77 /* AgentConversationViewModelAudioTranscript.swift in Sources */,
+					B11B22C033D44E5500000003 /* ColorPalette.swift in Sources */,
+					B11B22C033D44E5500000004 /* Typography.swift in Sources */,
 				F11B22C033D44E5500000002 /* DesignSystem.swift in Sources */,
 				F11B22C033D44E5500000001 /* WeeklyGoalSystem.swift in Sources */,
 				F11B22C033D44E5500000003 /* MotionAudioKit.swift in Sources */,
 				F11B22C033D44E5500000013 /* PushNotificationBridge.swift in Sources */,
-				A11B22C033D44E5500000004 /* ContentView.swift in Sources */,
-				A11B22C033D44E5500000101 /* Features/Auth/AuthFlowView.swift in Sources */,
-				A11B22C033D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift in Sources */,
-				A11B22C033D44E5500000103 /* Features/Dashboard/MainTabView.swift in Sources */,
+					A11B22C033D44E5500000004 /* ContentView.swift in Sources */,
+					A11B22C033D44E5500000101 /* Features/Auth/AuthFlowView.swift in Sources */,
+					DA26E7F6B78896FF9FB492FE /* Features/Auth/AuthFlowViewScreens.swift in Sources */,
+					6DA08CC8D615431B9F235621 /* Features/Auth/AuthFlowViewActions.swift in Sources */,
+					A11B22C033D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift in Sources */,
+					F089B37234D8A8EBBE1A2426 /* Features/Onboarding/OnboardingStepViews.swift in Sources */,
+					A11B22C033D44E5500000103 /* Features/Dashboard/MainTabView.swift in Sources */,
 				A11B22C033D44E5500000104 /* Features/Analysis/AnalysisHubView.swift in Sources */,
 				C33D44E550000030000000103 /* Features/Generator/GeneratorView.swift in Sources */,
 				C33D44E550000030000000101 /* Features/Dashboard/InAppBroadcastBanner.swift in Sources */,
@@ -392,14 +443,19 @@
 				C33D44E550000030000000105 /* Features/Dashboard/WeeklyGoalDetailView.swift in Sources */,
 				C33D44E550000030000000106 /* Features/Dashboard/ConfettiBurstView.swift in Sources */,
 				C33D44E550000030000000107 /* Features/Analysis/WeakAreaAnalysisView.swift in Sources */,
-				C33D44E550000030000000108 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift in Sources */,
-				C33D44E550000030000000109 /* Features/Analysis/WeakAreaRadarChart.swift in Sources */,
-				A11B22C033D44E5500000105 /* Features/Session/CaseSessionFlow.swift in Sources */,
-				A11B22C033D44E5500000106 /* Features/Results/ResultsViews.swift in Sources */,
-				A11B22C033D44E5500000107 /* Features/Flashcards/FlashcardViews.swift in Sources */,
-				A11B22C033D44E5500000108 /* Features/History/HistoryViews.swift in Sources */,
-				A11B22C033D44E5500000109 /* Features/Profile/ProfileViews.swift in Sources */,
-				A11B22C033D44E5500000110 /* Shared/Components/SharedUIComponents.swift in Sources */,
+					C33D44E550000030000000108 /* Features/Analysis/WeakAreaSpecialtyDetailView.swift in Sources */,
+					C33D44E550000030000000109 /* Features/Analysis/WeakAreaRadarChart.swift in Sources */,
+					A11B22C033D44E5500000105 /* Features/Session/CaseSessionFlow.swift in Sources */,
+					5ACC833576280C162E9CA996 /* Features/Session/CaseSessionViewLayout.swift in Sources */,
+					B057AF85A3E9C5D47BDE34FA /* Features/Session/CaseResultFlowView.swift in Sources */,
+					A11B22C033D44E5500000106 /* Features/Results/ResultsViews.swift in Sources */,
+					A11B22C033D44E5500000107 /* Features/Flashcards/FlashcardViews.swift in Sources */,
+					A11B22C033D44E5500000108 /* Features/History/HistoryViews.swift in Sources */,
+					A11B22C033D44E5500000109 /* Features/Profile/ProfileViews.swift in Sources */,
+					A11B22C033D44E5500000110 /* Shared/Components/SharedUIComponents.swift in Sources */,
+					FD8FD8C8A71A9D2BABCFD358 /* Features/Profile/ProfileSections.swift in Sources */,
+					73ECF162BB0CDA611DB3632D /* Shared/Components/SharedUIComponentsExtras.swift in Sources */,
+					A11B22C033D44E5500000111 /* SentryRuntime.swift in Sources */,
 				A11B22C033D44E5500000005 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -544,8 +600,68 @@
 			};
 			name = Release;
 		};
+		A11B22C733D44E5500000005 /* Staging */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Staging;
+		};
 		A11B22C733D44E5500000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F2A1CFA8B6E4D0187C1A102 /* App-Dev.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -573,6 +689,7 @@
 		};
 		A11B22C733D44E5500000004 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F2A1CFA8B6E4D0187C1A104 /* App-Prod.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -600,6 +717,37 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		A11B22C733D44E5500000006 /* Staging */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9F2A1CFA8B6E4D0187C1A103 /* App-Staging.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MedCaseAI/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medcaseai.native;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Staging;
 		};
 		D11B22C733D44E5500000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -654,6 +802,34 @@
 			};
 			name = Release;
 		};
+		D11B22C733D44E5500000003 /* Staging */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DEVELOPMENT_TEAM = D69AG4A34W;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = DrKynoxWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.medcaseai.native.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = YES;
+				STRIP_STYLE = all;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Staging;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -661,6 +837,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A11B22C733D44E5500000003 /* Debug */,
+				A11B22C733D44E5500000006 /* Staging */,
 				A11B22C733D44E5500000004 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -670,6 +847,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A11B22C733D44E5500000001 /* Debug */,
+				A11B22C733D44E5500000005 /* Staging */,
 				A11B22C733D44E5500000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -679,6 +857,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D11B22C733D44E5500000001 /* Debug */,
+				D11B22C733D44E5500000003 /* Staging */,
 				D11B22C733D44E5500000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

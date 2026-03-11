@@ -1,0 +1,6 @@
+#include "Common.xcconfig"
+
+APP_ENVIRONMENT = development
+APP_BACKEND_BASE_URL = http:$(URL_SLASH)$(URL_SLASH)localhost:3000
+APP_SENTRY_DSN =
+APP_SENTRY_ENVIRONMENT = development

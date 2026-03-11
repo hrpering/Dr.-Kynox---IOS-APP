@@ -3,7 +3,6 @@ import AVFoundation
 import AVKit
 import SafariServices
 import UIKit
-import Sentry
 
 struct RootView: View {
     @EnvironmentObject private var state: AppState
@@ -43,14 +42,14 @@ struct RootView: View {
     }
 
     private func trackRouteChange(_ route: AppState.Route) {
-        let crumb = Breadcrumb()
-        crumb.category = "navigation"
-        crumb.type = "navigation"
-        crumb.level = .info
-        crumb.message = "route_changed"
-        crumb.data = ["route": route.sentryName]
-        SentrySDK.addBreadcrumb(crumb)
-        SentrySDK.configureScope { scope in
+        SentryRuntime.addBreadcrumb { crumb in
+            crumb.category = "navigation"
+            crumb.type = "navigation"
+            crumb.level = .info
+            crumb.message = "route_changed"
+            crumb.data = ["route": route.sentryName]
+        }
+        SentryRuntime.configureScope { scope in
             scope.setTag(value: route.sentryName, key: "app.route")
         }
     }
@@ -96,4 +95,3 @@ private struct LoadingScreen: View {
         .background(AppColor.background)
     }
 }
-

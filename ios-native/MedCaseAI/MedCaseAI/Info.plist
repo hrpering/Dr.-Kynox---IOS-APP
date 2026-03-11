@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>BACKEND_BASE_URL</key>
-	<string>https://www.medcase.website</string>
+	<string>$(APP_BACKEND_BASE_URL)</string>
+	<key>APP_ENVIRONMENT</key>
+	<string>$(APP_ENVIRONMENT)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -34,11 +36,11 @@
 		</dict>
 	</array>
 	<key>SENTRY_DSN</key>
-	<string>https://81a71c504ea49c31da6dc5f329c81f78@o4511010111225856.ingest.de.sentry.io/4511010113585232</string>
+	<string>$(APP_SENTRY_DSN)</string>
 	<key>SENTRY_ENABLE_LOGS</key>
 	<true/>
 	<key>SENTRY_ENVIRONMENT</key>
-	<string>production</string>
+	<string>$(APP_SENTRY_ENVIRONMENT)</string>
 	<key>SENTRY_TRACES_SAMPLE_RATE</key>
 	<real>0.2</real>
 	<key>CFBundleVersion</key>

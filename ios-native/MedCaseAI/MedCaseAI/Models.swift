@@ -4,6 +4,7 @@ struct PublicConfig: Decodable {
     let supabaseUrl: String
     let supabaseAnonKey: String
     let authorizationUrl: String?
+    let sentryEnabled: Bool?
 }
 
 struct BasicResponse: Decodable {
@@ -52,6 +53,7 @@ struct DeleteAccountResponse: Decodable {
 
 struct ErrorResponse: Decodable {
     let error: String
+    let code: String?
 }
 
 struct UserProfile: Codable {

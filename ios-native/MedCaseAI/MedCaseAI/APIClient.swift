@@ -1,10 +1,10 @@
 import Foundation
-import Sentry
 
 enum AppError: LocalizedError {
     case invalidURL
     case invalidResponse
     case httpError(String)
+    case apiError(statusCode: Int, code: String?, message: String)
     case sessionMissing
     case malformedPayload
     case dependencyMissing(String)
@@ -16,6 +16,8 @@ enum AppError: LocalizedError {
         case .invalidResponse:
             return "Sunucu yanıtı okunamadı."
         case .httpError(let message):
+            return message
+        case .apiError(_, _, let message):
             return message
         case .sessionMissing:
             return "Oturum bulunamadı."
@@ -52,11 +54,13 @@ final class APIClient {
 
     func fetchPublicConfig(forceRefresh: Bool = false) async throws -> PublicConfig {
         if !forceRefresh, let config = cachedConfig {
+            applyRuntimeFlags(from: config)
             return config
         }
 
         if !forceRefresh, let persisted = loadPersistedPublicConfig() {
             cachedConfig = persisted
+            applyRuntimeFlags(from: persisted)
             return persisted
         }
 
@@ -65,14 +69,20 @@ final class APIClient {
             let response: PublicConfig = try await request(url: url, method: "GET", timeout: 8)
             cachedConfig = response
             persistPublicConfig(response)
+            applyRuntimeFlags(from: response)
             return response
         } catch {
             if let persisted = loadPersistedPublicConfig() {
                 cachedConfig = persisted
+                applyRuntimeFlags(from: persisted)
                 return persisted
             }
             throw error
         }
+    }
+
+    private func applyRuntimeFlags(from config: PublicConfig) {
+        SentryRuntime.configureIfPossible(serverEnabled: config.sentryEnabled ?? false)
     }
 
     func fetchElevenLabsSessionAuth(accessToken: String,
@@ -86,6 +96,7 @@ final class APIClient {
             let mode: String
             let sessionWindowToken: String?
             let dynamicVariables: [String: String]
+            let clientSupportsSignedUrl: Bool
         }
 
         return try await request(
@@ -99,7 +110,8 @@ final class APIClient {
                 agentId: agentId,
                 mode: mode,
                 sessionWindowToken: sessionWindowToken,
-                dynamicVariables: dynamicVariables
+                dynamicVariables: dynamicVariables,
+                clientSupportsSignedUrl: false
             )
         )
     }
@@ -645,7 +657,11 @@ final class APIClient {
                                  url: url,
                                  statusCode: http.statusCode,
                                  errorMessage: message)
-            throw AppError.httpError(message)
+            throw AppError.apiError(
+                statusCode: http.statusCode,
+                code: apiError?.code,
+                message: message
+            )
         }
 
         addNetworkBreadcrumb(stage: "response", method: method, url: url, statusCode: http.statusCode)
@@ -670,24 +686,24 @@ final class APIClient {
                                       url: URL,
                                       statusCode: Int? = nil,
                                       errorMessage: String? = nil) {
-        let crumb = Breadcrumb()
-        crumb.category = "http.client"
-        crumb.type = "http"
-        crumb.level = errorMessage == nil ? .info : .warning
-        crumb.message = "\(method.uppercased()) \(url.path)"
-        var data: [String: Any] = [
-            "stage": stage,
-            "method": method.uppercased(),
-            "path": url.path
-        ]
-        if let statusCode {
-            data["status_code"] = statusCode
+        SentryRuntime.addBreadcrumb { crumb in
+            crumb.category = "http.client"
+            crumb.type = "http"
+            crumb.level = errorMessage == nil ? .info : .warning
+            crumb.message = "\(method.uppercased()) \(url.path)"
+            var data: [String: Any] = [
+                "stage": stage,
+                "method": method.uppercased(),
+                "path": url.path
+            ]
+            if let statusCode {
+                data["status_code"] = statusCode
+            }
+            if let errorMessage, !errorMessage.isEmpty {
+                data["error"] = String(errorMessage.prefix(200))
+            }
+            crumb.data = data
         }
-        if let errorMessage, !errorMessage.isEmpty {
-            data["error"] = String(errorMessage.prefix(200))
-        }
-        crumb.data = data
-        SentrySDK.addBreadcrumb(crumb)
     }
 }
 
@@ -696,13 +712,15 @@ private extension APIClient {
         let supabaseUrl: String
         let supabaseAnonKey: String
         let authorizationUrl: String?
+        let sentryEnabled: Bool?
     }
 
     func persistPublicConfig(_ config: PublicConfig) {
         let payload = PersistedPublicConfig(
             supabaseUrl: config.supabaseUrl,
             supabaseAnonKey: config.supabaseAnonKey,
-            authorizationUrl: config.authorizationUrl
+            authorizationUrl: config.authorizationUrl,
+            sentryEnabled: config.sentryEnabled
         )
         guard let data = try? JSONEncoder().encode(payload) else { return }
         defaults.set(data, forKey: publicConfigCacheKey)
@@ -719,7 +737,8 @@ private extension APIClient {
         return PublicConfig(
             supabaseUrl: url,
             supabaseAnonKey: anon,
-            authorizationUrl: payload.authorizationUrl
+            authorizationUrl: payload.authorizationUrl,
+            sentryEnabled: payload.sentryEnabled
         )
     }
 }
