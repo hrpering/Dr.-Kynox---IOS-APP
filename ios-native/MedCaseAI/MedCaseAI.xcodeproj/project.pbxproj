@@ -56,6 +56,11 @@
 			6DA08CC8D615431B9F235621 /* Features/Auth/AuthFlowViewActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152D51B760AC04C17EED57DC /* Features/Auth/AuthFlowViewActions.swift */; };
 			1C139DD139DDAC09E7F0FEF3 /* AgentConversationViewModelConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F7C46B2D488B67C19CD7B8 /* AgentConversationViewModelConnection.swift */; };
 			1B6D54D56034C13C5FA66B77 /* AgentConversationViewModelAudioTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E452D69BBEAF0E5EC401988 /* AgentConversationViewModelAudioTranscript.swift */; };
+			A9E1A001D11F4C0D90000001 /* AgentConversationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E1A002D11F4C0D90000001 /* AgentConversationState.swift */; };
+			A9E1A001D11F4C0D90000002 /* AgentConversationEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E1A002D11F4C0D90000002 /* AgentConversationEvents.swift */; };
+			A9E1A001D11F4C0D90000003 /* AgentConversationStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E1A002D11F4C0D90000003 /* AgentConversationStart.swift */; };
+			A9E1A001D11F4C0D90000004 /* AgentConversationRetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E1A002D11F4C0D90000004 /* AgentConversationRetry.swift */; };
+			A9E1A001D11F4C0D90000005 /* AgentConversationCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E1A002D11F4C0D90000005 /* AgentConversationCleanup.swift */; };
 			C33D44E550000030000000101 /* Features/Dashboard/InAppBroadcastBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */; };
 			C33D44E550000030000000102 /* Features/Dashboard/DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */; };
 			C33D44E550000030000000103 /* Features/Generator/GeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */; };
@@ -144,6 +149,11 @@
 			152D51B760AC04C17EED57DC /* Features/Auth/AuthFlowViewActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Auth/AuthFlowViewActions.swift; sourceTree = "<group>"; };
 			01F7C46B2D488B67C19CD7B8 /* AgentConversationViewModelConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationViewModelConnection.swift; sourceTree = "<group>"; };
 			5E452D69BBEAF0E5EC401988 /* AgentConversationViewModelAudioTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationViewModelAudioTranscript.swift; sourceTree = "<group>"; };
+			A9E1A002D11F4C0D90000001 /* AgentConversationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationState.swift; sourceTree = "<group>"; };
+			A9E1A002D11F4C0D90000002 /* AgentConversationEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationEvents.swift; sourceTree = "<group>"; };
+			A9E1A002D11F4C0D90000003 /* AgentConversationStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationStart.swift; sourceTree = "<group>"; };
+			A9E1A002D11F4C0D90000004 /* AgentConversationRetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationRetry.swift; sourceTree = "<group>"; };
+			A9E1A002D11F4C0D90000005 /* AgentConversationCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConversationCleanup.swift; sourceTree = "<group>"; };
 			C33D44E550000030000000001 /* Features/Dashboard/InAppBroadcastBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/InAppBroadcastBanner.swift; sourceTree = "<group>"; };
 			C33D44E550000030000000002 /* Features/Dashboard/DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Dashboard/DashboardView.swift; sourceTree = "<group>"; };
 			C33D44E550000030000000003 /* Features/Generator/GeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Generator/GeneratorView.swift; sourceTree = "<group>"; };
@@ -217,11 +227,16 @@
 				B22C33D44E55000002000104 /* State/Notifications/NotificationManager.swift */,
 				A11B22C133D44E5500000003 /* APIClient.swift */,
 					B11B22C133D44E5500000001 /* SupabaseService.swift */,
-					B11B22C133D44E5500000002 /* AgentConversationViewModel.swift */,
-					01F7C46B2D488B67C19CD7B8 /* AgentConversationViewModelConnection.swift */,
-					5E452D69BBEAF0E5EC401988 /* AgentConversationViewModelAudioTranscript.swift */,
-					B11B22C133D44E5500000003 /* ColorPalette.swift */,
-					B11B22C133D44E5500000004 /* Typography.swift */,
+						B11B22C133D44E5500000002 /* AgentConversationViewModel.swift */,
+						01F7C46B2D488B67C19CD7B8 /* AgentConversationViewModelConnection.swift */,
+						5E452D69BBEAF0E5EC401988 /* AgentConversationViewModelAudioTranscript.swift */,
+						A9E1A002D11F4C0D90000001 /* AgentConversationState.swift */,
+						A9E1A002D11F4C0D90000002 /* AgentConversationEvents.swift */,
+						A9E1A002D11F4C0D90000003 /* AgentConversationStart.swift */,
+						A9E1A002D11F4C0D90000004 /* AgentConversationRetry.swift */,
+						A9E1A002D11F4C0D90000005 /* AgentConversationCleanup.swift */,
+						B11B22C133D44E5500000003 /* ColorPalette.swift */,
+						B11B22C133D44E5500000004 /* Typography.swift */,
 					A11B22C133D44E5500000111 /* SentryRuntime.swift */,
 				F11B22C133D44E5500000002 /* DesignSystem.swift */,
 				F11B22C133D44E5500000001 /* WeeklyGoalSystem.swift */,
@@ -419,11 +434,16 @@
 				B22C33D44E55000002000004 /* State/Notifications/NotificationManager.swift in Sources */,
 				A11B22C033D44E5500000003 /* APIClient.swift in Sources */,
 					B11B22C033D44E5500000001 /* SupabaseService.swift in Sources */,
-					B11B22C033D44E5500000002 /* AgentConversationViewModel.swift in Sources */,
-					1C139DD139DDAC09E7F0FEF3 /* AgentConversationViewModelConnection.swift in Sources */,
-					1B6D54D56034C13C5FA66B77 /* AgentConversationViewModelAudioTranscript.swift in Sources */,
-					B11B22C033D44E5500000003 /* ColorPalette.swift in Sources */,
-					B11B22C033D44E5500000004 /* Typography.swift in Sources */,
+						B11B22C033D44E5500000002 /* AgentConversationViewModel.swift in Sources */,
+						1C139DD139DDAC09E7F0FEF3 /* AgentConversationViewModelConnection.swift in Sources */,
+						1B6D54D56034C13C5FA66B77 /* AgentConversationViewModelAudioTranscript.swift in Sources */,
+						A9E1A001D11F4C0D90000001 /* AgentConversationState.swift in Sources */,
+						A9E1A001D11F4C0D90000002 /* AgentConversationEvents.swift in Sources */,
+						A9E1A001D11F4C0D90000003 /* AgentConversationStart.swift in Sources */,
+						A9E1A001D11F4C0D90000004 /* AgentConversationRetry.swift in Sources */,
+						A9E1A001D11F4C0D90000005 /* AgentConversationCleanup.swift in Sources */,
+						B11B22C033D44E5500000003 /* ColorPalette.swift in Sources */,
+						B11B22C033D44E5500000004 /* Typography.swift in Sources */,
 				F11B22C033D44E5500000002 /* DesignSystem.swift in Sources */,
 				F11B22C033D44E5500000001 /* WeeklyGoalSystem.swift in Sources */,
 				F11B22C033D44E5500000003 /* MotionAudioKit.swift in Sources */,
