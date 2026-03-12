@@ -10,14 +10,14 @@ import Supabase
 
 extension AuthFlowView {
     var welcomeCard: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: AppSpacing.x2) {
             IntroMotionCard(variant: .short)
                 .frame(height: 230)
                 .frame(maxWidth: .infinity)
                 .accessibilityHidden(true)
 
             Text("Dr.Kynox")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(AppFont.h1)
                 .foregroundStyle(AppColor.textPrimary)
 
             Text("Klinik pratiğinin yapay zeka asistanı")
@@ -32,7 +32,7 @@ extension AuthFlowView {
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
 
-            VStack(spacing: 10) {
+            VStack(spacing: AppSpacing.x1) {
                 FeatureHighlightRow(
                     icon: "mic.fill",
                     title: "Sesli etkileşim",
@@ -52,13 +52,14 @@ extension AuthFlowView {
                     tint: AppColor.warning
                 )
             }
-            .padding(14)
-            .background(AppColor.surface)
+            .padding(AppSpacing.cardPadding)
+            .background(AppColor.surfaceElevated)
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+            .appShadow(AppShadow.card)
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Button {
@@ -93,14 +94,14 @@ extension AuthFlowView {
                 Text("Hesabım var")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.primaryDark)
-                    .padding(.horizontal, 20)
-                    .frame(minWidth: 168, minHeight: 44)
+                    .padding(.horizontal, AppSpacing.x3)
+                    .frame(minWidth: 168, minHeight: 46)
                     .background(AppColor.primaryLight.opacity(0.45))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                             .stroke(AppColor.primary.opacity(0.45), lineWidth: 1)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
             }
             .buttonStyle(PressableButtonStyle())
             .accessibilityLabel("Hesabım var")

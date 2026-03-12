@@ -26,10 +26,13 @@ struct OnboardingView: View {
 
     private let totalSteps = 7
     private var transition: AnyTransition { reduceMotion ? .opacity : .move(edge: .trailing) }
+    private var completionPercent: Int {
+        Int((Double(step + 1) / Double(max(totalSteps, 1)) * 100).rounded())
+    }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
+            VStack(spacing: AppSpacing.x2) {
                 header
 
                 ZStack {
@@ -115,9 +118,9 @@ struct OnboardingView: View {
                     }
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.bottom, 16)
+            .padding(.horizontal, AppSpacing.x2)
+            .padding(.top, AppSpacing.x1_5)
+            .padding(.bottom, AppSpacing.x2)
             .background(AppColor.background.ignoresSafeArea())
             .sheet(item: $legalSheetItem) { item in
                 SafariSheet(url: item.url)
@@ -146,7 +149,17 @@ struct OnboardingView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: AppSpacing.x1) {
+            HStack {
+                Text("STEP \(step + 1) OF \(totalSteps)")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+                Spacer()
+                Text("%\(completionPercent)")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.primaryDark)
+            }
+
             GeometryReader { geo in
                 let totalSpacing = CGFloat(max(0, totalSteps - 1) * 8)
                 let rawWidth = (geo.size.width - totalSpacing) / CGFloat(max(totalSteps, 1))
@@ -162,7 +175,7 @@ struct OnboardingView: View {
             .frame(height: 6)
 
         }
-        .padding(.top, 4)
+        .padding(.top, AppSpacing.x1 / 2)
     }
 
     private var onboardingLegalLinks: some View {
@@ -215,6 +228,14 @@ struct OnboardingView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.cardPadding)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private func onboardingLegalButton(title: String, page: LegalPageLink) -> some View {
