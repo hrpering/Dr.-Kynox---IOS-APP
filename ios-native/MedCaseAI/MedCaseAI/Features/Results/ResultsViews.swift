@@ -30,7 +30,7 @@ struct ResultsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 12) {
                 resultHeroCard
                 resultMetricRow
                 scoreCard
@@ -40,7 +40,7 @@ struct ResultsView: View {
                 Button {
                     showDetailed = true
                 } label: {
-                    HStack(alignment: .center, spacing: 10) {
+                    HStack(alignment: .center, spacing: 8) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Detaylı geri bildirim")
                                 .font(AppFont.bodyMedium)
@@ -52,8 +52,8 @@ struct ResultsView: View {
                         Image(systemName: "arrow.right")
                     }
                     .foregroundStyle(AppColor.primary)
-                    .padding(.horizontal, 14)
-                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, minHeight: 48)
                     .background(AppColor.surfaceElevated)
                     .overlay(
                         RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
@@ -68,12 +68,12 @@ struct ResultsView: View {
                 quickCaseSection
                 cblMethodCard
             }
-            .padding(16)
-            .padding(.bottom, 100)
+            .padding(14)
+            .padding(.bottom, 92)
         }
         .background(AppColor.background.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 Button {
                     onRetry()
                 } label: {
@@ -84,11 +84,11 @@ struct ResultsView: View {
                 .accessibilityLabel("Bir Tur Daha Dene")
                 .accessibilityHint("Aynı bölüm ve zorlukla yeni vakaya başlar")
 
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     Button("Ana Sayfa") { onClose() }
                         .font(AppFont.bodyMedium)
                         .foregroundStyle(AppColor.primaryDark)
-                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .frame(maxWidth: .infinity, minHeight: 42)
                         .background(AppColor.primaryLight)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -101,7 +101,7 @@ struct ResultsView: View {
                         Text("Skoru Paylaş")
                             .font(AppFont.bodyMedium)
                             .foregroundStyle(AppColor.textSecondary)
-                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .frame(maxWidth: .infinity, minHeight: 42)
                             .background(AppColor.surface)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -112,9 +112,9 @@ struct ResultsView: View {
                     .buttonStyle(PressableButtonStyle())
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 10)
-            .padding(.bottom, 8)
+            .padding(.horizontal, 14)
+            .padding(.top, 8)
+            .padding(.bottom, 6)
             .background(AppColor.surface)
             .overlay(alignment: .top) {
                 Rectangle().fill(AppColor.border).frame(height: 1)
@@ -136,7 +136,7 @@ struct ResultsView: View {
     }
 
     private var resultMetricRow: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 7) {
             resultMetric(title: "Mod", value: config.mode == .voice ? "Sesli" : "Yazılı")
             resultMetric(title: "Mesaj", value: "\(userMessageCount)")
             resultMetric(title: "Skor", value: showsNumericScore ? "\(Int(result.overallScore.rounded()))" : "--")
@@ -153,8 +153,8 @@ struct ResultsView: View {
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
@@ -165,7 +165,7 @@ struct ResultsView: View {
     }
 
     private var quickCaseSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(systemName: "timer")
                     .foregroundStyle(AppColor.primary)
@@ -191,7 +191,7 @@ struct ResultsView: View {
             }
             .buttonStyle(PressableButtonStyle())
         }
-        .padding(12)
+        .padding(10)
         .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
@@ -202,7 +202,7 @@ struct ResultsView: View {
     }
 
     private var resultHeroCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Vaka tamamlandı")
                     .font(AppFont.title)
@@ -221,7 +221,7 @@ struct ResultsView: View {
                 .lineSpacing(4)
                 .lineLimit(3)
         }
-        .padding(14)
+        .padding(12)
         .background(
             LinearGradient(
                 colors: [AppColor.primaryDark, AppColor.primary],
@@ -238,7 +238,7 @@ struct ResultsView: View {
     }
 
     private var summarySection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             summaryDisclosure(
                 title: "Güçlü Yönler",
                 subtitle: "Ne iyi gitti",
@@ -270,12 +270,12 @@ struct ResultsView: View {
                                    background: Color,
                                    isExpanded: Binding<Bool>,
                                    items: [String] = []) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 7) {
             Button {
                 isExpanded.wrappedValue.toggle()
                 Haptic.selection()
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: 7) {
                     Image(systemName: icon)
                         .foregroundStyle(tint)
                     VStack(alignment: .leading, spacing: 2) {
@@ -295,7 +295,7 @@ struct ResultsView: View {
             .buttonStyle(PlainButtonStyle())
 
             if isExpanded.wrappedValue {
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 5) {
                     ForEach(items.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }, id: \.self) { item in
                         Text("• \(item)")
                             .font(AppFont.body)
@@ -305,22 +305,22 @@ struct ResultsView: View {
                 }
             }
         }
-        .padding(12)
+        .padding(10)
         .background(background)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(tint.opacity(0.25), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var diagnosisDisclosureCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 7) {
             Button {
                 diagnosisExpanded.toggle()
                 Haptic.selection()
             } label: {
-                HStack(spacing: 8) {
+                HStack(spacing: 7) {
                     Image(systemName: "cross.case.fill")
                         .foregroundStyle(AppColor.primary)
                     VStack(alignment: .leading, spacing: 2) {
@@ -340,7 +340,7 @@ struct ResultsView: View {
             .buttonStyle(PlainButtonStyle())
 
             if diagnosisExpanded {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 7) {
                     DiagnosisSummaryRow(
                         title: "Doğru tanı",
                         value: displayTrueDiagnosis,
@@ -364,13 +364,13 @@ struct ResultsView: View {
                 }
             }
         }
-        .padding(12)
+        .padding(10)
         .background(AppColor.surfaceAlt)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.primary.opacity(0.25), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var cblMethodCard: some View {
@@ -384,8 +384,8 @@ struct ResultsView: View {
                 .lineSpacing(4)
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .background(AppColor.surface)
         .overlay(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -395,7 +395,7 @@ struct ResultsView: View {
     }
 
     private var whatHappenedCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 7) {
             HStack(spacing: 8) {
                 Image(systemName: "doc.text.magnifyingglass")
                     .foregroundStyle(AppColor.primary)
@@ -422,7 +422,7 @@ struct ResultsView: View {
                 }
             }
         }
-        .padding(12)
+        .padding(10)
         .background(AppColor.surface)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -438,7 +438,7 @@ struct ResultsView: View {
     }
 
     private func flashcardPreviewDeck(_ card: FlashcardDraft) -> some View {
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Kart \(previewCardIndex + 1)/\(generatedFlashcards.count)")
                     .font(AppFont.caption)
@@ -449,7 +449,7 @@ struct ResultsView: View {
                     .foregroundStyle(AppColor.primary)
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text(card.title)
                     .font(AppFont.bodyMedium)
                     .foregroundStyle(AppColor.textPrimary)
@@ -463,7 +463,7 @@ struct ResultsView: View {
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.textTertiary)
             }
-            .padding(10)
+            .padding(9)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColor.surfaceAlt)
             .overlay(
@@ -477,7 +477,7 @@ struct ResultsView: View {
                 }
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 Button {
                     goToPreviousPreviewCard()
                 } label: {
@@ -517,12 +517,12 @@ struct ResultsView: View {
     private var scoreCard: some View {
         let theme = scoreTheme
 
-        return HStack(spacing: 14) {
+        return HStack(spacing: 12) {
             if showsNumericScore {
                 ZStack {
                     Circle()
-                        .stroke(theme.tint.opacity(0.18), lineWidth: 10)
-                        .frame(width: 102, height: 102)
+                        .stroke(theme.tint.opacity(0.18), lineWidth: 9)
+                        .frame(width: 96, height: 96)
                     Circle()
                         .trim(from: 0, to: max(0.02, min(1, animatedScore / 100)))
                         .stroke(
@@ -531,13 +531,13 @@ struct ResultsView: View {
                                 startPoint: .leading,
                                 endPoint: .trailing
                             ),
-                            style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                            style: StrokeStyle(lineWidth: 9, lineCap: .round)
                         )
-                        .frame(width: 102, height: 102)
+                        .frame(width: 96, height: 96)
                         .rotationEffect(.degrees(-90))
                     VStack(spacing: 0) {
                         Text("\(Int(animatedScore.rounded()))")
-                            .font(.system(size: 31, weight: .bold, design: .rounded))
+                            .font(.system(size: 29, weight: .bold, design: .rounded))
                             .foregroundStyle(scoreValueColor)
                         Text("/100")
                             .font(AppFont.caption)
@@ -546,15 +546,15 @@ struct ResultsView: View {
                 }
             } else {
                 Image(systemName: "clock.badge.exclamationmark.fill")
-                    .font(.system(size: 42, weight: .semibold))
+                    .font(.system(size: 38, weight: .semibold))
                     .foregroundStyle(theme.tint)
-                    .frame(width: 102, height: 102)
+                    .frame(width: 96, height: 96)
                     .background(theme.tint.opacity(0.12))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .accessibilityHidden(true)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 7) {
                 Label(theme.title, systemImage: theme.icon)
                     .font(AppFont.title2)
                     .foregroundStyle(AppColor.textPrimary)
@@ -575,13 +575,13 @@ struct ResultsView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(14)
+        .padding(12)
         .background(theme.background)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(theme.tint.opacity(0.35), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var diagnosisCard: some View {
@@ -634,7 +634,7 @@ struct ResultsView: View {
     }
 
     private var flashcardSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Image(systemName: "rectangle.stack.fill")
                     .foregroundStyle(AppColor.primary)
@@ -652,7 +652,7 @@ struct ResultsView: View {
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
 
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 flashcardTypePill("Tanı")
                 flashcardTypePill("Kırmızı bayrak")
                 flashcardTypePill("Ayırıcı tanı")
@@ -705,7 +705,7 @@ struct ResultsView: View {
                             .foregroundStyle(AppColor.textSecondary)
                             .lineSpacing(4)
                     }
-                    .padding(10)
+                    .padding(9)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(AppColor.successLight.opacity(0.8))
                     .overlay(
@@ -736,21 +736,21 @@ struct ResultsView: View {
                     .lineSpacing(4)
             }
         }
-        .padding(12)
+        .padding(10)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func flashcardTypePill(_ title: String) -> some View {
         Text(title)
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(AppColor.primaryDark)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
             .background(AppColor.primaryLight)
             .overlay(
                 Capsule().stroke(AppColor.primary.opacity(0.24), lineWidth: 1)
@@ -759,17 +759,17 @@ struct ResultsView: View {
     }
 
     private var flashcardLoadingCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 ProgressView()
                 Text("Dr.Kynox hızlı tekrar kartlarını hazırlıyor...")
                     .font(AppFont.bodyMedium)
                     .foregroundStyle(AppColor.textPrimary)
             }
-            ShimmerView().frame(height: 56)
-            ShimmerView().frame(height: 56)
+            ShimmerView().frame(height: 52)
+            ShimmerView().frame(height: 52)
         }
-        .padding(10)
+        .padding(9)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceAlt)
         .overlay(
