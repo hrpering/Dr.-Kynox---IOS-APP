@@ -20,6 +20,22 @@ enum ToolResultSheetRoute: Identifiable, Equatable {
 }
 
 struct CaseSessionView: View {
+    enum SessionStartPhase: Equatable {
+        case idle
+        case waitingPermission
+        case starting
+        case started
+        case failed
+    }
+
+    enum AutoStartTrigger: String {
+        case initialTask
+        case permissionGranted
+        case sceneActivePermissionGrant
+        case retry
+        case modeFallback
+    }
+
     @EnvironmentObject var state: AppState
     @Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityReduceMotion) var reduceMotion
@@ -38,7 +54,8 @@ struct CaseSessionView: View {
     @State var isStartingSession = false
     @State var startSessionTask: Task<Void, Never>?
     @State var micPermission: AVAudioSession.RecordPermission = AVAudioSession.sharedInstance().recordPermission
-    @State var hasRequestedInitialMic = false
+    @State var startPhase: SessionStartPhase = .idle
+    @State var lastObservedMicPermission: AVAudioSession.RecordPermission?
     @State var isTextFallbackMode = false
     @State var isKeyboardVisible = false
     @State var showEndSessionConfirmation = false
@@ -92,6 +109,9 @@ struct CaseSessionView: View {
                         Button {
                             isTextFallbackMode.toggle()
                             Haptic.selection()
+                            guard !hasStarted else { return }
+                            startPhase = .idle
+                            attemptInitialAutoStart(trigger: .modeFallback)
                         } label: {
                             Label("Metin Modu", systemImage: "keyboard")
                                 .font(AppFont.caption)
@@ -120,6 +140,12 @@ struct CaseSessionView: View {
                 }
             }
             .onChange(of: vm.connectionState) { newState in
+                if newState == .connecting || newState == .connected {
+                    if hasStarted {
+                        startPhase = .started
+                    }
+                    return
+                }
                 guard (newState == .ended || newState == .failed) else { return }
                 guard !wasSessionEnded else { return }
                 activeToolSheetRoute = nil
@@ -130,6 +156,7 @@ struct CaseSessionView: View {
                 }
 
                 hasStarted = false
+                startPhase = .failed
                 let existingError = vm.errorText.trimmingCharacters(in: .whitespacesAndNewlines)
                 let fallbackError = newState == .failed
                     ? "Bağlantı kesildi. Vakayı yeniden başlatabilirsin."
@@ -201,10 +228,17 @@ struct CaseSessionView: View {
             .onChange(of: scenePhase) { phase in
                 Task {
                     await vm.handleScenePhaseChange(phase)
+                    if phase == .active {
+                        await MainActor.run {
+                            handleSceneActivePermissionRecheck()
+                        }
+                    }
                 }
             }
-            .task {
-                syncMicrophonePermissionStatus()
+            .task(id: config.id) {
+                await MainActor.run {
+                    attemptInitialAutoStart(trigger: .initialTask)
+                }
             }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
                 isKeyboardVisible = true

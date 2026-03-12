@@ -6,6 +6,7 @@ import ElevenLabs
 
 extension AgentConversationViewModel {
     func cleanup() {
+        connectionEpoch &+= 1
         activeConnectionRunId = UUID()
         stopSessionHeartbeat()
         removeVoiceAudioObservers()
@@ -59,6 +60,7 @@ extension AgentConversationViewModel {
         // Ayni conversation icin tekrar `endConversation()` cagirmayi onlemek daha guvenlidir.
         conversation = nil
 #endif
+        connectionEpoch &+= 1
         cancellables.removeAll()
         activeConnectionRunId = UUID()
         resetToolAccessoryState()

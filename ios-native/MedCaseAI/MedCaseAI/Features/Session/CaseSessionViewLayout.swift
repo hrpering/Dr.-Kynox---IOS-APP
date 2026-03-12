@@ -92,8 +92,8 @@ extension CaseSessionView {
                     if !vm.errorText.isEmpty {
                         ErrorStateCard(message: vm.errorText) {
                             if vm.connectionState == .ended || vm.connectionState == .failed {
-                                resetSessionForRetry()
-                                triggerStartSession()
+                                resetStartFlowForRetry()
+                                attemptInitialAutoStart(trigger: .retry)
                             } else {
                                 vm.errorText = ""
                             }
@@ -228,7 +228,9 @@ extension CaseSessionView {
                                 await requestMicrophoneIfNeeded()
                                 if micPermission == .granted {
                                     vm.errorText = ""
+                                    attemptInitialAutoStart(trigger: .permissionGranted)
                                 } else {
+                                    startPhase = .waitingPermission
                                     vm.errorText = "Sesli mod için mikrofon izni gerekiyor."
                                 }
                             }
@@ -248,6 +250,8 @@ extension CaseSessionView {
                         Button {
                             isTextFallbackMode = true
                             vm.errorText = ""
+                            startPhase = .idle
+                            attemptInitialAutoStart(trigger: .modeFallback)
                             Haptic.selection()
                         } label: {
                             Text("Şimdilik yazılı moda geç")
@@ -273,21 +277,13 @@ extension CaseSessionView {
                         Rectangle().fill(AppColor.border).frame(height: 1)
                     }
                 } else {
-                    Button {
-                        triggerStartSession()
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: (config.mode == .voice && !isTextFallbackMode) ? "mic.fill" : "text.bubble.fill")
-                            Text("Vaka başlat")
-                                .font(AppFont.bodyMedium)
-                        }
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, minHeight: 52)
-                        .background(AppColor.primary)
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    VStack(spacing: 8) {
+                        ProgressView()
+                        Text("Vaka hazırlanıyor, bağlantı kuruluyor...")
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textSecondary)
                     }
-                    .buttonStyle(PressableButtonStyle())
-                    .disabled(isStartingSession || startSessionTask != nil || vm.isConnecting)
+                    .frame(maxWidth: .infinity, minHeight: 52)
                     .padding(.horizontal, 14)
                     .padding(.top, 8)
                     .padding(.bottom, 6)
@@ -556,7 +552,18 @@ extension CaseSessionView {
 
     var statusText: String {
         if !hasStarted {
-            return "Dr.Kynox hazır. Vakayı başlatmak için butona bas."
+            switch startPhase {
+            case .idle:
+                return "Vaka hazırlanıyor..."
+            case .waitingPermission:
+                return "Mikrofon izni bekleniyor"
+            case .starting:
+                return "Bağlanıyor..."
+            case .started:
+                return "Bağlantı doğrulanıyor..."
+            case .failed:
+                return "Bağlantı kurulamadı"
+            }
         }
         if config.mode == .text || isTextFallbackMode {
             if vm.isConnecting { return "Bağlanıyor..." }
@@ -621,19 +628,70 @@ extension CaseSessionView {
         }
     }
 
-    func requestMicrophoneIfNeeded() async {
-        let granted = await requestMicrophoneAccess()
-        micPermission = granted ? .granted : .denied
+    @MainActor
+    func observeMicrophonePermission(_ permission: AVAudioSession.RecordPermission, reason: String) {
+        let previous = lastObservedMicPermission
+        micPermission = permission
+        lastObservedMicPermission = permission
+        guard previous != permission else { return }
+        AppLog.log(
+            "[mic-permission] reason=\(reason) old=\(String(describing: previous?.rawValue)) new=\(permission.rawValue)",
+            level: .debug,
+            category: .caseSession
+        )
     }
 
-    func syncMicrophonePermissionStatus() {
-        guard config.mode == .voice else { return }
-        guard !hasRequestedInitialMic else { return }
-        hasRequestedInitialMic = true
-        micPermission = AVAudioSession.sharedInstance().recordPermission
-        if micPermission != .granted {
-            vm.errorText = "Sesli moda geçmek için mikrofon izni gerekiyor."
+    @MainActor
+    @discardableResult
+    func refreshMicrophonePermission(reason: String) -> AVAudioSession.RecordPermission {
+        let permission = AVAudioSession.sharedInstance().recordPermission
+        observeMicrophonePermission(permission, reason: reason)
+        return permission
+    }
+
+    func requestMicrophoneIfNeeded() async {
+        let granted = await requestMicrophoneAccess()
+        let resolvedPermission = granted ? AVAudioSession.RecordPermission.granted : AVAudioSession.sharedInstance().recordPermission
+        await MainActor.run {
+            observeMicrophonePermission(resolvedPermission, reason: "request_result")
         }
+    }
+
+    @MainActor
+    func handleSceneActivePermissionRecheck() {
+        guard startPhase == .waitingPermission else { return }
+        guard config.mode == .voice && !isTextFallbackMode else { return }
+        let permission = refreshMicrophonePermission(reason: "scene_active_recheck")
+        guard permission == .granted else { return }
+        vm.errorText = ""
+        attemptInitialAutoStart(trigger: .sceneActivePermissionGrant)
+    }
+
+    @MainActor
+    func attemptInitialAutoStart(trigger: AutoStartTrigger) {
+        guard !hasStarted, !isStartingSession else { return }
+        guard startSessionTask == nil else { return }
+        guard startPhase != .starting, startPhase != .started else { return }
+        if startPhase == .failed, trigger != .retry {
+            return
+        }
+
+        vm.setTextOnlyOverride(config.mode == .voice && isTextFallbackMode)
+
+        if config.mode == .voice && !isTextFallbackMode {
+            let permission = refreshMicrophonePermission(reason: "auto_start_\(trigger.rawValue)")
+            guard permission == .granted else {
+                startPhase = .waitingPermission
+                if vm.errorText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    vm.errorText = "Sesli mod için mikrofon izni gerekiyor."
+                }
+                return
+            }
+        }
+
+        vm.errorText = ""
+        startPhase = .starting
+        triggerStartSession()
     }
 
     @MainActor
@@ -659,8 +717,9 @@ extension CaseSessionView {
         print("[startSession] begin state=\(vm.connectionState)")
         vm.setTextOnlyOverride(config.mode == .voice && isTextFallbackMode)
         if config.mode == .voice && !isTextFallbackMode {
-            await requestMicrophoneIfNeeded()
-            guard micPermission == .granted else {
+            let permission = refreshMicrophonePermission(reason: "start_session")
+            guard permission == .granted else {
+                startPhase = .waitingPermission
                 vm.errorText = "Sesli mod için mikrofon izni gerekiyor."
                 Haptic.error()
                 print("[startSession] abort microphone permission denied")
@@ -674,7 +733,8 @@ extension CaseSessionView {
     }
 
     var canSendText: Bool {
-        !vm.isConnecting &&
+        vm.isTextSendReady &&
+            !vm.isConnecting &&
             !vm.isEnding &&
             !wasSessionEnded
     }
@@ -707,13 +767,14 @@ extension CaseSessionView {
         vm.markUserRequestedEnd()
     }
 
-    func resetSessionForRetry() {
+    func resetStartFlowForRetry() {
         isComposerFocused = false
         activeToolSheetRoute = nil
         showEndSessionConfirmation = false
         startSessionTask?.cancel()
         startSessionTask = nil
         isStartingSession = false
+        startPhase = .idle
         userRequestedEnd = false
         wasSessionEnded = false
         hasStarted = false

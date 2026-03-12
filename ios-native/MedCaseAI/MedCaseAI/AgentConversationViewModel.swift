@@ -688,6 +688,13 @@ final class AgentConversationViewModel: ObservableObject {
         case failed
     }
 
+    struct TextSendSnapshot {
+        let runId: UUID
+        let connectionEpoch: UInt64
+        let conversationObjectId: ObjectIdentifier
+        let capturedAt: Date
+    }
+
     @Published var messages: [Message] = []
     @Published var agentState: AgentState = .unknown
     @Published var connectionState: ConnectionState = .idle
@@ -728,6 +735,7 @@ final class AgentConversationViewModel: ObservableObject {
     var isStoppingUnexpectedly = false
     var isConnectInFlight = false
     var activeConnectionRunId = UUID()
+    var connectionEpoch: UInt64 = 0
     var audioInterruptionObserver: NSObjectProtocol?
     var audioRouteChangeObserver: NSObjectProtocol?
     var networkMonitor: NWPathMonitor?

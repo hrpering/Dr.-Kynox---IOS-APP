@@ -37,6 +37,7 @@ extension AgentConversationViewModel {
             conversation = nil
         }
 #endif
+        connectionEpoch &+= 1
         cancellables.removeAll()
         stopSessionHeartbeat()
         isFinalized = false
@@ -78,6 +79,7 @@ extension AgentConversationViewModel {
                 statusLine = "Ses oturumu hazırlanamadı"
                 errorText = "Ses ayarı yapılamadı: \(error.localizedDescription)"
                 logError("[audio] prepare failed error=\(String(reflecting: error))")
+                connectionEpoch &+= 1
                 await releaseElevenSessionLock()
                 return
             }
@@ -93,7 +95,7 @@ extension AgentConversationViewModel {
         let runtimeConfig = ConversationConfig(
             conversationOverrides: runtimeConversationOverrides,
             dynamicVariables: runtimeDynamicVariables,
-            onDisconnect: { [weak self] in
+            onDisconnect: { [weak self] reason in
                 Task { @MainActor in
                     guard let self else { return }
                     guard self.activeConnectionRunId == runId else {
@@ -101,7 +103,7 @@ extension AgentConversationViewModel {
                         return
                     }
                     self.logInfo(
-                        "[connect-callback] onDisconnect runId=\(runId.uuidString) mode=\(self.activeMode.rawValue) state=\(self.connectionState) localEnd=\(self.lastLocalEndSource ?? "nil") net=\(String(describing: self.lastNetworkStatus))"
+                        "[connect-callback] onDisconnect reason=\(reason) runId=\(runId.uuidString) mode=\(self.activeMode.rawValue) state=\(self.connectionState) localEnd=\(self.lastLocalEndSource ?? "nil") net=\(String(describing: self.lastNetworkStatus))"
                     )
                     self.statusLine = "Bağlantı kesildi"
                 }
@@ -173,10 +175,12 @@ extension AgentConversationViewModel {
             statusLine = "Bağlantı başarısız"
             errorText = "Bağlantı kurulamadı: \(error.localizedDescription)"
             stopSessionHeartbeat()
+            connectionEpoch &+= 1
             await releaseElevenSessionLock()
             logError("[connect] attempt=\(attempt) failed error=\(String(reflecting: error))")
         }
 #else
+        connectionEpoch &+= 1
         connectionState = .failed
         errorText = "ElevenLabs Swift SDK bulunamadı."
 #endif
@@ -186,14 +190,10 @@ extension AgentConversationViewModel {
         guard activeMode == .text else { return }
         let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !clean.isEmpty else { return }
-        guard connectionState == .connected, isConversationActive, didReachActiveState else {
-            throw AppError.httpError("Text oturumu henüz hazır değil. Birkaç saniye sonra tekrar deneyin.")
-        }
 
 #if canImport(ElevenLabs)
-        guard let conversation else {
-            throw AppError.httpError("Text oturumu hazır değil.")
-        }
+        let snapshot = try captureTextSendSnapshot()
+        let conversation = try validateTextSendSnapshot(snapshot, stage: "pre_send")
         isAwaitingReply = true
         agentState = .thinking
         appendLocalMessage(source: "user", text: clean, id: "user-local-\(UUID().uuidString)")
@@ -204,6 +204,15 @@ extension AgentConversationViewModel {
 
         do {
             try await conversation.sendMessage(clean)
+            guard (try? validateTextSendSnapshot(snapshot, stage: "post_send")) != nil else {
+                let ageMs = Int(Date().timeIntervalSince(snapshot.capturedAt) * 1000)
+                logWarning("[text-send] post_send stale snapshot dropped ageMs=\(ageMs)")
+                isAwaitingReply = false
+                if agentState == .thinking {
+                    agentState = .unknown
+                }
+                return
+            }
             logDebug("[text-send] delivered")
             Task { [weak self] in
                 await self?.touchSessionLockIfPossible(reason: "text_send_delivered")
@@ -217,6 +226,45 @@ extension AgentConversationViewModel {
         throw AppError.httpError("ElevenLabs Swift SDK bulunamadı.")
 #endif
     }
+
+#if canImport(ElevenLabs)
+    private func captureTextSendSnapshot() throws -> TextSendSnapshot {
+        guard connectionState == .connected, isConversationActive, didReachActiveState else {
+            throw AppError.httpError("Text oturumu henüz hazır değil. Birkaç saniye sonra tekrar deneyin.")
+        }
+        guard let conversation else {
+            throw AppError.httpError("Text oturumu hazır değil.")
+        }
+        return TextSendSnapshot(
+            runId: activeConnectionRunId,
+            connectionEpoch: connectionEpoch,
+            conversationObjectId: ObjectIdentifier(conversation),
+            capturedAt: Date()
+        )
+    }
+
+    private func validateTextSendSnapshot(_ snapshot: TextSendSnapshot, stage: String) throws -> Conversation {
+        guard snapshot.connectionEpoch == connectionEpoch else {
+            logDebug("[text-send] snapshot epoch mismatch stage=\(stage)")
+            throw AppError.httpError("Text oturumu artık hazır değil. Lütfen tekrar deneyin.")
+        }
+        guard snapshot.runId == activeConnectionRunId else {
+            logDebug("[text-send] snapshot run mismatch stage=\(stage)")
+            throw AppError.httpError("Text oturumu artık hazır değil. Lütfen tekrar deneyin.")
+        }
+        guard connectionState == .connected, isConversationActive, didReachActiveState else {
+            throw AppError.httpError("Text oturumu artık hazır değil. Lütfen tekrar deneyin.")
+        }
+        guard let conversation else {
+            throw AppError.httpError("Text oturumu artık hazır değil. Lütfen tekrar deneyin.")
+        }
+        guard ObjectIdentifier(conversation) == snapshot.conversationObjectId else {
+            logDebug("[text-send] snapshot conversation mismatch stage=\(stage)")
+            throw AppError.httpError("Text oturumu artık hazır değil. Lütfen tekrar deneyin.")
+        }
+        return conversation
+    }
+#endif
 
     func setMuted(_ muted: Bool) async throws {
         guard activeMode == .voice else { return }
