@@ -17,10 +17,13 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: AppSpacing.sectionSpacing) {
                     primaryActionBlock
                     dailyChallengeBlock
+                    weeklyGoalCard
+                    studyPlanCycleCard
+                    weakAreaInsightCard
                     progressBlock
                 }
                 .padding(AppSpacing.x2)
-                .padding(.bottom, AppSpacing.x2)
+                .padding(.bottom, AppSpacing.x3)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Dr.Kynox")
@@ -98,29 +101,44 @@ struct DashboardView: View {
     }
 
     private var primaryActionBlock: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x2) {
+        VStack(alignment: .leading, spacing: AppSpacing.x1_5) {
             greetingSection
+            Text("Bugünün ana hedefi: bir vaka başlat ve karar akışını tamamla.")
+                .font(AppFont.body)
+                .foregroundStyle(.white.opacity(0.9))
+                .lineSpacing(4)
 
-            DSInfoCard(tone: .primary) {
-                Text("Bugünün ana hedefi")
-                    .font(AppFont.secondary)
-                    .foregroundStyle(AppColor.primaryDark)
-                Text("Tek odak: bir vaka başlat, klinik karar akışını tamamla.")
-                    .font(AppFont.body)
-                    .foregroundStyle(AppColor.textPrimary)
-                    .lineSpacing(4)
+            HStack(spacing: AppSpacing.x1) {
+                heroMetricPill(
+                    icon: "waveform.path.ecg",
+                    title: "Ortalama",
+                    value: averageScoreText
+                )
+                heroMetricPill(
+                    icon: "flame.fill",
+                    title: "Seri",
+                    value: "\(streakDays) gün"
+                )
+                heroMetricPill(
+                    icon: "target",
+                    title: "Haftalık",
+                    value: "\(state.weeklyGoalSummary.completedCount)/\(state.weeklyGoalSummary.target)"
+                )
+            }
 
+            VStack(spacing: AppSpacing.x1) {
                 Button {
                     onOpenGenerator()
                 } label: {
                     HStack(spacing: AppSpacing.x1) {
                         Image(systemName: "bolt.fill")
-                        Text("Vaka başlat")
+                        Text("Rastgele Vaka Başlat")
                         Spacer()
                         Image(systemName: "arrow.right")
                     }
+                    .appPrimaryButtonLabelStyle()
                 }
-                .buttonStyle(DSPrimaryButtonStyle())
+                .buttonStyle(PressableButtonStyle())
                 .accessibilityLabel("Vaka başlat")
                 .accessibilityHint("Vaka akışını başlatmak için seçim ekranına gider")
 
@@ -133,12 +151,61 @@ struct DashboardView: View {
                         Spacer()
                         Image(systemName: "arrow.right")
                     }
+                    .appSecondaryButtonLabelStyle()
                 }
-                .buttonStyle(DSSecondaryButtonStyle())
+                .buttonStyle(PressableButtonStyle())
                 .accessibilityLabel("15 saniye hızlı vaka başlat")
                 .accessibilityHint("Code Blue hızlı vaka akışını açar")
             }
+
+            if completedCaseHistory.isEmpty {
+                Text("İlk vakadan sonra skor trendin, güçlü alanların ve önerilerin burada otomatik akacak.")
+                    .font(AppFont.caption)
+                    .foregroundStyle(.white.opacity(0.84))
+                    .lineSpacing(4)
+            }
         }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(AppColor.primary.opacity(0.32), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .appShadow(AppShadow.elevated)
+    }
+
+    private func heroMetricPill(icon: String, title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.95))
+                Text(title)
+                    .font(AppFont.caption)
+                    .foregroundStyle(.white.opacity(0.78))
+            }
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var dailyChallengeBlock: some View {
@@ -182,22 +249,22 @@ struct DashboardView: View {
                     .font(AppFont.h3)
                     .foregroundStyle(AppColor.textPrimary)
                 Spacer()
-            }
-
-            if completedCaseHistory.isEmpty {
-                DSEmptyState(
-                    icon: "sparkles",
-                    title: "İlk vakana hazırsın",
-                    subtitle: "İlk vakanı tamamladığında skor, güçlü yönler ve gelişim alanların burada görünür.",
-                    tone: .primary
-                )
                 Button {
                     onOpenGenerator()
                 } label: {
-                    Text("İlk vakayı başlat")
-                        .appPrimaryButtonLabel()
+                    Text("Yeni Vaka")
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.primaryDark)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(AppColor.primaryLight)
+                        .clipShape(Capsule())
                 }
                 .buttonStyle(PressableButtonStyle())
+            }
+
+            if completedCaseHistory.isEmpty {
+                emptyStatsState
             } else {
                 statsScroller
                 continueBlock
@@ -332,11 +399,11 @@ struct DashboardView: View {
         return VStack(alignment: .leading, spacing: AppSpacing.x1 / 2) {
             Text("\(timeGreeting)\(displayName) 👋")
                 .font(AppFont.h2)
-                .foregroundStyle(AppColor.textPrimary)
+                .foregroundStyle(.white)
 
             Text("Bugün odak bölümün: \(SpecialtyOption.label(for: preferredSpecialty))")
                 .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
+                .foregroundStyle(.white.opacity(0.85))
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

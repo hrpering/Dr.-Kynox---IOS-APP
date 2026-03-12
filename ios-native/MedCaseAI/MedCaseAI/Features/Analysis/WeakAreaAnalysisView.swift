@@ -11,6 +11,8 @@ struct WeakAreaAnalysisView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
+                analysisHeaderBand
+
                 if loading && state.weakAreaAnalysis == nil {
                     ShimmerView()
                         .frame(height: 230)
@@ -19,6 +21,7 @@ struct WeakAreaAnalysisView: View {
                     ShimmerView()
                         .frame(height: 160)
                 } else if let analysis = state.weakAreaAnalysis, analysis.hasData {
+                    overviewMetricRow(analysis)
                     summaryHeader(analysis)
                     trendHistoryCard
                     scoreMapCard(analysis)
@@ -59,6 +62,62 @@ struct WeakAreaAnalysisView: View {
                 WeakAreaSpecialtyDetailView(item: item)
             }
         }
+    }
+
+    private var analysisHeaderBand: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Text("Zayıf Alan Merkezi")
+                .font(AppFont.title)
+                .foregroundStyle(.white)
+            Text("Branş kırılımı, trend ve AI önerilerini aynı panelde takip et.")
+                .font(AppFont.body)
+                .foregroundStyle(.white.opacity(0.88))
+                .lineSpacing(4)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .appShadow(AppShadow.elevated)
+    }
+
+    private func overviewMetricRow(_ analysis: WeakAreaAnalysisResponse) -> some View {
+        HStack(spacing: 8) {
+            overviewMetric(title: "Skorlu vaka", value: "\(analysis.summary.userCaseCount)")
+            overviewMetric(title: "Ortalama", value: "\(Int(analysis.summary.userAverageScore.rounded()))")
+            overviewMetric(title: "Global", value: "\(Int(analysis.summary.globalAverageScore.rounded()))")
+        }
+    }
+
+    private func overviewMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     private func refresh() async {

@@ -72,8 +72,13 @@ struct GeneratorView: View {
             stepHeader(
                 step: "1/3",
                 title: "Bölüm seç",
-                subtitle: "Klinik odağını seç. Sonraki adımda zorluk seviyesini belirleyeceksin."
+                subtitle: "Önce klinik odağı belirle. Sonraki adımda zorluk seviyesini bağlayacağız."
             )
+
+            HStack(spacing: 8) {
+                generatorMetric(icon: "square.stack.3d.forward.dottedline", title: "Bölüm", value: specialty.isEmpty ? "Seçilmedi" : selectedSpecialtyLabel)
+                generatorMetric(icon: "waveform.path.ecg", title: "Vaka Tipi", value: specialty == "Random" ? "Çoklu branş" : "Odaklı")
+            }
 
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
@@ -93,25 +98,42 @@ struct GeneratorView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            LazyVStack(spacing: 8) {
+            LazyVStack(spacing: 10) {
                 ForEach(filteredSpecialtyRows) { item in
                     Button {
                         specialty = item.value
                         Haptic.selection()
                     } label: {
-                        HStack(spacing: 10) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(item.label)
-                                    .font(AppFont.bodyMedium)
-                                    .foregroundStyle(specialty == item.value ? AppColor.primaryDark : AppColor.textPrimary)
-                                    .multilineTextAlignment(.leading)
-                                    .lineLimit(2)
+                        HStack(alignment: .top, spacing: 10) {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(specialty == item.value ? AppColor.primary : AppColor.surfaceAlt)
+                                .frame(width: 8, height: 44)
+
+                            VStack(alignment: .leading, spacing: 5) {
+                                HStack(spacing: 8) {
+                                    Text(item.label)
+                                        .font(AppFont.bodyMedium)
+                                        .foregroundStyle(specialty == item.value ? AppColor.primaryDark : AppColor.textPrimary)
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                    if specialty == item.value {
+                                        Text("Aktif")
+                                            .font(AppFont.caption)
+                                            .foregroundStyle(AppColor.primaryDark)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 3)
+                                            .background(AppColor.primaryLight)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+
                                 Text(item.hint)
                                     .font(AppFont.caption)
                                     .foregroundStyle(AppColor.textSecondary)
                                     .lineSpacing(3)
-                                    .lineLimit(1)
+                                    .lineLimit(2)
                             }
+
                             Spacer()
                             Image(systemName: specialty == item.value ? "checkmark.circle.fill" : "circle")
                                 .font(.system(size: 20, weight: .semibold))
@@ -143,16 +165,17 @@ struct GeneratorView: View {
                         .font(AppFont.caption)
                         .foregroundStyle(AppColor.textSecondary)
                         .lineSpacing(3)
-                        .lineLimit(1)
+                        .lineLimit(2)
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(AppColor.surface)
+                .background(AppColor.surfaceElevated)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(AppColor.border, lineWidth: 1)
+                        .stroke(AppColor.primary.opacity(0.28), lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .appShadow(AppShadow.card)
             }
         } bottom: {
             Button {
@@ -176,27 +199,13 @@ struct GeneratorView: View {
             stepHeader(
                 step: "2/3",
                 title: "Zorluk seç",
-                subtitle: "\(selectedSpecialtyLabel) için zorluk seç. İstersen rastgele bırakabilirsin."
+                subtitle: "\(selectedSpecialtyLabel) odağında vaka yoğunluğunu belirle."
             )
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Bölüm özeti")
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textTertiary)
-                Text(selectedSpecialtyFocusLine)
-                    .font(AppFont.body)
-                    .foregroundStyle(AppColor.textSecondary)
-                    .lineSpacing(4)
-                    .lineLimit(1)
+            HStack(spacing: 8) {
+                generatorMetric(icon: "stethoscope", title: "Bölüm", value: selectedSpecialtyLabel)
+                generatorMetric(icon: "target", title: "Zorluk", value: difficulty)
             }
-            .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(AppColor.surface)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(AppColor.border, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
             LazyVStack(spacing: 10) {
                 ForEach([randomDifficultyCard] + difficultyCards) { config in
@@ -235,27 +244,39 @@ struct GeneratorView: View {
                 content()
             }
             .padding(.horizontal, AppSpacing.x2)
-            .padding(.top, AppSpacing.x1)
+            .padding(.top, AppSpacing.x1_5)
             .padding(.bottom, AppSpacing.x3)
         }
         .background(AppColor.background.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 0) {
-                Divider()
+                Rectangle()
+                    .fill(AppColor.border)
+                    .frame(height: 1)
                 bottom()
                     .padding(.horizontal, AppSpacing.x2)
                     .padding(.top, 10)
-                    .padding(.bottom, 8)
+                    .padding(.bottom, 10)
             }
             .background(AppColor.surface)
+            .appShadow(AppShadow.card)
         }
     }
 
     private func stepHeader(step: String, title: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Adım \(step)")
-                .font(AppFont.caption)
-                .foregroundStyle(Color.white.opacity(0.9))
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Text("Adım \(step)")
+                    .font(AppFont.caption)
+                    .foregroundStyle(Color.white.opacity(0.9))
+                Spacer()
+                HStack(spacing: 4) {
+                    Capsule().fill(.white.opacity(0.95)).frame(width: 26, height: 5)
+                    Capsule().fill(.white.opacity(0.45)).frame(width: 16, height: 5)
+                    Capsule().fill(.white.opacity(0.28)).frame(width: 16, height: 5)
+                }
+            }
+
             Text(title)
                 .font(AppFont.title)
                 .foregroundStyle(.white)
@@ -263,6 +284,12 @@ struct GeneratorView: View {
                 .font(AppFont.body)
                 .foregroundStyle(.white.opacity(0.86))
                 .lineSpacing(4)
+
+            Text(selectedSpecialtyFocusLine)
+                .font(AppFont.caption)
+                .foregroundStyle(Color.white.opacity(0.9))
+                .lineSpacing(4)
+                .lineLimit(2)
         }
         .padding(AppSpacing.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -281,6 +308,32 @@ struct GeneratorView: View {
         .appShadow(AppShadow.card)
     }
 
+    private func generatorMetric(icon: String, title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(AppColor.primaryDark)
+                Text(title)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 11)
+        .padding(.vertical, 9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
     private var selectedSpecialtyLabel: String {
         if specialty.isEmpty {
             return "Henüz seçilmedi"
@@ -292,7 +345,11 @@ struct GeneratorView: View {
     }
 
     private var selectedSpecialtyFocusLine: String {
-        SpecialtyOption.focusHint(for: specialty)
+        let trimmed = specialty.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            return "Bölüm seçtiğinde klinik odak ipucu burada görünür."
+        }
+        return SpecialtyOption.focusHint(for: specialty)
     }
 
     private func consumeGeneratorReplayIfNeeded() {

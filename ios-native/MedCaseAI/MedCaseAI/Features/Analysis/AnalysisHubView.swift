@@ -22,20 +22,46 @@ struct AnalysisHubView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("Analiz Merkezi")
-                        .font(AppFont.largeTitle)
-                        .foregroundStyle(AppColor.textPrimary)
-
-                    Text("Skor trendini, bölüm bazlı güçlü/zayıf alanlarını ve hızlı vaka kartlarını tek yerden takip et.")
-                        .font(AppFont.body)
-                        .foregroundStyle(AppColor.textSecondary)
-                        .lineSpacing(4)
-
+                    analysisHeroCard
                     summaryStatsRow
-                    scoreTrendCard
-                    specialtyInsightCard
-                    quickCaseFavoriteStatusCard
-                    aiRecommendationPreviewCard
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Analiz Araçları")
+                            .font(AppFont.title2)
+                            .foregroundStyle(AppColor.textPrimary)
+
+                        Button {
+                            destination = .weakArea
+                            state.selectedMainTab = "analysis"
+                            Haptic.selection()
+                        } label: {
+                            analysisHubCard(
+                                icon: "chart.line.uptrend.xyaxis",
+                                title: "Zayıf Alan Analizi",
+                                subtitle: hasEnoughAnalysisData
+                                    ? "Skor haritanı, bölüm bazlı performansını ve AI önerilerini gör."
+                                    : "3 vaka tamamlandığında detaylı zayıf alan haritan açılır.",
+                                tint: AppColor.primary,
+                                background: AppColor.primaryLight
+                            )
+                        }
+                        .buttonStyle(PressableButtonStyle())
+
+                        Button {
+                            destination = .quickFavorites
+                            state.selectedMainTab = "analysis"
+                            Haptic.selection()
+                        } label: {
+                            analysisHubCard(
+                                icon: "star.square.on.square.fill",
+                                title: "Favori Hızlı Vaka Kartları",
+                                subtitle: "15sn vakalarda işaretlediğin kartları burada tekrar incele.",
+                                tint: AppColor.success,
+                                background: AppColor.successLight
+                            )
+                        }
+                        .buttonStyle(PressableButtonStyle())
+                    }
 
                     if !hasEnoughAnalysisData {
                         DSEmptyState(
@@ -55,42 +81,10 @@ struct AnalysisHubView: View {
                         .accessibilityHint("Vaka seçim ekranına geçer")
                     }
 
-                    Text("Analiz Araçları")
-                        .font(AppFont.title2)
-                        .foregroundStyle(AppColor.textPrimary)
-                        .padding(.top, 4)
-
-                    Button {
-                        destination = .weakArea
-                        state.selectedMainTab = "analysis"
-                        Haptic.selection()
-                    } label: {
-                        analysisHubCard(
-                            icon: "chart.line.uptrend.xyaxis",
-                            title: "Zayıf Alan Analizi",
-                            subtitle: hasEnoughAnalysisData
-                                ? "Skor haritanı, bölüm bazlı performansını ve AI önerilerini gör."
-                                : "3 vaka tamamlandığında detaylı zayıf alan haritan açılır.",
-                            tint: AppColor.primary,
-                            background: AppColor.primaryLight
-                        )
-                    }
-                    .buttonStyle(PressableButtonStyle())
-
-                    Button {
-                        destination = .quickFavorites
-                        state.selectedMainTab = "analysis"
-                        Haptic.selection()
-                    } label: {
-                        analysisHubCard(
-                            icon: "star.square.on.square.fill",
-                            title: "Favori Hızlı Vaka Kartları",
-                            subtitle: "15sn vakalarda işaretlediğin kartları burada tekrar incele.",
-                            tint: AppColor.success,
-                            background: AppColor.successLight
-                        )
-                    }
-                    .buttonStyle(PressableButtonStyle())
+                    scoreTrendCard
+                    specialtyInsightCard
+                    quickCaseFavoriteStatusCard
+                    aiRecommendationPreviewCard
                 }
                 .padding(16)
             }
@@ -138,6 +132,68 @@ struct AnalysisHubView: View {
                 }
             }
         }
+    }
+
+    private var analysisHeroCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Analiz Merkezi")
+                        .font(AppFont.largeTitle)
+                        .foregroundStyle(.white)
+                    Text("Skor trendi, branş haritası ve hızlı vaka kartlarını tek panelde yönet.")
+                        .font(AppFont.body)
+                        .foregroundStyle(.white.opacity(0.88))
+                        .lineSpacing(4)
+                }
+                Spacer()
+                Image(systemName: "waveform.path.ecg.rectangle")
+                    .font(.system(size: 30, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.95))
+            }
+
+            HStack(spacing: 8) {
+                heroMetric(title: "Skorlu vaka", value: "\(scoredSessions.count)")
+                heroMetric(title: "Son 7 gün", value: "\(last7DayBuckets.map(\.caseCount).reduce(0, +))")
+                heroMetric(title: "Favori kart", value: "\(favoriteCardTotal)")
+            }
+        }
+        .padding(15)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .appShadow(AppShadow.elevated)
+    }
+
+    private func heroMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(.white.opacity(0.78))
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(.white.opacity(0.18), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private var completedSessions: [CaseSession] {
