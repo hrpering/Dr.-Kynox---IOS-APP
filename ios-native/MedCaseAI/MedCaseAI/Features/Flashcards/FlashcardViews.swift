@@ -328,6 +328,7 @@ struct CodeBlueSessionView: View {
     @State private var reviewState: CodeBlueReviewState?
     @State private var favoriteSavedQuestionIndexes = Set<Int>()
     @State private var timeoutSubmittedForToken: String?
+    @State private var now = Date()
 
     private let ticker = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
 
@@ -390,6 +391,7 @@ struct CodeBlueSessionView: View {
             }
         }
         .onReceive(ticker) { _ in
+            now = Date()
             tickTimerAndResolveTimeoutIfNeeded()
         }
     }
@@ -450,7 +452,7 @@ struct CodeBlueSessionView: View {
               let expiresDate = parseISODate(expiresAt) else {
             return 0
         }
-        let ms = max(0, Int((expiresDate.timeIntervalSinceNow * 1000).rounded()))
+        let ms = max(0, Int((expiresDate.timeIntervalSince(now) * 1000).rounded()))
         return Int(ceil(Double(ms) / 1000.0))
     }
 
