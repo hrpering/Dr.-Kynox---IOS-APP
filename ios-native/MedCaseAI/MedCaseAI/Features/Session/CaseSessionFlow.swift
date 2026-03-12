@@ -71,7 +71,7 @@ struct CaseSessionView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 topCaseHeader
                 statusStrip
 
@@ -85,8 +85,8 @@ struct CaseSessionView: View {
                     .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                     .appShadow(AppShadow.card)
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 8)
+            .padding(.horizontal, 12)
+            .padding(.top, 6)
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle(config.displayTitle)
             .navigationBarTitleDisplayMode(.inline)

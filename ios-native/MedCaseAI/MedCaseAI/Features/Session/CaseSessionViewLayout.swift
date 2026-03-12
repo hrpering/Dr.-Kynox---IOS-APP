@@ -7,7 +7,7 @@ import Sentry
 
 extension CaseSessionView {
     var topCaseHeader: some View {
-        VStack(alignment: .leading, spacing: 9) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top, spacing: 10) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(activeHeadline)
@@ -22,13 +22,13 @@ extension CaseSessionView {
                 Badge(text: config.difficulty, tint: AppColor.primaryDark, background: .white.opacity(0.9))
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 sessionHeaderMetric(title: "Mod", value: (config.mode == .voice && !isTextFallbackMode) ? "Sesli" : "Yazılı")
                 sessionHeaderMetric(title: "Mesaj", value: "\(vm.messages.count)")
                 sessionHeaderMetric(title: "Durum", value: hasStarted ? "Aktif" : "Hazırlık")
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity)
         .background(
             LinearGradient(
@@ -46,7 +46,7 @@ extension CaseSessionView {
     }
 
     var statusStrip: some View {
-        HStack(alignment: .center, spacing: 10) {
+        HStack(alignment: .center, spacing: 8) {
             HStack(spacing: 8) {
                 statusIcon
                     .font(.system(size: 18, weight: .semibold))
@@ -67,8 +67,8 @@ extension CaseSessionView {
                 .background(statusColor.opacity(0.14))
                 .clipShape(Capsule())
         }
-        .padding(.horizontal, 12)
-        .frame(maxWidth: .infinity, minHeight: 52)
+        .padding(.horizontal, 10)
+        .frame(maxWidth: .infinity, minHeight: 48)
         .background(statusBackground)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
@@ -88,8 +88,8 @@ extension CaseSessionView {
                 .foregroundStyle(.white)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.white.opacity(0.14))
         .overlay(
@@ -102,7 +102,7 @@ extension CaseSessionView {
     var transcriptArea: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
+                LazyVStack(alignment: .leading, spacing: 8) {
                     if !hasStarted {
                         startPanel
                     } else if vm.messages.isEmpty {
@@ -147,8 +147,8 @@ extension CaseSessionView {
                         }
                     }
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
             }
             .scrollDismissesKeyboard(.interactively)
             .contentShape(Rectangle())
@@ -169,7 +169,7 @@ extension CaseSessionView {
     }
 
     var startPanel: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             if showVoicePermissionPreflight {
                 voicePermissionPreflightCard
             } else if let preview = firstAgentPreview {
@@ -182,28 +182,28 @@ extension CaseSessionView {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, showVoicePermissionPreflight ? 20 : 48)
+        .padding(.vertical, showVoicePermissionPreflight ? 16 : 34)
     }
 
     var textComposer: some View {
         let textCharacterLimit = 300
         let remainingCharacters = max(0, textCharacterLimit - textInput.count)
 
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
+        return VStack(alignment: .leading, spacing: 5) {
+            HStack(spacing: 7) {
                 TextField("Mesajını yaz", text: $textInput, axis: .vertical)
                     .font(AppFont.body)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
                     .lineLimit(1...4)
                     .focused($isComposerFocused)
-                    .frame(minHeight: 44, maxHeight: 120, alignment: .topLeading)
+                    .frame(minHeight: 42, maxHeight: 110, alignment: .topLeading)
                     .background(AppColor.surfaceAlt)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(AppColor.border, lineWidth: 1)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .onChange(of: textInput) { newValue in
                         guard newValue.count > textCharacterLimit else { return }
                         textInput = String(newValue.prefix(textCharacterLimit))
@@ -240,9 +240,9 @@ extension CaseSessionView {
                     }
                 } label: {
                     Image(systemName: "paperplane.fill")
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
-                        .frame(width: 52, height: 52)
+                        .frame(width: 48, height: 48)
                         .background(AppColor.primary)
                         .clipShape(Circle())
                 }
@@ -266,7 +266,7 @@ extension CaseSessionView {
 
     @ViewBuilder
     var bottomControlArea: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             if !hasStarted {
                 if showVoicePermissionPreflight {
                     VStack(spacing: 8) {
@@ -288,7 +288,7 @@ extension CaseSessionView {
                                     .font(AppFont.bodyMedium)
                             }
                             .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, minHeight: 52)
+                            .frame(maxWidth: .infinity, minHeight: 50)
                             .background(AppColor.primary)
                             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                         }
@@ -304,7 +304,7 @@ extension CaseSessionView {
                             Text("Şimdilik yazılı moda geç")
                                 .font(AppFont.caption)
                                 .foregroundStyle(AppColor.primaryDark)
-                                .frame(maxWidth: .infinity, minHeight: 44)
+                                .frame(maxWidth: .infinity, minHeight: 42)
                                 .background(AppColor.primaryLight.opacity(0.65))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -316,9 +316,9 @@ extension CaseSessionView {
                         .accessibilityLabel("Şimdilik yazılı moda geç")
                         .accessibilityHint("Mikrofon izni vermeden yazılı vaka oturumuna geçer")
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.top, 8)
-                    .padding(.bottom, 6)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 6)
+                    .padding(.bottom, 4)
                     .background(AppColor.surface)
                     .overlay(alignment: .top) {
                         Rectangle().fill(AppColor.border).frame(height: 1)
@@ -330,10 +330,10 @@ extension CaseSessionView {
                             .font(AppFont.caption)
                             .foregroundStyle(AppColor.textSecondary)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .padding(.horizontal, 14)
-                    .padding(.top, 8)
-                    .padding(.bottom, 6)
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 6)
+                    .padding(.bottom, 4)
                     .background(AppColor.surface)
                     .overlay(alignment: .top) {
                         Rectangle().fill(AppColor.border).frame(height: 1)
@@ -342,17 +342,17 @@ extension CaseSessionView {
             } else {
                 if config.mode == .text || isTextFallbackMode {
                     textComposer
-                        .padding(.horizontal, 14)
-                        .padding(.top, 8)
+                        .padding(.horizontal, 12)
+                        .padding(.top, 6)
                 } else {
                     voiceControls
-                        .padding(.horizontal, 14)
-                        .padding(.top, 8)
+                        .padding(.horizontal, 12)
+                        .padding(.top, 6)
                 }
 
                 if config.mode == .voice, micPermission != .granted {
                     warningBanner
-                        .padding(.horizontal, 14)
+                        .padding(.horizontal, 12)
                 }
 
                 if !(config.mode == .text || isTextFallbackMode) || !isKeyboardVisible {
@@ -362,7 +362,7 @@ extension CaseSessionView {
                         Text("Vaka Sonlandır")
                             .font(AppFont.bodyMedium)
                             .foregroundStyle(AppColor.error)
-                            .frame(maxWidth: .infinity, minHeight: 52)
+                            .frame(maxWidth: .infinity, minHeight: 48)
                             .background(AppColor.errorLight)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -371,12 +371,12 @@ extension CaseSessionView {
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     }
                     .buttonStyle(PressableButtonStyle())
-                    .padding(.horizontal, 14)
-                    .padding(.bottom, 4)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 3)
                 }
             }
         }
-        .padding(.bottom, 8)
+        .padding(.bottom, 6)
         .background(AppColor.surface)
         .overlay(alignment: .top) {
             Rectangle().fill(AppColor.border).frame(height: 1)
@@ -384,8 +384,8 @@ extension CaseSessionView {
     }
 
     var voiceControls: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 10) {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
                 Button {
                     Task {
                         do {
@@ -399,7 +399,7 @@ extension CaseSessionView {
                     Image(systemName: "pause.fill")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(AppColor.textPrimary)
-                        .frame(width: 52, height: 52)
+                        .frame(width: 48, height: 48)
                         .background(AppColor.surfaceAlt)
                         .overlay(Circle().stroke(AppColor.border, lineWidth: 1))
                         .clipShape(Circle())
@@ -430,10 +430,10 @@ extension CaseSessionView {
                 } label: {
                     Circle()
                         .fill(vm.isMicMuted ? AppColor.textTertiary : AppColor.primary)
-                        .frame(width: 72, height: 72)
+                        .frame(width: 66, height: 66)
                         .overlay(
                             Image(systemName: vm.isMicMuted ? "mic.slash.fill" : "mic.fill")
-                                .font(.system(size: 28, weight: .semibold))
+                                .font(.system(size: 24, weight: .semibold))
                                 .foregroundStyle(.white)
                         )
                         .scaleEffect(isMicPulsing && !reduceMotion ? 1.04 : 1.0)
@@ -453,7 +453,7 @@ extension CaseSessionView {
                     Image(systemName: "stop.fill")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(AppColor.error)
-                        .frame(width: 52, height: 52)
+                        .frame(width: 48, height: 48)
                         .background(AppColor.errorLight)
                         .overlay(Circle().stroke(AppColor.error.opacity(0.35), lineWidth: 1))
                         .clipShape(Circle())
@@ -528,11 +528,11 @@ extension CaseSessionView {
     }
 
     var voicePermissionPreflightCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
                 Circle()
                     .fill(AppColor.primaryLight)
-                    .frame(width: 44, height: 44)
+                    .frame(width: 40, height: 40)
                     .overlay(
                         Image(systemName: "mic.fill")
                             .font(.system(size: 20, weight: .semibold))
@@ -549,12 +549,12 @@ extension CaseSessionView {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 preflightBenefit("Mikrofon yalnızca vaka sırasında kullanılır.")
                 preflightBenefit("İstediğinde yazılı moda geçebilirsin.")
             }
         }
-        .padding(12)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
