@@ -22,6 +22,8 @@ struct ResultsView: View {
     @State private var isSavingFlashcards = false
     @State private var flashcardsSaved = false
     @State private var flashcardError = ""
+    @State private var previewCardIndex = 0
+    @State private var previewIsBack = false
     @State private var strengthsExpanded = true
     @State private var improvementsExpanded = true
     @State private var diagnosisExpanded = false
@@ -359,6 +361,89 @@ struct ResultsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
+    private var currentPreviewCard: FlashcardDraft? {
+        guard !generatedFlashcards.isEmpty else { return nil }
+        let safeIndex = max(0, min(previewCardIndex, generatedFlashcards.count - 1))
+        return generatedFlashcards[safeIndex]
+    }
+
+    private func flashcardPreviewDeck(_ card: FlashcardDraft) -> some View {
+        return VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Kart \(previewCardIndex + 1)/\(generatedFlashcards.count)")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+                Spacer()
+                Text("Manuel geçiş")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.primary)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(card.title)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                    .lineLimit(2)
+                Text(previewIsBack ? card.back : card.front)
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .lineSpacing(4)
+                    .lineLimit(4)
+                Text(previewIsBack ? "Arka yüz" : "Ön yüz")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textTertiary)
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppColor.surfaceAlt)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(AppColor.border, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .onTapGesture {
+                withAnimation(reduceMotion ? .none : .easeInOut(duration: 0.25)) {
+                    previewIsBack.toggle()
+                }
+            }
+
+            HStack(spacing: 8) {
+                Button {
+                    goToPreviousPreviewCard()
+                } label: {
+                    Label("Önceki", systemImage: "chevron.left")
+                        .appSecondaryButtonLabelStyle()
+                }
+                .buttonStyle(PressableButtonStyle())
+
+                Button {
+                    advancePreviewCard()
+                } label: {
+                    Label("Sonraki", systemImage: "chevron.right")
+                        .appPrimaryButtonLabelStyle()
+                }
+                .buttonStyle(PressableButtonStyle())
+            }
+        }
+    }
+
+    private func advancePreviewCard() {
+        guard !generatedFlashcards.isEmpty else { return }
+        previewCardIndex = (previewCardIndex + 1) % generatedFlashcards.count
+        previewIsBack = false
+    }
+
+    private func goToPreviousPreviewCard() {
+        guard !generatedFlashcards.isEmpty else { return }
+        previewCardIndex = (previewCardIndex - 1 + generatedFlashcards.count) % generatedFlashcards.count
+        previewIsBack = false
+    }
+
+    private func resetPreviewDeck() {
+        previewCardIndex = 0
+        previewIsBack = false
+    }
+
     private var scoreCard: some View {
         let theme = scoreTheme
 
@@ -519,24 +604,8 @@ struct ResultsView: View {
                 .disabled(isGeneratingFlashcards)
                 .buttonStyle(PressableButtonStyle())
             } else {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(Array(generatedFlashcards.prefix(3).enumerated()), id: \.offset) { _, card in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(card.title)
-                                .font(AppFont.bodyMedium)
-                                .foregroundStyle(AppColor.textPrimary)
-                                .lineLimit(1)
-                            Text(card.front)
-                                .font(AppFont.body)
-                                .foregroundStyle(AppColor.textSecondary)
-                                .lineSpacing(4)
-                                .lineLimit(2)
-                        }
-                        .padding(10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(AppColor.surfaceAlt)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
+                if let card = currentPreviewCard {
+                    flashcardPreviewDeck(card)
                 }
 
                 if !flashcardsSaved {
@@ -670,6 +739,7 @@ struct ResultsView: View {
                 maxCards: 4
             )
             generatedFlashcards = response.cards
+            resetPreviewDeck()
             if response.source == "session_saved" {
                 flashcardsSaved = true
                 state.statusMessage = "Bu vakanın kayıtlı flashcard’ları yüklendi."

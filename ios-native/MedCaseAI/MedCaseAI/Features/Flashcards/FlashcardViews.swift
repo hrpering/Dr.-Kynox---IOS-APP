@@ -546,9 +546,14 @@ struct FlashcardStudyView: View {
         NavigationStack {
             VStack(spacing: 16) {
                 if let current = queue.first {
-                    Text("Kart \(cards.count - queue.count + 1)/\(cards.count)")
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.textSecondary)
+                    VStack(spacing: 8) {
+                        Text("Kart \(cards.count - queue.count + 1)/\(cards.count)")
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textSecondary)
+                        Text("Diğer karta geçiş sadece seçiminle olur.")
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textTertiary)
+                    }
 
                     FlashcardFlipCard(
                         front: current.front,
@@ -596,6 +601,9 @@ struct FlashcardStudyView: View {
                     .foregroundStyle(AppColor.primary)
                 }
             }
+            .onChange(of: queue.first?.id) { _ in
+                resetCardState()
+            }
         }
     }
 
@@ -603,16 +611,7 @@ struct FlashcardStudyView: View {
                               tint: Color,
                               background: Color) -> some View {
         Button {
-            guard let current = queue.first else { return }
-            Task {
-                isSubmitting = true
-                await onRate(current, rating)
-                if !queue.isEmpty {
-                    queue.removeFirst()
-                }
-                isFlipped = false
-                isSubmitting = false
-            }
+            submitCurrent(rating)
         } label: {
             VStack(spacing: 2) {
                 Text(rating.title)
@@ -632,6 +631,25 @@ struct FlashcardStudyView: View {
         }
         .disabled(isSubmitting)
         .buttonStyle(PressableButtonStyle())
+    }
+
+    private func resetCardState() {
+        isFlipped = false
+    }
+
+    private func submitCurrent(_ rating: FlashcardReviewRating) {
+        guard let current = queue.first, !isSubmitting else { return }
+        isSubmitting = true
+        Task {
+            await onRate(current, rating)
+            await MainActor.run {
+                if !queue.isEmpty {
+                    queue.removeFirst()
+                }
+                resetCardState()
+                isSubmitting = false
+            }
+        }
     }
 }
 

@@ -109,7 +109,13 @@ struct ProfileLanguagePreferencesView: View {
             )
             statusText = "Dil tercihleri güncellendi."
         } catch {
-            statusText = error.localizedDescription
+            let message = error.localizedDescription
+            let lowered = message.lowercased()
+            if lowered.contains("country_code") || lowered.contains("preferred_language_code") || lowered.contains("language_source") {
+                statusText = "Sunucu şeması eski görünüyor. Supabase SQL Editor'da `supabase/profiles.sql` dosyasını tekrar çalıştırıp yeniden dene."
+            } else {
+                statusText = message
+            }
         }
     }
 }
