@@ -90,7 +90,7 @@ struct GeneratorView: View {
                     .submitLabel(.search)
             }
             .padding(.horizontal, 12)
-            .frame(minHeight: 48)
+            .frame(minHeight: 44)
             .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -98,18 +98,18 @@ struct GeneratorView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            LazyVStack(spacing: 10) {
+            LazyVStack(spacing: 8) {
                 ForEach(filteredSpecialtyRows) { item in
                     Button {
                         specialty = item.value
                         Haptic.selection()
                     } label: {
-                        HStack(alignment: .top, spacing: 10) {
+                        HStack(alignment: .top, spacing: 8) {
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
                                 .fill(specialty == item.value ? AppColor.primary : AppColor.surfaceAlt)
-                                .frame(width: 8, height: 44)
+                                .frame(width: 6, height: 40)
 
-                            VStack(alignment: .leading, spacing: 5) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 HStack(spacing: 8) {
                                     Text(item.label)
                                         .font(AppFont.bodyMedium)
@@ -131,7 +131,7 @@ struct GeneratorView: View {
                                     .font(AppFont.caption)
                                     .foregroundStyle(AppColor.textSecondary)
                                     .lineSpacing(3)
-                                    .lineLimit(2)
+                                    .lineLimit(1)
                             }
 
                             Spacer()
@@ -140,7 +140,7 @@ struct GeneratorView: View {
                                 .foregroundStyle(specialty == item.value ? AppColor.primary : AppColor.textTertiary)
                         }
                         .padding(.horizontal, 12)
-                        .padding(.vertical, 10)
+                        .padding(.vertical, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(specialty == item.value ? AppColor.primaryLight : AppColor.surface)
                         .overlay(
@@ -167,7 +167,7 @@ struct GeneratorView: View {
                         .lineSpacing(3)
                         .lineLimit(2)
                 }
-                .padding(12)
+                .padding(10)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(AppColor.surfaceElevated)
                 .overlay(
@@ -184,6 +184,7 @@ struct GeneratorView: View {
                 Text(specialty.isEmpty ? "Önce bölüm seç" : "Zorluk seç")
                     .appPrimaryButtonLabel()
             }
+            .frame(minHeight: 50)
             .buttonStyle(PressableButtonStyle())
             .disabled(specialty.isEmpty)
             .opacity(specialty.isEmpty ? 0.45 : 1)
@@ -207,7 +208,7 @@ struct GeneratorView: View {
                 generatorMetric(icon: "target", title: "Zorluk", value: difficulty)
             }
 
-            LazyVStack(spacing: 10) {
+            LazyVStack(spacing: 8) {
                 ForEach([randomDifficultyCard] + difficultyCards) { config in
                     Button {
                         difficulty = config.id
@@ -227,6 +228,7 @@ struct GeneratorView: View {
                 Text("Mod seç")
                     .appPrimaryButtonLabel()
             }
+            .frame(minHeight: 50)
             .buttonStyle(PressableButtonStyle())
             .accessibilityLabel("Mod seç")
             .accessibilityHint("Seçilen bölüm ve zorluk ile mod seçim ekranına geçer")
@@ -240,12 +242,12 @@ struct GeneratorView: View {
         @ViewBuilder bottom: () -> Bottom
     ) -> some View {
         ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: AppSpacing.x2) {
+            VStack(alignment: .leading, spacing: 14) {
                 content()
             }
-            .padding(.horizontal, AppSpacing.x2)
-            .padding(.top, AppSpacing.x1_5)
-            .padding(.bottom, AppSpacing.x3)
+            .padding(.horizontal, 14)
+            .padding(.top, 10)
+            .padding(.bottom, 20)
         }
         .background(AppColor.background.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
@@ -254,9 +256,9 @@ struct GeneratorView: View {
                     .fill(AppColor.border)
                     .frame(height: 1)
                 bottom()
-                    .padding(.horizontal, AppSpacing.x2)
-                    .padding(.top, 10)
-                    .padding(.bottom, 10)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
             }
             .background(AppColor.surface)
             .appShadow(AppShadow.card)
@@ -264,16 +266,16 @@ struct GeneratorView: View {
     }
 
     private func stepHeader(step: String, title: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Text("Adım \(step)")
                     .font(AppFont.caption)
                     .foregroundStyle(Color.white.opacity(0.9))
                 Spacer()
                 HStack(spacing: 4) {
-                    Capsule().fill(.white.opacity(0.95)).frame(width: 26, height: 5)
-                    Capsule().fill(.white.opacity(0.45)).frame(width: 16, height: 5)
-                    Capsule().fill(.white.opacity(0.28)).frame(width: 16, height: 5)
+                    Capsule().fill(.white.opacity(0.95)).frame(width: 22, height: 4)
+                    Capsule().fill(.white.opacity(0.45)).frame(width: 14, height: 4)
+                    Capsule().fill(.white.opacity(0.28)).frame(width: 14, height: 4)
                 }
             }
 
@@ -291,7 +293,7 @@ struct GeneratorView: View {
                 .lineSpacing(4)
                 .lineLimit(2)
         }
-        .padding(AppSpacing.cardPadding)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -323,15 +325,15 @@ struct GeneratorView: View {
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 11)
-        .padding(.vertical, 9)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private var selectedSpecialtyLabel: String {
