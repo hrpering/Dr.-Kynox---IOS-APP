@@ -330,6 +330,8 @@ struct CodeBlueSessionView: View {
     @State private var timeoutSubmittedForToken: String?
     @State private var now = Date()
     @State private var countdownDeadline: Date?
+    @State private var countdownToken: String?
+    @State private var reviewCardFlipped = false
 
     private let ticker = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
 
@@ -393,9 +395,7 @@ struct CodeBlueSessionView: View {
         }
         .onReceive(ticker) { _ in
             now = Date()
-            if countdownDeadline == nil {
-                syncCountdownDeadline()
-            }
+            ensureLocalCountdownDeadline()
             tickTimerAndResolveTimeoutIfNeeded()
         }
     }
@@ -416,7 +416,7 @@ struct CodeBlueSessionView: View {
                     .clipShape(Capsule())
             }
 
-            Text("Süre yalnızca sunucu saatine göre ilerler. Arka plan veya telefon çağrısı sırasında durmaz.")
+            Text("Süre cihaz saatine göre ilerler. Arka plan veya telefon çağrısı sırasında durmaz.")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
@@ -471,24 +471,24 @@ struct CodeBlueSessionView: View {
         return max(0, min(1, Double(remainingSeconds) / Double(total)))
     }
 
-    private func syncCountdownDeadline() {
-        if let remainingMs = session?.timeRemainingMs, remainingMs > 0 {
-            countdownDeadline = now.addingTimeInterval(Double(remainingMs) / 1000.0)
+    private func ensureLocalCountdownDeadline(resetForNewQuestion: Bool = false) {
+        guard let question else {
+            countdownDeadline = nil
+            countdownToken = nil
             return
         }
 
-        if let expiresAt = session?.currentQuestionExpiresAt,
-           let expiresDate = parseISODate(expiresAt) {
-            countdownDeadline = expiresDate
-            return
-        }
-
-        if let question {
+        let token = question.questionToken
+        let needsReset = resetForNewQuestion || countdownToken != token
+        if needsReset {
+            countdownToken = token
             countdownDeadline = now.addingTimeInterval(Double(max(1, question.timeLimit)))
             return
         }
 
-        countdownDeadline = nil
+        if countdownDeadline == nil {
+            countdownDeadline = now.addingTimeInterval(Double(max(1, question.timeLimit)))
+        }
     }
 
     private func questionCard(_ question: CodeBlueQuestion) -> some View {
@@ -545,21 +545,28 @@ struct CodeBlueSessionView: View {
                 .font(AppFont.title2)
                 .foregroundStyle(AppColor.textPrimary)
 
-            Text(review.question.question)
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
+            ZStack {
+                reviewFace(
+                    title: "Ön Yüz",
+                    primaryText: review.question.question,
+                    secondaryText: "Kartı çevir: outcome ve klinik çıkarım"
+                )
+                .opacity(reviewCardFlipped ? 0 : 1)
 
-            if let back = review.answer.back {
-                if let outcome = back.outcomeMessage, !outcome.isEmpty {
-                    resultLine(title: "Sonuç", value: outcome)
-                }
-                if let status = back.statusText, !status.isEmpty {
-                    resultLine(title: "Durum", value: status)
-                }
-                if let takeaway = back.clinicalTakeaway, !takeaway.isEmpty {
-                    resultLine(title: "Klinik çıkarım", value: takeaway)
-                }
+                reviewFace(
+                    title: "Arka Yüz",
+                    primaryText: reviewOutcomeText(review),
+                    secondaryText: reviewTakeawayText(review)
+                )
+                .opacity(reviewCardFlipped ? 1 : 0)
+                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+            }
+            .frame(maxWidth: .infinity, minHeight: 220, alignment: .leading)
+            .rotation3DEffect(.degrees(reviewCardFlipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+            .animation(.spring(response: 0.34, dampingFraction: 0.84), value: reviewCardFlipped)
+            .onTapGesture {
+                reviewCardFlipped.toggle()
+                Haptic.selection()
             }
 
             HStack(spacing: 10) {
@@ -594,6 +601,44 @@ struct CodeBlueSessionView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
+    private func reviewOutcomeText(_ review: CodeBlueReviewState) -> String {
+        let raw = review.answer.back?.outcomeMessage?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return raw.isEmpty ? "Sonuç bilgisi alınamadı." : raw
+    }
+
+    private func reviewTakeawayText(_ review: CodeBlueReviewState) -> String {
+        let raw = review.answer.back?.clinicalTakeaway?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return raw.isEmpty ? "Klinik çıkarım bilgisi alınamadı." : raw
+    }
+
+    private func reviewFace(title: String, primaryText: String, secondaryText: String?) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textTertiary)
+
+            Text(primaryText)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineSpacing(4)
+
+            if let secondaryText, !secondaryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text(secondaryText)
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .lineSpacing(4)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .background(AppColor.surfaceAlt)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
     private func completionCard(_ summary: CodeBlueSummary) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Oturum Tamamlandı")
@@ -612,7 +657,7 @@ struct CodeBlueSessionView: View {
 
             HStack(spacing: 10) {
                 Button("Yeni 15sn Oturum Başlat") {
-                    Task { await startOrResumeSession() }
+                    Task { await startOrResumeSession(forceNew: true) }
                 }
                 .buttonStyle(DSPrimaryButtonStyle())
 
@@ -632,18 +677,6 @@ struct CodeBlueSessionView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private func resultLine(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textTertiary)
-            Text(value)
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textPrimary)
-                .lineSpacing(4)
-        }
-    }
-
     private func statPill(title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
@@ -659,17 +692,22 @@ struct CodeBlueSessionView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
-    private func startOrResumeSession() async {
+    private func startOrResumeSession(forceNew: Bool = false) async {
         if loading { return }
         loading = true
         defer { loading = false }
 
         completionSummary = nil
         reviewState = nil
-        timeoutSubmittedForToken = nil
+        reviewCardFlipped = false
+        if forceNew {
+            timeoutSubmittedForToken = nil
+            countdownDeadline = nil
+            countdownToken = nil
+        }
 
         do {
-            let response = try await state.startCodeBlueSession()
+            let response = try await state.startCodeBlueSession(forceNew: forceNew)
             applySessionResponse(response)
             errorText = ""
         } catch {
@@ -680,13 +718,21 @@ struct CodeBlueSessionView: View {
     private func restoreSessionAndResolveTimeoutIfNeeded() async {
         guard !loading else { return }
         guard let sessionId = session?.id, !sessionId.isEmpty else { return }
+        let previousToken = question?.questionToken
+        let previousDeadline = countdownDeadline
         do {
             let response = try await state.restoreCodeBlueSession(sessionId: sessionId)
             applySessionResponse(response)
-            if response.session?.needsTimeoutResolution == true,
-               response.question != nil,
+
+            let activeToken = question?.questionToken
+            if scenePhase == .active,
                reviewState == nil,
-               completionSummary == nil {
+               completionSummary == nil,
+               let previousToken,
+               let previousDeadline,
+               activeToken == previousToken,
+               previousDeadline <= Date(),
+               timeoutSubmittedForToken != activeToken {
                 await submitAnswer(selectedOptionIndex: nil, timedOut: true)
             }
             errorText = ""
@@ -721,6 +767,7 @@ struct CodeBlueSessionView: View {
                 summary: response.summary
             )
             reviewState = review
+            reviewCardFlipped = false
             if review.sessionCompleted {
                 completionSummary = review.summary
             }
@@ -734,10 +781,12 @@ struct CodeBlueSessionView: View {
         if review.sessionCompleted {
             completionSummary = review.summary
             reviewState = nil
+            reviewCardFlipped = false
             question = nil
             return
         }
         reviewState = nil
+        reviewCardFlipped = false
         await restoreSessionAndResolveTimeoutIfNeeded()
     }
 
@@ -756,6 +805,7 @@ struct CodeBlueSessionView: View {
     }
 
     private func tickTimerAndResolveTimeoutIfNeeded() {
+        guard scenePhase == .active else { return }
         guard reviewState == nil, completionSummary == nil else { return }
         guard let questionToken = question?.questionToken else { return }
         guard remainingSeconds <= 0 else { return }
@@ -773,6 +823,8 @@ struct CodeBlueSessionView: View {
             session = response.session
             question = nil
             countdownDeadline = nil
+            countdownToken = nil
+            reviewCardFlipped = false
             return
         }
 
@@ -780,28 +832,15 @@ struct CodeBlueSessionView: View {
             session = newSession
         }
         if let newQuestion = response.question {
+            let isNewToken = countdownToken != newQuestion.questionToken
             question = newQuestion
-            timeoutSubmittedForToken = nil
+            if isNewToken {
+                timeoutSubmittedForToken = nil
+                reviewCardFlipped = false
+            }
+            ensureLocalCountdownDeadline(resetForNewQuestion: isNewToken)
+            return
         }
-        syncCountdownDeadline()
+        ensureLocalCountdownDeadline()
     }
-
-    private func parseISODate(_ raw: String) -> Date? {
-        if let value = Self.isoWithFraction.date(from: raw) {
-            return value
-        }
-        return Self.isoStandard.date(from: raw)
-    }
-
-    private static let isoWithFraction: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    private static let isoStandard: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
 }

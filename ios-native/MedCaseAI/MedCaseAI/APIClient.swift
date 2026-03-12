@@ -331,10 +331,12 @@ final class APIClient {
     }
 
     func startCodeBlueSession(accessToken: String,
-                              uiLanguageCode: String?) async throws -> CodeBlueSessionResponse {
+                              uiLanguageCode: String?,
+                              forceNew: Bool = false) async throws -> CodeBlueSessionResponse {
         let url = try buildURL(path: "/api/code-blue/session/start")
         struct Payload: Encodable {
             let uiLanguageCode: String?
+            let forceNew: Bool?
         }
 
         return try await request(
@@ -344,7 +346,10 @@ final class APIClient {
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"
             ],
-            body: Payload(uiLanguageCode: uiLanguageCode),
+            body: Payload(
+                uiLanguageCode: uiLanguageCode,
+                forceNew: forceNew ? true : nil
+            ),
             timeout: 25
         )
     }

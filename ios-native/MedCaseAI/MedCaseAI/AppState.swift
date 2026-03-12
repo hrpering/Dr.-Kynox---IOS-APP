@@ -309,12 +309,16 @@ final class AppState: ObservableObject {
         return try await api.fetchFlashcardPerformance(accessToken: token, rangeDays: rangeDays)
     }
 
-    func startCodeBlueSession() async throws -> CodeBlueSessionResponse {
+    func startCodeBlueSession(forceNew: Bool = false) async throws -> CodeBlueSessionResponse {
         guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
             throw AppError.sessionMissing
         }
         authViewModel.updateSessionToken(token)
-        return try await api.startCodeBlueSession(accessToken: token, uiLanguageCode: uiLanguageCode)
+        return try await api.startCodeBlueSession(
+            accessToken: token,
+            uiLanguageCode: uiLanguageCode,
+            forceNew: forceNew
+        )
     }
 
     func restoreCodeBlueSession(sessionId: String) async throws -> CodeBlueSessionResponse {
