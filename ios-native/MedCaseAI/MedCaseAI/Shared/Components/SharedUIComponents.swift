@@ -53,13 +53,13 @@ struct HistoryCard: View {
     let item: CaseSession
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 5) {
             Text(item.caseTitle)
                 .font(AppFont.title2)
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(2)
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 Badge(text: SpecialtyOption.label(for: item.specialty), tint: AppColor.primary, background: AppColor.primaryLight)
                 Badge(text: item.difficultyLabel, tint: AppColor.warning, background: AppColor.warningLight)
             }
@@ -70,7 +70,7 @@ struct HistoryCard: View {
                     .foregroundStyle(AppColor.textSecondary)
             }
         }
-        .padding(12)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(

@@ -12,23 +12,23 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 10) {
                     historyHeroCard
                     historySummaryCard
 
                     if state.caseHistory.isEmpty {
                         if state.isBusy {
-                            VStack(spacing: 10) {
-                                ShimmerView().frame(height: 76)
-                                ShimmerView().frame(height: 76)
-                                ShimmerView().frame(height: 76)
+                            VStack(spacing: 8) {
+                                ShimmerView().frame(height: 70)
+                                ShimmerView().frame(height: 70)
+                                ShimmerView().frame(height: 70)
                             }
                         } else {
                             Text("Henüz vaka geçmişi yok.")
                                 .font(AppFont.body)
                                 .foregroundStyle(AppColor.textSecondary)
                                 .lineSpacing(4)
-                                .padding(14)
+                                .padding(12)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(AppColor.surfaceElevated)
                                 .overlay(
@@ -39,7 +39,7 @@ struct HistoryView: View {
                                 .appShadow(AppShadow.card)
                         }
                     } else {
-                        LazyVStack(spacing: 10) {
+                        LazyVStack(spacing: 8) {
                             ForEach(state.caseHistory) { item in
                                 Button {
                                     selectedSession = item
@@ -51,8 +51,8 @@ struct HistoryView: View {
                         }
                     }
                 }
-                .padding(16)
-                .padding(.bottom, 12)
+                .padding(14)
+                .padding(.bottom, 10)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Vaka Geçmişi")
@@ -82,7 +82,7 @@ struct HistoryView: View {
     }
 
     private var historyHeroCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 7) {
             Text("Vaka Geçmişi")
                 .font(AppFont.title)
                 .foregroundStyle(.white)
@@ -91,7 +91,7 @@ struct HistoryView: View {
                 .foregroundStyle(.white.opacity(0.9))
                 .lineSpacing(4)
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -109,7 +109,7 @@ struct HistoryView: View {
     }
 
     private var historySummaryCard: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             summaryPill(title: "Toplam", value: "\(state.caseHistory.count)")
             summaryPill(title: "Skorlu", value: "\(scoredCaseCount)")
             summaryPill(title: "Ortalama", value: averageScoreText)
@@ -117,7 +117,7 @@ struct HistoryView: View {
     }
 
     private func summaryPill(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
@@ -126,9 +126,9 @@ struct HistoryView: View {
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
@@ -182,7 +182,7 @@ struct HistorySessionDetailView: View {
                     }
                 )
             } else if item.status == "pending" || item.status == "pending_score" {
-                VStack(spacing: 14) {
+                VStack(spacing: 12) {
                     ProgressView()
                         .controlSize(.large)
                     Text("Skor ve geri bildirim hazırlanıyor...")
@@ -193,11 +193,11 @@ struct HistorySessionDetailView: View {
                     }
                     .appSecondaryButton()
                 }
-                .padding(24)
+                .padding(20)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(AppColor.background.ignoresSafeArea())
             } else {
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     Text("Bu oturum için skor henüz yok.")
                         .font(AppFont.body)
                         .foregroundStyle(AppColor.textSecondary)
@@ -207,7 +207,7 @@ struct HistorySessionDetailView: View {
                     }
                     .appPrimaryButton()
                 }
-                .padding(24)
+                .padding(20)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(AppColor.background.ignoresSafeArea())
             }
@@ -302,7 +302,7 @@ private struct HistorySessionArtifactsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
                 Picker("Sekme", selection: $selectedTab) {
                     ForEach(Tab.allCases) { tab in
                         Text(tab.rawValue).tag(tab)
@@ -313,7 +313,7 @@ private struct HistorySessionArtifactsView: View {
                 if isLoading && detail == nil {
                     ProgressView("Yükleniyor...")
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 24)
+                        .padding(.vertical, 20)
                 } else {
                     contentView
                 }
@@ -322,7 +322,7 @@ private struct HistorySessionArtifactsView: View {
                     ErrorStateCard(message: errorText, retry: onRetry)
                 }
             }
-            .padding(16)
+            .padding(14)
         }
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle("Kayıt Detayı")
@@ -358,14 +358,14 @@ private struct HistorySessionArtifactsView: View {
     }
 
     private var transcriptSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             if transcriptEntries.isEmpty {
                 Text("Transcript kaydı bulunamadı.")
                     .font(AppFont.body)
                     .foregroundStyle(AppColor.textSecondary)
             } else {
                 ForEach(transcriptEntries) { entry in
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 3) {
                         Text(entry.source.uppercased())
                             .font(AppFont.caption)
                             .foregroundStyle(AppColor.textSecondary)
@@ -374,7 +374,7 @@ private struct HistorySessionArtifactsView: View {
                             .foregroundStyle(AppColor.textPrimary)
                             .lineSpacing(4)
                     }
-                    .padding(12)
+                    .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(AppColor.surface)
                     .overlay(
@@ -388,14 +388,14 @@ private struct HistorySessionArtifactsView: View {
     }
 
     private func toolsSection(_ rows: [CaseSessionToolResult]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             if rows.isEmpty {
                 Text("Bu bölüm için kayıt bulunamadı.")
                     .font(AppFont.body)
                     .foregroundStyle(AppColor.textSecondary)
             } else {
                 ForEach(rows) { row in
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 7) {
                         HStack {
                             Text(row.title ?? row.toolName ?? "Tool Sonucu")
                                 .font(AppFont.bodyMedium)
@@ -429,7 +429,7 @@ private struct HistorySessionArtifactsView: View {
                             }
                         }
                     }
-                    .padding(12)
+                    .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(AppColor.surface)
                     .overlay(
