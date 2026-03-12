@@ -9,6 +9,7 @@ struct DashboardView: View {
     @State private var showStudyPlanDetail = false
     @State private var showWidgetGuideSheet = false
     @State private var showNotificationPrimer = false
+    @State private var showQuickCase = false
 
     var body: some View {
         NavigationStack {
@@ -57,6 +58,12 @@ struct DashboardView: View {
             .fullScreenCover(item: $modeFlow) { flow in
                 NavigationStack {
                     ModeSelectionPage(flow: flow)
+                }
+            }
+            .fullScreenCover(isPresented: $showQuickCase) {
+                NavigationStack {
+                    CodeBlueSessionView()
+                        .environmentObject(state)
                 }
             }
             .alert("Bildirimleri açmak ister misin?", isPresented: $showNotificationPrimer) {
@@ -116,6 +123,20 @@ struct DashboardView: View {
                 .buttonStyle(DSPrimaryButtonStyle())
                 .accessibilityLabel("Vaka başlat")
                 .accessibilityHint("Vaka akışını başlatmak için seçim ekranına gider")
+
+                Button {
+                    showQuickCase = true
+                } label: {
+                    HStack(spacing: AppSpacing.x1) {
+                        Image(systemName: "timer")
+                        Text("10sn Hızlı Vaka")
+                        Spacer()
+                        Image(systemName: "arrow.right")
+                    }
+                }
+                .buttonStyle(DSSecondaryButtonStyle())
+                .accessibilityLabel("10 saniye hızlı vaka başlat")
+                .accessibilityHint("Code Blue hızlı vaka akışını açar")
             }
         }
     }

@@ -9,13 +9,13 @@ struct AnalysisHubView: View {
     @EnvironmentObject private var state: AppState
     private enum Destination: Int, Identifiable {
         case weakArea
-        case flashcards
+        case quickFavorites
         var id: Int { rawValue }
     }
     @State private var destination: Destination?
-    @State private var isLoadingFlashcardStats = false
-    @State private var flashcardTotal = 0
-    @State private var flashcardDueToday = 0
+    @State private var isLoadingFavoriteStats = false
+    @State private var favoriteCardTotal = 0
+    @State private var latestFavoriteLabel = "--"
     @State private var didInitialLoad = false
 
     var body: some View {
@@ -26,7 +26,7 @@ struct AnalysisHubView: View {
                         .font(AppFont.largeTitle)
                         .foregroundStyle(AppColor.textPrimary)
 
-                    Text("Skor trendini, bölüm bazlı güçlü/zayıf alanlarını ve tekrar durumunu tek yerden takip et.")
+                    Text("Skor trendini, bölüm bazlı güçlü/zayıf alanlarını ve hızlı vaka kartlarını tek yerden takip et.")
                         .font(AppFont.body)
                         .foregroundStyle(AppColor.textSecondary)
                         .lineSpacing(4)
@@ -34,7 +34,7 @@ struct AnalysisHubView: View {
                     summaryStatsRow
                     scoreTrendCard
                     specialtyInsightCard
-                    flashcardStatusCard
+                    quickCaseFavoriteStatusCard
                     aiRecommendationPreviewCard
 
                     if !hasEnoughAnalysisData {
@@ -78,14 +78,14 @@ struct AnalysisHubView: View {
                     .buttonStyle(PressableButtonStyle())
 
                     Button {
-                        destination = .flashcards
-                        state.selectedMainTab = "flashcards"
+                        destination = .quickFavorites
+                        state.selectedMainTab = "analysis"
                         Haptic.selection()
                     } label: {
                         analysisHubCard(
-                            icon: "rectangle.stack.fill",
-                            title: "Flashcard Merkezi",
-                            subtitle: "Kartlarını ayrı ekranda çalış, flip animasyonuyla tekrar yap.",
+                            icon: "star.square.on.square.fill",
+                            title: "Favori Hızlı Vaka Kartları",
+                            subtitle: "10sn vakalarda işaretlediğin kartları burada tekrar incele.",
                             tint: AppColor.success,
                             background: AppColor.successLight
                         )
@@ -98,7 +98,7 @@ struct AnalysisHubView: View {
             .navigationTitle("Analiz")
             .onAppear {
                 if state.selectedMainTab == "flashcards" {
-                    destination = .flashcards
+                    destination = .quickFavorites
                 }
             }
             .refreshable {
@@ -111,7 +111,7 @@ struct AnalysisHubView: View {
             }
             .onChange(of: state.selectedMainTab) { value in
                 if value == "flashcards" {
-                    destination = .flashcards
+                    destination = .quickFavorites
                 }
             }
             .navigationDestination(
@@ -129,7 +129,7 @@ struct AnalysisHubView: View {
                     case .weakArea:
                         WeakAreaAnalysisView()
                             .environmentObject(state)
-                    case .flashcards:
+                    case .quickFavorites:
                         FlashcardsHubView()
                             .environmentObject(state)
                     case .none:
@@ -252,22 +252,22 @@ struct AnalysisHubView: View {
         }
     }
 
-    private var flashcardStatusCard: some View {
+    private var quickCaseFavoriteStatusCard: some View {
         DSInfoCard(tone: .success) {
-            sectionHeader(title: "Flashcard Tekrar Durumu")
+            sectionHeader(title: "Hızlı Vaka Favori Kartları")
             HStack(spacing: 10) {
-                flashcardMetricPill(
-                    icon: "rectangle.stack.fill",
+                favoriteMetricPill(
+                    icon: "star.fill",
                     title: "Toplam Kart",
-                    value: isLoadingFlashcardStats ? "..." : "\(flashcardTotal)"
+                    value: isLoadingFavoriteStats ? "..." : "\(favoriteCardTotal)"
                 )
-                flashcardMetricPill(
-                    icon: "clock.arrow.circlepath",
-                    title: "Bugün Tekrar",
-                    value: isLoadingFlashcardStats ? "..." : "\(flashcardDueToday)"
+                favoriteMetricPill(
+                    icon: "clock.fill",
+                    title: "Son Eklenen",
+                    value: isLoadingFavoriteStats ? "..." : latestFavoriteLabel
                 )
             }
-            Text("Kart tekrarlarını düzenli yaptığında analiz önerileri daha isabetli olur.")
+            Text("10sn oturum sonrasında favoriye eklediğin ön/arka kartlar burada birikir.")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
@@ -328,7 +328,7 @@ struct AnalysisHubView: View {
         }
     }
 
-    private func flashcardMetricPill(icon: String, title: String, value: String) -> some View {
+    private func favoriteMetricPill(icon: String, title: String, value: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 12, weight: .semibold))
@@ -445,20 +445,31 @@ struct AnalysisHubView: View {
 
     private func refreshHub() async {
         await state.refreshDashboard(showBusy: false)
-        await refreshFlashcardStats()
+        await refreshFavoriteStats()
     }
 
-    private func refreshFlashcardStats() async {
-        isLoadingFlashcardStats = true
-        defer { isLoadingFlashcardStats = false }
+    private func refreshFavoriteStats() async {
+        isLoadingFavoriteStats = true
+        defer { isLoadingFavoriteStats = false }
         do {
-            let collections = try await state.fetchFlashcardCollections(limit: 1)
-            flashcardTotal = collections.stats?.total ?? collections.cards.count
-            flashcardDueToday = collections.stats?.dueToday ?? 0
+            let favorites = try await state.fetchCodeBlueFavorites(limit: 1)
+            favoriteCardTotal = favorites.totalCount ?? favorites.items.count
+            if let latest = favorites.items.first?.createdAt, let date = parseISODate(latest) {
+                latestFavoriteLabel = shortDayMonth(date)
+            } else {
+                latestFavoriteLabel = "--"
+            }
         } catch {
-            flashcardTotal = 0
-            flashcardDueToday = 0
+            favoriteCardTotal = 0
+            latestFavoriteLabel = "--"
         }
+    }
+
+    private func shortDayMonth(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "dd.MM"
+        return formatter.string(from: date)
     }
 
     private func analysisHubCard(

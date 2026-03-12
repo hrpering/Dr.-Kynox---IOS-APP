@@ -3,8 +3,8 @@ import SwiftUI
 struct StudyPlanDetailView: View {
     @EnvironmentObject private var state: AppState
 
-    @State private var isLoadingFlashcardStats = false
-    @State private var flashcardTotal = 0
+    @State private var isLoadingFavoriteStats = false
+    @State private var favoriteCardTotal = 0
 
     private struct CycleStep: Identifiable {
         let id: Int
@@ -226,7 +226,7 @@ struct StudyPlanDetailView: View {
             .init(id: 1, title: "Plan bilgisi tamamlandı", subtitle: state.studyPlan.isConfigured ? state.studyPlan.compactLabel : "Hedef ve sınav bilgisi girilmedi", done: state.studyPlan.isConfigured, icon: "doc.text", tint: AppColor.primary),
             .init(id: 2, title: "Haftalık hedef belirlendi", subtitle: "Hedef: \(state.weeklyGoalTarget) vaka / hafta", done: state.weeklyGoalTarget > 0, icon: "target", tint: AppColor.primary),
             .init(id: 3, title: "Vaka pratikleri tamamlandı", subtitle: solvedAtLeastOne ? "\(completedCaseCount) vaka tamamlandı" : "Henüz tamamlanan vaka yok", done: solvedAtLeastOne, icon: "stethoscope", tint: AppColor.success),
-            .init(id: 4, title: "Hızlı tekrar kartları hazır", subtitle: isLoadingFlashcardStats ? "Kartlar yükleniyor..." : "\(flashcardTotal) kart kayıtlı", done: flashcardTotal > 0, icon: "rectangle.stack", tint: AppColor.success),
+            .init(id: 4, title: "Favori hızlı vaka kartları hazır", subtitle: isLoadingFavoriteStats ? "Kartlar yükleniyor..." : "\(favoriteCardTotal) kart kayıtlı", done: favoriteCardTotal > 0, icon: "star.square", tint: AppColor.success),
             .init(id: 5, title: "Zayıf alan haritası güncel", subtitle: weakReady ? "Analiz güncel" : "Analiz için daha fazla vaka gerekiyor", done: weakReady, icon: "chart.line.uptrend.xyaxis", tint: AppColor.warning),
             .init(id: 6, title: "Haftalık odak önerisi üretildi", subtitle: aiReady ? (state.weeklyGoalFocus?.summaryLine ?? "Odak önerisi hazır") : "Odak önerisi bekleniyor", done: aiReady, icon: "sparkles", tint: AppColor.warning),
             .init(id: 7, title: "Yeni haftalık hedefe geçildi", subtitle: "Mevcut hedef: \(state.weeklyGoalTarget) vaka / hafta", done: weeklyUpdated, icon: "arrow.triangle.2.circlepath", tint: AppColor.error)
@@ -252,13 +252,13 @@ struct StudyPlanDetailView: View {
     }
 
     private func refreshLoopState() async {
-        isLoadingFlashcardStats = true
-        defer { isLoadingFlashcardStats = false }
+        isLoadingFavoriteStats = true
+        defer { isLoadingFavoriteStats = false }
         do {
-            let collections = try await state.fetchFlashcardCollections(limit: 1)
-            flashcardTotal = collections.stats?.total ?? collections.cards.count
+            let favorites = try await state.fetchCodeBlueFavorites(limit: 1)
+            favoriteCardTotal = favorites.totalCount ?? favorites.items.count
         } catch {
-            flashcardTotal = 0
+            favoriteCardTotal = 0
         }
     }
 }

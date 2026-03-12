@@ -933,6 +933,201 @@ struct ConversationLine: Codable {
     let timestamp: Int
 }
 
+struct CodeBlueSessionState: Decodable {
+    let id: String
+    let status: String
+    let index: Int
+    let total: Int
+    let startedAt: String?
+    let completedAt: String?
+    let currentQuestionStartedAt: String?
+    let currentQuestionExpiresAt: String?
+    let timeRemainingMs: Int?
+    let needsTimeoutResolution: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case status
+        case index
+        case total
+        case startedAt = "started_at"
+        case completedAt = "completed_at"
+        case currentQuestionStartedAt = "current_question_started_at"
+        case currentQuestionExpiresAt = "current_question_expires_at"
+        case timeRemainingMs = "time_remaining_ms"
+        case needsTimeoutResolution = "needs_timeout_resolution"
+    }
+}
+
+struct CodeBlueQuestion: Decodable, Identifiable {
+    let scenarioId: String
+    let scenarioKey: String
+    let specialty: String
+    let difficulty: String
+    let urgencyType: String
+    let tags: [String]
+    let question: String
+    let options: [String]
+    let timeLimit: Int
+    let questionToken: String
+
+    var id: String { "\(scenarioId):\(questionToken)" }
+
+    enum CodingKeys: String, CodingKey {
+        case scenarioId = "scenario_id"
+        case scenarioKey = "scenario_key"
+        case specialty
+        case difficulty
+        case urgencyType = "urgency_type"
+        case tags
+        case question
+        case options
+        case timeLimit = "time_limit"
+        case questionToken = "question_token"
+    }
+}
+
+struct CodeBlueSummary: Decodable {
+    let totalQuestions: Int?
+    let correctCount: Int?
+    let wrongCount: Int?
+    let timeoutCount: Int?
+    let rawScore: Int?
+    let maxRawScore: Int?
+    let scorePercent: Double?
+    let avgResponseMs: Double?
+    let completedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case totalQuestions = "total_questions"
+        case correctCount = "correct_count"
+        case wrongCount = "wrong_count"
+        case timeoutCount = "timeout_count"
+        case rawScore = "raw_score"
+        case maxRawScore = "max_raw_score"
+        case scorePercent = "score_percent"
+        case avgResponseMs = "avg_response_ms"
+        case completedAt = "completed_at"
+    }
+}
+
+struct CodeBlueSessionResponse: Decodable {
+    let ok: Bool?
+    let resumed: Bool?
+    let session: CodeBlueSessionState?
+    let question: CodeBlueQuestion?
+    let sessionCompleted: Bool?
+    let summary: CodeBlueSummary?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case resumed
+        case session
+        case question
+        case sessionCompleted = "session_completed"
+        case summary
+    }
+}
+
+struct CodeBlueAnswerBack: Decodable {
+    let outcomeMessage: String?
+    let statusText: String?
+    let clinicalTakeaway: String?
+
+    enum CodingKeys: String, CodingKey {
+        case outcomeMessage = "outcome_message"
+        case statusText = "status_text"
+        case clinicalTakeaway = "clinical_takeaway"
+    }
+}
+
+struct CodeBlueAnswerResult: Decodable {
+    let outcome: String?
+    let isCorrect: Bool?
+    let elapsedMs: Int?
+    let back: CodeBlueAnswerBack?
+
+    enum CodingKeys: String, CodingKey {
+        case outcome
+        case isCorrect = "is_correct"
+        case elapsedMs = "elapsed_ms"
+        case back
+    }
+}
+
+struct CodeBlueProgress: Decodable {
+    let index: Int?
+    let total: Int?
+    let remaining: Int?
+}
+
+struct CodeBlueAnswerResponse: Decodable {
+    let ok: Bool?
+    let idempotent: Bool?
+    let result: CodeBlueAnswerResult?
+    let sessionCompleted: Bool?
+    let progress: CodeBlueProgress?
+    let nextQuestion: CodeBlueQuestion?
+    let summary: CodeBlueSummary?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case idempotent
+        case result
+        case sessionCompleted = "session_completed"
+        case progress
+        case nextQuestion = "next_question"
+        case summary
+    }
+}
+
+struct CodeBlueFavoriteCard: Decodable, Identifiable, Hashable {
+    let id: String
+    let sessionId: String
+    let questionIndex: Int
+    let scenarioId: String
+    let specialty: String
+    let difficulty: String
+    let front: String
+    let back: String
+    let createdAt: String?
+    let updatedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case sessionId = "session_id"
+        case questionIndex = "question_index"
+        case scenarioId = "scenario_id"
+        case specialty
+        case difficulty
+        case front
+        case back
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+}
+
+struct CodeBlueFavoriteSaveResponse: Decodable {
+    let ok: Bool?
+    let item: CodeBlueFavoriteCard?
+}
+
+struct CodeBlueFavoritesResponse: Decodable {
+    let ok: Bool?
+    let items: [CodeBlueFavoriteCard]
+    let hasMore: Bool?
+    let nextCursor: String?
+    let totalCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case items
+        case hasMore = "has_more"
+        case nextCursor = "next_cursor"
+        case totalCount = "total_count"
+    }
+}
+
 enum FlashcardReviewRating: String, Codable, CaseIterable {
     case again
     case hard

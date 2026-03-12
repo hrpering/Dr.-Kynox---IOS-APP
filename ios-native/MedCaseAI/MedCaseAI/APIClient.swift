@@ -330,6 +330,143 @@ final class APIClient {
         )
     }
 
+    func startCodeBlueSession(accessToken: String,
+                              uiLanguageCode: String?) async throws -> CodeBlueSessionResponse {
+        let url = try buildURL(path: "/api/code-blue/session/start")
+        struct Payload: Encodable {
+            let uiLanguageCode: String?
+        }
+
+        return try await request(
+            url: url,
+            method: "POST",
+            headers: [
+                "Authorization": "Bearer \(accessToken)",
+                "Content-Type": "application/json"
+            ],
+            body: Payload(uiLanguageCode: uiLanguageCode),
+            timeout: 25
+        )
+    }
+
+    func restoreCodeBlueSession(accessToken: String,
+                                sessionId: String) async throws -> CodeBlueSessionResponse {
+        let cleanSessionId = sessionId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanSessionId.isEmpty else {
+            throw AppError.httpError("Geçerli sessionId gerekli.")
+        }
+        let encoded = cleanSessionId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? cleanSessionId
+        let url = try buildURL(path: "/api/code-blue/session/\(encoded)")
+        return try await request(
+            url: url,
+            method: "GET",
+            headers: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            timeout: 20
+        )
+    }
+
+    func answerCodeBlue(accessToken: String,
+                        sessionId: String,
+                        questionIndex: Int,
+                        questionToken: String,
+                        selectedOptionIndex: Int?,
+                        timedOut: Bool,
+                        clientRequestId: String?) async throws -> CodeBlueAnswerResponse {
+        let url = try buildURL(path: "/api/code-blue/session/answer")
+        struct Payload: Encodable {
+            let sessionId: String
+            let questionIndex: Int
+            let questionToken: String
+            let selectedOptionIndex: Int?
+            let timedOut: Bool
+            let clientRequestId: String?
+        }
+
+        return try await request(
+            url: url,
+            method: "POST",
+            headers: [
+                "Authorization": "Bearer \(accessToken)",
+                "Content-Type": "application/json"
+            ],
+            body: Payload(
+                sessionId: sessionId,
+                questionIndex: questionIndex,
+                questionToken: questionToken,
+                selectedOptionIndex: selectedOptionIndex,
+                timedOut: timedOut,
+                clientRequestId: clientRequestId
+            ),
+            timeout: 20
+        )
+    }
+
+    func saveCodeBlueFavorite(accessToken: String,
+                              sessionId: String,
+                              questionIndex: Int) async throws -> CodeBlueFavoriteSaveResponse {
+        let url = try buildURL(path: "/api/code-blue/cards/favorites")
+        struct Payload: Encodable {
+            let sessionId: String
+            let questionIndex: Int
+        }
+
+        return try await request(
+            url: url,
+            method: "POST",
+            headers: [
+                "Authorization": "Bearer \(accessToken)",
+                "Content-Type": "application/json"
+            ],
+            body: Payload(sessionId: sessionId, questionIndex: questionIndex),
+            timeout: 20
+        )
+    }
+
+    func fetchCodeBlueFavorites(accessToken: String,
+                                limit: Int = 20,
+                                cursor: String?) async throws -> CodeBlueFavoritesResponse {
+        var components = URLComponents(url: try buildURL(path: "/api/code-blue/cards/favorites"), resolvingAgainstBaseURL: false)
+        var queryItems: [URLQueryItem] = [
+            .init(name: "limit", value: String(max(1, min(50, limit))))
+        ]
+        if let cursor, !cursor.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            queryItems.append(.init(name: "cursor", value: cursor))
+        }
+        components?.queryItems = queryItems
+        guard let url = components?.url else {
+            throw AppError.invalidURL
+        }
+
+        return try await request(
+            url: url,
+            method: "GET",
+            headers: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            timeout: 20
+        )
+    }
+
+    func deleteCodeBlueFavorite(accessToken: String,
+                                favoriteId: String) async throws -> BasicResponse {
+        let cleanFavoriteId = favoriteId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanFavoriteId.isEmpty else {
+            throw AppError.httpError("Geçerli favoriteId gerekli.")
+        }
+        let encoded = cleanFavoriteId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? cleanFavoriteId
+        let url = try buildURL(path: "/api/code-blue/cards/favorites/\(encoded)")
+        return try await request(
+            url: url,
+            method: "DELETE",
+            headers: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            timeout: 20
+        )
+    }
+
     func generateFlashcards(accessToken: String,
                             sessionId: String,
                             specialty: String,

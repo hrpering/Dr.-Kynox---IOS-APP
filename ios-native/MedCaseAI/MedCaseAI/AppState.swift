@@ -309,6 +309,74 @@ final class AppState: ObservableObject {
         return try await api.fetchFlashcardPerformance(accessToken: token, rangeDays: rangeDays)
     }
 
+    func startCodeBlueSession() async throws -> CodeBlueSessionResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        authViewModel.updateSessionToken(token)
+        return try await api.startCodeBlueSession(accessToken: token, uiLanguageCode: uiLanguageCode)
+    }
+
+    func restoreCodeBlueSession(sessionId: String) async throws -> CodeBlueSessionResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        authViewModel.updateSessionToken(token)
+        return try await api.restoreCodeBlueSession(accessToken: token, sessionId: sessionId)
+    }
+
+    func answerCodeBlue(sessionId: String,
+                        questionIndex: Int,
+                        questionToken: String,
+                        selectedOptionIndex: Int?,
+                        timedOut: Bool,
+                        clientRequestId: String?) async throws -> CodeBlueAnswerResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        authViewModel.updateSessionToken(token)
+        return try await api.answerCodeBlue(
+            accessToken: token,
+            sessionId: sessionId,
+            questionIndex: questionIndex,
+            questionToken: questionToken,
+            selectedOptionIndex: selectedOptionIndex,
+            timedOut: timedOut,
+            clientRequestId: clientRequestId
+        )
+    }
+
+    func saveCodeBlueFavorite(sessionId: String, questionIndex: Int) async throws -> CodeBlueFavoriteCard? {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        authViewModel.updateSessionToken(token)
+        let response = try await api.saveCodeBlueFavorite(
+            accessToken: token,
+            sessionId: sessionId,
+            questionIndex: questionIndex
+        )
+        return response.item
+    }
+
+    func fetchCodeBlueFavorites(limit: Int = 20, cursor: String? = nil) async throws -> CodeBlueFavoritesResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        authViewModel.updateSessionToken(token)
+        return try await api.fetchCodeBlueFavorites(accessToken: token, limit: limit, cursor: cursor)
+    }
+
+    @discardableResult
+    func deleteCodeBlueFavorite(favoriteId: String) async throws -> Bool {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        authViewModel.updateSessionToken(token)
+        let response = try await api.deleteCodeBlueFavorite(accessToken: token, favoriteId: favoriteId)
+        return response.ok
+    }
+
     func fetchSubscriptionStatus() async throws -> SubscriptionStatusResponse {
         guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
             throw AppError.sessionMissing

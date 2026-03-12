@@ -62,7 +62,7 @@ struct ResultsView: View {
                 }
                     .buttonStyle(PressableButtonStyle())
 
-                flashcardSection
+                quickCaseSection
                 cblMethodCard
             }
             .padding(16)
@@ -129,6 +129,42 @@ struct ResultsView: View {
         .onChange(of: result.overallScore) { _ in
             animateScoreGauge()
         }
+    }
+
+    private var quickCaseSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "timer")
+                    .foregroundStyle(AppColor.primary)
+                Text("10sn Hızlı Vaka")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+            }
+
+            Text("Hızlı karar pratiği için ana sayfadaki 10sn Hızlı Vaka akışına geçebilirsin. Cevap sonrası kartlarını favoriye alıp Analiz sekmesinde görebilirsin.")
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
+
+            Button {
+                state.selectedMainTab = "home"
+                onClose()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "bolt.fill")
+                    Text("Ana Sayfadan 10sn Hızlı Vaka Aç")
+                }
+                .appPrimaryButtonLabelStyle()
+            }
+            .buttonStyle(PressableButtonStyle())
+        }
+        .padding(12)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var resultHeroCard: some View {

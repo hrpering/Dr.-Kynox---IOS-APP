@@ -7,87 +7,56 @@ import Sentry
 
 struct FlashcardsHubView: View {
     @EnvironmentObject private var state: AppState
+
+    @State private var items: [CodeBlueFavoriteCard] = []
     @State private var loading = false
+    @State private var loadingMore = false
     @State private var errorText = ""
-    @State private var todayCards: [FlashcardItem] = []
-    @State private var collectionCards: [FlashcardItem] = []
-    @State private var selectedSpecialty: String = "all"
-    @State private var selectedType: String = "all"
-    @State private var showStudy = false
-    @State private var showSampleCards = false
-    @State private var performanceRangeDays: Int = 30
-    @State private var performance: FlashcardPerformanceResponse?
-
-    private var specialties: [String] {
-        let values = Set(collectionCards.compactMap { card in
-            let value = (card.specialty ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-            return value.isEmpty ? nil : value
-        })
-        return ["all"] + values.sorted()
-    }
-
-    private var cardTypes: [String] {
-        let values = Set(collectionCards.map { $0.cardType })
-        return ["all"] + values.sorted()
-    }
-
-    private var filteredCollectionCards: [FlashcardItem] {
-        collectionCards.filter { card in
-            let specialtyMatch = selectedSpecialty == "all" || card.specialty == selectedSpecialty
-            let typeMatch = selectedType == "all" || card.cardType == selectedType
-            return specialtyMatch && typeMatch
-        }
-    }
-
-    private var selectedSpecialtyLabel: String {
-        selectedSpecialty == "all" ? "Tüm Bölümler" : SpecialtyOption.label(for: selectedSpecialty)
-    }
-
-    private var selectedTypeLabel: String {
-        selectedType == "all" ? "Tüm Kart Tipleri" : flashcardTypeLabel(selectedType)
-    }
-
-    private var specialtyOptions: [(key: String, label: String)] {
-        specialties.map { value in
-            (value, value == "all" ? "Tüm Bölümler" : SpecialtyOption.label(for: value))
-        }
-    }
-
-    private var typeOptions: [(key: String, label: String)] {
-        cardTypes.map { value in
-            (value, value == "all" ? "Tüm Kart Tipleri" : flashcardTypeLabel(value))
-        }
-    }
+    @State private var nextCursor: String?
+    @State private var hasMore = false
+    @State private var totalCount = 0
+    @State private var showQuickCase = false
+    @State private var deletingId: String?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
-                todayReviewCard
-                performanceCard
-
-                filterSection
+                headerCard
 
                 if loading {
                     VStack(spacing: 10) {
-                        ShimmerView().frame(height: 86)
-                        ShimmerView().frame(height: 86)
-                        ShimmerView().frame(height: 86)
+                        ShimmerView().frame(height: 110)
+                        ShimmerView().frame(height: 110)
+                        ShimmerView().frame(height: 110)
                     }
-                } else if filteredCollectionCards.isEmpty {
-                    if collectionCards.isEmpty {
-                        emptyCollectionShowcase
-                    } else {
-                        noFilterResultCard
-                    }
+                } else if items.isEmpty {
+                    emptyStateCard
                 } else {
-                    ForEach(filteredCollectionCards.prefix(120)) { card in
-                        flashcardRow(card)
+                    ForEach(items) { item in
+                        favoriteRow(item)
+                    }
+
+                    if hasMore {
+                        Button {
+                            Task { await loadMore() }
+                        } label: {
+                            HStack(spacing: 8) {
+                                if loadingMore {
+                                    ProgressView()
+                                }
+                                Text(loadingMore ? "Yükleniyor..." : "Daha Fazla Yükle")
+                                    .font(AppFont.bodyMedium)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 46)
+                        }
+                        .buttonStyle(DSSecondaryButtonStyle())
+                        .disabled(loadingMore)
                     }
                 }
 
                 if !errorText.isEmpty {
                     ErrorStateCard(message: errorText) {
-                        Task { await loadData(force: true) }
+                        Task { await reload() }
                     }
                 }
             }
@@ -95,168 +64,87 @@ struct FlashcardsHubView: View {
             .padding(.bottom, 10)
         }
         .background(AppColor.background.ignoresSafeArea())
-        .navigationTitle("Kartlar")
+        .navigationTitle("Favori Kartlar")
         .refreshable {
-            await loadData(force: true)
+            await reload()
         }
         .task {
-            await loadData()
+            await reload()
         }
-        .fullScreenCover(isPresented: $showStudy) {
-            FlashcardStudyView(cards: todayCards) { card, rating in
-                _ = try? await state.reviewFlashcard(cardId: card.id, rating: rating)
-                await loadData(force: true)
+        .fullScreenCover(isPresented: $showQuickCase) {
+            NavigationStack {
+                CodeBlueSessionView()
+                    .environmentObject(state)
             }
-            .environmentObject(state)
         }
     }
 
-    private var todayReviewCard: some View {
+    private var headerCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Bugünkü Tekrar")
+                    Text("Hızlı Vaka Favorileri")
                         .font(AppFont.title2)
                         .foregroundStyle(AppColor.textPrimary)
-                    Text("\(todayCards.count) kart sırada")
+                    Text("Toplam \(totalCount) kart")
                         .font(AppFont.caption)
                         .foregroundStyle(AppColor.textSecondary)
                 }
                 Spacer()
-                Image(systemName: "calendar.badge.clock")
+                Image(systemName: "star.square.on.square.fill")
                     .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(AppColor.primary)
+                    .foregroundStyle(AppColor.warning)
             }
 
-            Text("Spaced repetition: Bilmiyordum → yarın, Zordu → 3 gün, Kolaydı → 7+ gün.")
+            Text("10sn vaka akışında cevap sonrası işaretlediğin ön/arka kartlar burada saklanır.")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
 
             Button {
-                showStudy = true
+                showQuickCase = true
             } label: {
-                if todayCards.isEmpty {
-                    HStack(spacing: 8) {
-                        Image(systemName: "lock.fill")
-                        Text("Bugün tekrar yok")
-                    }
-                    .font(AppFont.bodyMedium)
-                    .foregroundStyle(AppColor.textTertiary)
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(AppColor.surfaceAlt.opacity(0.9))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .stroke(AppColor.border.opacity(0.9), lineWidth: 1)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                } else {
-                    Text("Bugünkü Tekrara Başla")
-                        .appPrimaryButtonLabel()
+                HStack(spacing: 8) {
+                    Image(systemName: "timer")
+                    Text("10sn Hızlı Vaka Başlat")
+                    Spacer()
+                    Image(systemName: "arrow.right")
                 }
+                .font(AppFont.bodyMedium)
+                .frame(maxWidth: .infinity, minHeight: 46)
             }
-            .disabled(todayCards.isEmpty)
-            .buttonStyle(PressableButtonStyle())
+            .buttonStyle(DSPrimaryButtonStyle())
         }
         .padding(14)
         .background(
             LinearGradient(
-                colors: [AppColor.primaryLight, AppColor.surface],
+                colors: [AppColor.warningLight, AppColor.surface],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(AppColor.primary.opacity(0.18), lineWidth: 1)
+                .stroke(AppColor.warning.opacity(0.2), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    private var filterSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Koleksiyon Filtreleri")
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
-
-            HStack(spacing: 10) {
-                filterDropdown(
-                    title: "Bölüm",
-                    selectedLabel: selectedSpecialtyLabel,
-                    options: specialtyOptions,
-                    selectedKey: selectedSpecialty
-                ) { value in
-                    selectedSpecialty = value
-                }
-
-                filterDropdown(
-                    title: "Kart Tipi",
-                    selectedLabel: selectedTypeLabel,
-                    options: typeOptions,
-                    selectedKey: selectedType
-                ) { value in
-                    selectedType = value
-                }
-            }
-        }
-    }
-
-    private var performanceCard: some View {
+    private var emptyStateCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Performans Geçmişi")
-                    .font(AppFont.title2)
-                    .foregroundStyle(AppColor.textPrimary)
-                Spacer()
-                Picker("Aralık", selection: $performanceRangeDays) {
-                    Text("7g").tag(7)
-                    Text("30g").tag(30)
-                    Text("90g").tag(90)
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 170)
-                .onChange(of: performanceRangeDays) { _ in
-                    Task { await loadData(force: true) }
-                }
-            }
+            Text("Henüz favori kartın yok")
+                .font(AppFont.title2)
+                .foregroundStyle(AppColor.textPrimary)
+            Text("10sn hızlı vaka çözerken cevap sonrası kartı favoriye eklediğinde burada görünür.")
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
 
-            let summary = performance?.summary
-            HStack(spacing: 10) {
-                statChip(title: "Review", value: "\(summary?.totalReviews ?? 0)")
-                statChip(title: "Retention", value: "\(Int((summary?.retentionRate ?? 0).rounded()))%")
-                statChip(title: "Aralık", value: String(format: "%.1fg", summary?.avgIntervalDays ?? 0))
+            Button("10sn Hızlı Vaka Başlat") {
+                showQuickCase = true
+                Haptic.selection()
             }
-
-            let rows = groupedPerformanceRows
-            if rows.isEmpty {
-                Text("Henüz performans geçmişi oluşmadı.")
-                    .font(AppFont.body)
-                    .foregroundStyle(AppColor.textSecondary)
-            } else {
-                ForEach(rows.prefix(6), id: \.date) { row in
-                    HStack(spacing: 10) {
-                        Text(shortDate(row.date))
-                            .font(AppFont.caption)
-                            .foregroundStyle(AppColor.textSecondary)
-                            .frame(width: 56, alignment: .leading)
-                        GeometryReader { proxy in
-                            let ratio = max(0, min(1, row.retention / 100))
-                            ZStack(alignment: .leading) {
-                                Capsule().fill(AppColor.surfaceAlt)
-                                Capsule()
-                                    .fill(AppColor.success)
-                                    .frame(width: proxy.size.width * ratio)
-                            }
-                        }
-                        .frame(height: 8)
-                        Text("\(Int(row.retention.rounded()))%")
-                            .font(AppFont.caption)
-                            .foregroundStyle(AppColor.textPrimary)
-                            .frame(width: 42, alignment: .trailing)
-                    }
-                    .frame(height: 20)
-                }
-            }
+            .appPrimaryButton()
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -268,7 +156,458 @@ struct FlashcardsHubView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private func statChip(title: String, value: String) -> some View {
+    private func favoriteRow(_ item: CodeBlueFavoriteCard) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.specialty.isEmpty ? "Genel" : SpecialtyOption.label(for: item.specialty))
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(AppColor.textPrimary)
+                    Text(item.difficulty.isEmpty ? "-" : item.difficulty)
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+                Spacer()
+                Button {
+                    Task { await delete(item) }
+                } label: {
+                    if deletingId == item.id {
+                        ProgressView()
+                            .frame(width: 22, height: 22)
+                    } else {
+                        Image(systemName: "trash")
+                            .font(.system(size: 13, weight: .semibold))
+                    }
+                }
+                .disabled(deletingId == item.id)
+                .buttonStyle(.plain)
+                .foregroundStyle(AppColor.error)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Ön Yüz")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.primaryDark)
+                Text(item.front)
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .lineSpacing(4)
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Arka Yüz")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.success)
+                Text(item.back)
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .lineSpacing(4)
+            }
+
+            if let createdAt = item.createdAt, !createdAt.isEmpty {
+                Text("Eklenme: \(prettyDate(createdAt))")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textTertiary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func prettyDate(_ iso: String) -> String {
+        guard let date = parseISODate(iso) else { return iso }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "tr_TR")
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private func parseISODate(_ raw: String) -> Date? {
+        if let value = Self.isoWithFraction.date(from: raw) {
+            return value
+        }
+        return Self.isoStandard.date(from: raw)
+    }
+
+    private static let isoWithFraction: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private static let isoStandard: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+
+    private func reload() async {
+        if loading { return }
+        loading = true
+        defer { loading = false }
+
+        do {
+            let response = try await state.fetchCodeBlueFavorites(limit: 20, cursor: nil)
+            items = response.items
+            nextCursor = response.nextCursor
+            hasMore = response.hasMore == true
+            totalCount = response.totalCount ?? response.items.count
+            errorText = ""
+        } catch {
+            errorText = error.localizedDescription
+            items = []
+            nextCursor = nil
+            hasMore = false
+            totalCount = 0
+        }
+    }
+
+    private func loadMore() async {
+        guard !loadingMore else { return }
+        guard hasMore, let cursor = nextCursor, !cursor.isEmpty else { return }
+        loadingMore = true
+        defer { loadingMore = false }
+
+        do {
+            let response = try await state.fetchCodeBlueFavorites(limit: 20, cursor: cursor)
+            let existingIds = Set(items.map(\.id))
+            let newItems = response.items.filter { !existingIds.contains($0.id) }
+            items.append(contentsOf: newItems)
+            nextCursor = response.nextCursor
+            hasMore = response.hasMore == true
+            totalCount = response.totalCount ?? max(totalCount, items.count)
+            errorText = ""
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+
+    private func delete(_ item: CodeBlueFavoriteCard) async {
+        guard deletingId == nil else { return }
+        deletingId = item.id
+        defer { deletingId = nil }
+        do {
+            _ = try await state.deleteCodeBlueFavorite(favoriteId: item.id)
+            items.removeAll { $0.id == item.id }
+            totalCount = max(0, totalCount - 1)
+            errorText = ""
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+}
+
+private struct CodeBlueReviewState {
+    let sessionId: String
+    let questionIndex: Int
+    let question: CodeBlueQuestion
+    let answer: CodeBlueAnswerResult
+    let sessionCompleted: Bool
+    let summary: CodeBlueSummary?
+}
+
+struct CodeBlueSessionView: View {
+    @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+
+    @State private var loading = false
+    @State private var submitting = false
+    @State private var errorText = ""
+    @State private var session: CodeBlueSessionState?
+    @State private var question: CodeBlueQuestion?
+    @State private var completionSummary: CodeBlueSummary?
+    @State private var reviewState: CodeBlueReviewState?
+    @State private var favoriteSavedQuestionIndexes = Set<Int>()
+    @State private var timeoutSubmittedForToken: String?
+
+    private let ticker = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        VStack(spacing: 14) {
+            headerCard
+
+            if loading {
+                VStack(spacing: 10) {
+                    ProgressView()
+                    Text("Hızlı vaka hazırlanıyor...")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let summary = completionSummary {
+                completionCard(summary)
+            } else if let reviewState {
+                reviewCard(reviewState)
+            } else if let question {
+                questionCard(question)
+            } else {
+                VStack(spacing: 8) {
+                    Text("Aktif soru bulunamadı")
+                        .font(AppFont.title2)
+                        .foregroundStyle(AppColor.textPrimary)
+                    Text("Oturumu yenileyerek tekrar deneyebilirsin.")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+
+            if !errorText.isEmpty {
+                Text(errorText)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.error)
+                    .lineSpacing(4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(16)
+        .background(AppColor.background.ignoresSafeArea())
+        .navigationTitle("10sn Hızlı Vaka")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Kapat") {
+                    dismiss()
+                }
+                .foregroundStyle(AppColor.primary)
+            }
+        }
+        .task {
+            await startOrResumeSession()
+        }
+        .onChange(of: scenePhase) { value in
+            if value == .active {
+                Task { await restoreSessionAndResolveTimeoutIfNeeded() }
+            }
+        }
+        .onReceive(ticker) { _ in
+            tickTimerAndResolveTimeoutIfNeeded()
+        }
+    }
+
+    private var headerCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Code Blue")
+                    .font(AppFont.title2)
+                    .foregroundStyle(AppColor.textPrimary)
+                Spacer()
+                Text(progressLabel)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(AppColor.surfaceAlt)
+                    .clipShape(Capsule())
+            }
+
+            Text("Süre yalnızca sunucu saatine göre ilerler. Arka plan veya telefon çağrısı sırasında durmaz.")
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
+
+            if let question, completionSummary == nil, reviewState == nil {
+                HStack(spacing: 8) {
+                    Image(systemName: "timer")
+                        .foregroundStyle(remainingSeconds > 0 ? AppColor.warning : AppColor.error)
+                    Text("Kalan süre: \(remainingSeconds) sn")
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(remainingSeconds > 0 ? AppColor.textPrimary : AppColor.error)
+                    Spacer()
+                    Text(question.difficulty)
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var progressLabel: String {
+        guard let session else { return "--" }
+        let current = min(session.total, session.index + 1)
+        return "\(current)/\(session.total)"
+    }
+
+    private var remainingSeconds: Int {
+        guard let expiresAt = session?.currentQuestionExpiresAt,
+              let expiresDate = parseISODate(expiresAt) else {
+            return 0
+        }
+        let ms = max(0, Int((expiresDate.timeIntervalSinceNow * 1000).rounded()))
+        return Int(ceil(Double(ms) / 1000.0))
+    }
+
+    private func questionCard(_ question: CodeBlueQuestion) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(question.question)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineSpacing(4)
+
+            ForEach(Array(question.options.enumerated()), id: \.offset) { index, option in
+                Button {
+                    Task { await submitAnswer(selectedOptionIndex: index, timedOut: false) }
+                } label: {
+                    HStack(alignment: .top, spacing: 8) {
+                        Text(["A", "B", "C", "D"][index])
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(AppColor.primaryDark)
+                            .frame(width: 22, height: 22)
+                            .background(AppColor.primaryLight)
+                            .clipShape(Circle())
+                        Text(option)
+                            .font(AppFont.body)
+                            .foregroundStyle(AppColor.textPrimary)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                    .padding(10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(AppColor.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+                .buttonStyle(PressableButtonStyle())
+                .disabled(submitting)
+                .opacity(submitting ? 0.65 : 1)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func reviewCard(_ review: CodeBlueReviewState) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Soru Sonucu")
+                .font(AppFont.title2)
+                .foregroundStyle(AppColor.textPrimary)
+
+            Text(review.question.question)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
+
+            if let back = review.answer.back {
+                if let outcome = back.outcomeMessage, !outcome.isEmpty {
+                    resultLine(title: "Sonuç", value: outcome)
+                }
+                if let status = back.statusText, !status.isEmpty {
+                    resultLine(title: "Durum", value: status)
+                }
+                if let takeaway = back.clinicalTakeaway, !takeaway.isEmpty {
+                    resultLine(title: "Klinik çıkarım", value: takeaway)
+                }
+            }
+
+            HStack(spacing: 10) {
+                Button {
+                    Task { await saveFavoriteIfNeeded(review) }
+                } label: {
+                    Text(favoriteSavedQuestionIndexes.contains(review.questionIndex) ? "Favorilere Kaydedildi" : "Kartı Favoriye Ekle")
+                        .font(AppFont.bodyMedium)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(DSSecondaryButtonStyle())
+                .disabled(favoriteSavedQuestionIndexes.contains(review.questionIndex) || submitting)
+
+                Button {
+                    Task { await proceedAfterReview(review) }
+                } label: {
+                    Text(review.sessionCompleted ? "Oturumu Tamamla" : "Sonraki Soru")
+                        .font(AppFont.bodyMedium)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(DSPrimaryButtonStyle())
+                .disabled(submitting)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func completionCard(_ summary: CodeBlueSummary) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Oturum Tamamlandı")
+                .font(AppFont.title2)
+                .foregroundStyle(AppColor.textPrimary)
+
+            HStack(spacing: 10) {
+                statPill(title: "Doğru", value: "\(summary.correctCount ?? 0)")
+                statPill(title: "Yanlış", value: "\(summary.wrongCount ?? 0)")
+                statPill(title: "Timeout", value: "\(summary.timeoutCount ?? 0)")
+            }
+
+            Text("Skor: \(Int((summary.scorePercent ?? 0).rounded()))")
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+
+            HStack(spacing: 10) {
+                Button("Yeni 10sn Oturum Başlat") {
+                    Task { await startOrResumeSession() }
+                }
+                .buttonStyle(DSPrimaryButtonStyle())
+
+                Button("Kapat") {
+                    dismiss()
+                }
+                .buttonStyle(DSSecondaryButtonStyle())
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func resultLine(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textTertiary)
+            Text(value)
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineSpacing(4)
+        }
+    }
+
+    private func statPill(title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(AppFont.caption)
@@ -283,426 +622,147 @@ struct FlashcardsHubView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
-    private var groupedPerformanceRows: [(date: String, retention: Double)] {
-        let snapshots = performance?.snapshots ?? []
-        let grouped = Dictionary(grouping: snapshots, by: { $0.snapshotDate })
-        return grouped.compactMap { date, rows in
-            let values = rows.compactMap { $0.retentionRate }
-            guard !values.isEmpty else { return nil }
-            let avg = values.reduce(0, +) / Double(values.count)
-            return (date: date, retention: avg)
-        }
-        .sorted { $0.date > $1.date }
-    }
-
-    private func shortDate(_ token: String) -> String {
-        let parts = token.split(separator: "-")
-        guard parts.count == 3 else { return token }
-        return "\(parts[2]).\(parts[1])"
-    }
-
-    private func filterDropdown(
-        title: String,
-        selectedLabel: String,
-        options: [(key: String, label: String)],
-        selectedKey: String,
-        onSelect: @escaping (String) -> Void
-    ) -> some View {
-        Menu {
-            ForEach(options, id: \.key) { option in
-                Button {
-                    onSelect(option.key)
-                    Haptic.selection()
-                } label: {
-                    if option.key == selectedKey {
-                        Label(option.label, systemImage: "checkmark")
-                    } else {
-                        Text(option.label)
-                    }
-                }
-            }
-        } label: {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(AppColor.textTertiary)
-                HStack(spacing: 6) {
-                    Text(selectedLabel)
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.textPrimary)
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(AppColor.textSecondary)
-                }
-            }
-            .padding(.horizontal, 10)
-            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
-            .background(AppColor.surface)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(AppColor.border, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        }
-        .buttonStyle(PressableButtonStyle())
-    }
-
-    private var emptyCollectionShowcase: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Henüz kartın yok")
-                .font(AppFont.title2)
-                .foregroundStyle(AppColor.textPrimary)
-            Text("Bir vaka çözdüğünde buraya otomatik eklenir.")
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
-
-            HStack(spacing: 10) {
-                Button("Vaka başlat") {
-                    state.selectedMainTab = "generator"
-                    Haptic.selection()
-                }
-                .appPrimaryButton()
-
-                Button(showSampleCards ? "Örnekleri Gizle" : "Örnek Kartları İncele") {
-                    showSampleCards.toggle()
-                    Haptic.selection()
-                }
-                .appSecondaryButton()
-            }
-
-            if showSampleCards {
-                sampleFlashcardRow(
-                    title: "Örnek · Tanı İpucu",
-                    front: "Ani göğüs ağrısı + soğuk terleme ilk hangi tanıyı düşündürür?",
-                    badge: "Tanı"
-                )
-                sampleFlashcardRow(
-                    title: "Örnek · Kırmızı Bayrak",
-                    front: "Dispne + hipotansiyon + taşikardi birlikteliğinde öncelik ne olmalı?",
-                    badge: "Kırmızı Bayrak"
-                )
-            }
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private var noFilterResultCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Bu filtreye uygun kart bulunamadı")
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
-            Text("Filtreleri genişletip tüm kartları görebilirsin.")
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
-            Button("Filtreleri sıfırla") {
-                selectedSpecialty = "all"
-                selectedType = "all"
-                Haptic.selection()
-            }
-            .font(AppFont.caption)
-            .foregroundStyle(AppColor.primaryDark)
-            .frame(minHeight: 32)
-            .buttonStyle(.plain)
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private func sampleFlashcardRow(title: String, front: String, badge: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(title)
-                    .font(AppFont.bodyMedium)
-                    .foregroundStyle(AppColor.textPrimary)
-                    .lineLimit(1)
-                Spacer()
-                Badge(text: badge, tint: AppColor.primaryDark, background: AppColor.primaryLight)
-            }
-            Text(front)
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
-                .lineLimit(2)
-            Text("Örnek kart")
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textTertiary)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceAlt)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private func flashcardRow(_ card: FlashcardItem) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(card.title)
-                    .font(AppFont.bodyMedium)
-                    .foregroundStyle(AppColor.textPrimary)
-                    .lineLimit(1)
-                Spacer()
-                Badge(text: card.typeDisplayName, tint: AppColor.primaryDark, background: AppColor.primaryLight)
-            }
-            Text(card.front)
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
-                .lineLimit(2)
-            HStack(spacing: 8) {
-                if let specialty = card.specialty, !specialty.isEmpty {
-                    Badge(text: SpecialtyOption.label(for: specialty), tint: AppColor.textSecondary, background: AppColor.surfaceAlt)
-                }
-                Text("Tekrar: \(card.dueLabel)")
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textTertiary)
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private func flashcardTypeLabel(_ value: String) -> String {
-        switch value {
-        case "diagnosis": return "Tanı"
-        case "drug": return "İlaç"
-        case "red_flag": return "Kırmızı Bayrak"
-        case "differential": return "Ayırıcı Tanı"
-        case "management": return "Yönetim"
-        case "lab": return "Laboratuvar"
-        case "imaging": return "Görüntüleme"
-        case "procedure": return "Prosedür"
-        default: return "Kavram"
-        }
-    }
-
-    private func loadData(force: Bool = false) async {
-        if loading && !force { return }
+    private func startOrResumeSession() async {
+        if loading { return }
         loading = true
         defer { loading = false }
+
+        completionSummary = nil
+        reviewState = nil
+        timeoutSubmittedForToken = nil
+
         do {
-            async let due = state.fetchFlashcardsToday(limit: 80)
-            async let collection = state.fetchFlashcardCollections(limit: 300)
-            let (dueCards, all) = try await (due, collection)
-            todayCards = dueCards
-            collectionCards = all.cards
-            do {
-                performance = try await state.fetchFlashcardPerformance(rangeDays: performanceRangeDays)
-            } catch {
-                performance = nil
+            let response = try await state.startCodeBlueSession()
+            applySessionResponse(response)
+            errorText = ""
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+
+    private func restoreSessionAndResolveTimeoutIfNeeded() async {
+        guard !loading else { return }
+        guard let sessionId = session?.id, !sessionId.isEmpty else { return }
+        do {
+            let response = try await state.restoreCodeBlueSession(sessionId: sessionId)
+            applySessionResponse(response)
+            if response.session?.needsTimeoutResolution == true,
+               response.question != nil,
+               reviewState == nil,
+               completionSummary == nil {
+                await submitAnswer(selectedOptionIndex: nil, timedOut: true)
             }
             errorText = ""
         } catch {
             errorText = error.localizedDescription
         }
     }
-}
 
-struct FlashcardStudyView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private func submitAnswer(selectedOptionIndex: Int?, timedOut: Bool) async {
+        guard !submitting else { return }
+        guard let session, let question else { return }
 
-    let cards: [FlashcardItem]
-    let onRate: (FlashcardItem, FlashcardReviewRating) async -> Void
+        submitting = true
+        defer { submitting = false }
 
-    @State private var queue: [FlashcardItem]
-    @State private var isFlipped = false
-    @State private var isSubmitting = false
-
-    init(cards: [FlashcardItem],
-         onRate: @escaping (FlashcardItem, FlashcardReviewRating) async -> Void) {
-        self.cards = cards
-        self.onRate = onRate
-        _queue = State(initialValue: cards)
-    }
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                if let current = queue.first {
-                    VStack(spacing: 8) {
-                        Text("Kart \(cards.count - queue.count + 1)/\(cards.count)")
-                            .font(AppFont.caption)
-                            .foregroundStyle(AppColor.textSecondary)
-                        Text("Diğer karta geçiş sadece seçiminle olur.")
-                            .font(AppFont.caption)
-                            .foregroundStyle(AppColor.textTertiary)
-                    }
-
-                    FlashcardFlipCard(
-                        front: current.front,
-                        back: current.back,
-                        isFlipped: isFlipped
-                    )
-                    .onTapGesture {
-                        withAnimation(reduceMotion ? .none : .easeInOut(duration: 0.35)) {
-                            isFlipped.toggle()
-                        }
-                    }
-
-                    HStack(spacing: 10) {
-                        reviewButton(.again, tint: AppColor.error, background: AppColor.errorLight)
-                        reviewButton(.hard, tint: AppColor.warning, background: AppColor.warningLight)
-                        reviewButton(.easy, tint: AppColor.success, background: AppColor.successLight)
-                    }
-                } else {
-                    VStack(spacing: 12) {
-                        Image(systemName: "checkmark.seal.fill")
-                            .font(.system(size: 48))
-                            .foregroundStyle(AppColor.success)
-                        Text("Bugünkü tekrar tamamlandı")
-                            .font(AppFont.title2)
-                            .foregroundStyle(AppColor.textPrimary)
-                        Text("Harika. Yeni kartlar sonuç ekranından üretildiğinde burada görünecek.")
-                            .font(AppFont.body)
-                            .foregroundStyle(AppColor.textSecondary)
-                            .lineSpacing(4)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal, 20)
-                }
-                Spacer()
-            }
-            .padding(16)
-            .background(AppColor.background.ignoresSafeArea())
-            .navigationTitle("Bugünkü Tekrar")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Kapat") {
-                        dismiss()
-                    }
-                    .foregroundStyle(AppColor.primary)
-                }
-            }
-            .onChange(of: queue.first?.id) { _ in
-                resetCardState()
-            }
-        }
-    }
-
-    private func reviewButton(_ rating: FlashcardReviewRating,
-                              tint: Color,
-                              background: Color) -> some View {
-        Button {
-            submitCurrent(rating)
-        } label: {
-            VStack(spacing: 2) {
-                Text(rating.title)
-                    .font(AppFont.caption)
-                Text(rating.subtitle)
-                    .font(.system(size: 11, weight: .medium))
-            }
-            .foregroundStyle(tint)
-            .frame(maxWidth: .infinity, minHeight: 52)
-            .background(background)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(tint.opacity(0.25), lineWidth: 1)
+        do {
+            let response = try await state.answerCodeBlue(
+                sessionId: session.id,
+                questionIndex: session.index,
+                questionToken: question.questionToken,
+                selectedOptionIndex: selectedOptionIndex,
+                timedOut: timedOut,
+                clientRequestId: UUID().uuidString
             )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .opacity(isSubmitting ? 0.7 : 1)
+
+            let review = CodeBlueReviewState(
+                sessionId: session.id,
+                questionIndex: session.index,
+                question: question,
+                answer: response.result ?? CodeBlueAnswerResult(outcome: nil, isCorrect: nil, elapsedMs: nil, back: nil),
+                sessionCompleted: response.sessionCompleted == true,
+                summary: response.summary
+            )
+            reviewState = review
+            if review.sessionCompleted {
+                completionSummary = review.summary
+            }
+            errorText = ""
+        } catch {
+            errorText = error.localizedDescription
         }
-        .disabled(isSubmitting)
-        .buttonStyle(PressableButtonStyle())
     }
 
-    private func resetCardState() {
-        isFlipped = false
+    private func proceedAfterReview(_ review: CodeBlueReviewState) async {
+        if review.sessionCompleted {
+            completionSummary = review.summary
+            reviewState = nil
+            question = nil
+            return
+        }
+        reviewState = nil
+        await restoreSessionAndResolveTimeoutIfNeeded()
     }
 
-    private func submitCurrent(_ rating: FlashcardReviewRating) {
-        guard let current = queue.first, !isSubmitting else { return }
-        isSubmitting = true
+    private func saveFavoriteIfNeeded(_ review: CodeBlueReviewState) async {
+        guard !favoriteSavedQuestionIndexes.contains(review.questionIndex) else { return }
+        do {
+            _ = try await state.saveCodeBlueFavorite(
+                sessionId: review.sessionId,
+                questionIndex: review.questionIndex
+            )
+            favoriteSavedQuestionIndexes.insert(review.questionIndex)
+            errorText = ""
+        } catch {
+            errorText = error.localizedDescription
+        }
+    }
+
+    private func tickTimerAndResolveTimeoutIfNeeded() {
+        guard reviewState == nil, completionSummary == nil else { return }
+        guard let questionToken = question?.questionToken else { return }
+        guard remainingSeconds <= 0 else { return }
+        guard timeoutSubmittedForToken != questionToken else { return }
+
+        timeoutSubmittedForToken = questionToken
         Task {
-            await onRate(current, rating)
-            await MainActor.run {
-                if !queue.isEmpty {
-                    queue.removeFirst()
-                }
-                resetCardState()
-                isSubmitting = false
-            }
+            await submitAnswer(selectedOptionIndex: nil, timedOut: true)
         }
     }
-}
 
-struct FlashcardFlipCard: View {
-    let front: String
-    let back: String
-    let isFlipped: Bool
-
-    var body: some View {
-        ZStack {
-            flashSurface(
-                title: "Ön Yüz",
-                text: front,
-                tint: AppColor.primary
-            )
-            .opacity(isFlipped ? 0 : 1)
-
-            flashSurface(
-                title: "Arka Yüz",
-                text: back,
-                tint: AppColor.success
-            )
-            .opacity(isFlipped ? 1 : 0)
-            .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+    private func applySessionResponse(_ response: CodeBlueSessionResponse) {
+        if response.sessionCompleted == true {
+            completionSummary = response.summary
+            session = response.session
+            question = nil
+            return
         }
-        .rotation3DEffect(.degrees(isFlipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
-        .frame(maxWidth: .infinity, minHeight: 280)
-        .animation(.easeInOut(duration: 0.35), value: isFlipped)
+
+        if let newSession = response.session {
+            session = newSession
+        }
+        if let newQuestion = response.question {
+            question = newQuestion
+            timeoutSubmittedForToken = nil
+        }
     }
 
-    private func flashSurface(title: String, text: String, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(title)
-                    .font(AppFont.caption)
-                    .foregroundStyle(tint)
-                Spacer()
-                Image(systemName: "arrow.2.squarepath")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(AppColor.textTertiary)
-            }
-            Text(text)
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textPrimary)
-                .lineSpacing(4)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    private func parseISODate(_ raw: String) -> Date? {
+        if let value = Self.isoWithFraction.date(from: raw) {
+            return value
         }
-        .padding(16)
-        .background(AppColor.surface)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(tint.opacity(0.25), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        return Self.isoStandard.date(from: raw)
     }
+
+    private static let isoWithFraction: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private static let isoStandard: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
 }
