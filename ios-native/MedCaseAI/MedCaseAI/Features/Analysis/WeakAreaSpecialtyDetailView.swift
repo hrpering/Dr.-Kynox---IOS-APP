@@ -5,15 +5,15 @@ struct WeakAreaSpecialtyDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
                 headerCard
                 sectionHeader(title: "Detay Skor Grafiği")
                 ForEach(item.dimensions) { dimension in
                     dimensionRow(dimension)
                 }
             }
-            .padding(16)
-            .padding(.bottom, 12)
+            .padding(14)
+            .padding(.bottom, 10)
         }
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle(item.specialtyLabel)
@@ -21,7 +21,7 @@ struct WeakAreaSpecialtyDetailView: View {
     }
 
     private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 7) {
             HStack {
                 Text(item.specialtyLabel)
                     .font(AppFont.title2)
@@ -40,14 +40,14 @@ struct WeakAreaSpecialtyDetailView: View {
                     .foregroundStyle(AppColor.primaryDark)
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func dimensionRow(_ item: WeakAreaSpecialtyDimension) -> some View {
@@ -59,7 +59,7 @@ struct WeakAreaSpecialtyDetailView: View {
             return AppColor.error
         }()
 
-        return VStack(alignment: .leading, spacing: 8) {
+        return VStack(alignment: .leading, spacing: 7) {
             HStack {
                 Text(item.label)
                     .font(AppFont.bodyMedium)
@@ -88,14 +88,13 @@ struct WeakAreaSpecialtyDetailView: View {
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
         }
-        .padding(12)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
                 .stroke(tint.opacity(0.22), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 }
-

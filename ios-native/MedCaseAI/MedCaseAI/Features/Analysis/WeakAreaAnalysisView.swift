@@ -10,7 +10,7 @@ struct WeakAreaAnalysisView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 12) {
                 analysisHeaderBand
 
                 if loading && state.weakAreaAnalysis == nil {
@@ -46,7 +46,7 @@ struct WeakAreaAnalysisView: View {
                     .accessibilityHint("Vaka seçim ekranına döner")
                 }
             }
-            .padding(16)
+            .padding(14)
         }
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle("Zayıf Alan Analizi")
@@ -65,7 +65,7 @@ struct WeakAreaAnalysisView: View {
     }
 
     private var analysisHeaderBand: some View {
-        VStack(alignment: .leading, spacing: 9) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Zayıf Alan Merkezi")
                 .font(AppFont.title)
                 .foregroundStyle(.white)
@@ -74,7 +74,7 @@ struct WeakAreaAnalysisView: View {
                 .foregroundStyle(.white.opacity(0.88))
                 .lineSpacing(4)
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -84,15 +84,15 @@ struct WeakAreaAnalysisView: View {
             )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(.white.opacity(0.2), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .appShadow(AppShadow.elevated)
     }
 
     private func overviewMetricRow(_ analysis: WeakAreaAnalysisResponse) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 7) {
             overviewMetric(title: "Skorlu vaka", value: "\(analysis.summary.userCaseCount)")
             overviewMetric(title: "Ortalama", value: "\(Int(analysis.summary.userAverageScore.rounded()))")
             overviewMetric(title: "Global", value: "\(Int(analysis.summary.globalAverageScore.rounded()))")
@@ -109,8 +109,8 @@ struct WeakAreaAnalysisView: View {
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
@@ -143,7 +143,7 @@ struct WeakAreaAnalysisView: View {
     }
 
     private var trendHistoryCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 sectionHeader(title: "Zaman Trendi")
                 Spacer()
@@ -153,7 +153,7 @@ struct WeakAreaAnalysisView: View {
                     Text("90g").tag(90)
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 170)
+                .frame(width: 160)
                 .onChange(of: selectedHistoryRangeDays) { _ in
                     Task { await refresh() }
                 }
@@ -166,7 +166,7 @@ struct WeakAreaAnalysisView: View {
                     .foregroundStyle(AppColor.textSecondary)
             } else {
                 ForEach(grouped.prefix(8), id: \.date) { item in
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         Text(shortDate(item.date))
                             .font(AppFont.caption)
                             .foregroundStyle(AppColor.textSecondary)
@@ -186,18 +186,18 @@ struct WeakAreaAnalysisView: View {
                             .foregroundStyle(AppColor.textPrimary)
                             .frame(width: 36, alignment: .trailing)
                     }
-                    .frame(height: 20)
+                    .frame(height: 18)
                 }
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .appShadow(AppShadow.card)
     }
 
@@ -224,9 +224,9 @@ struct WeakAreaAnalysisView: View {
         let globalScore = analysis.summary.globalAverageScore
         let delta = userScore - globalScore
 
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 8) {
             HStack {
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text("Genel Performans")
                         .font(AppFont.title2)
                         .foregroundStyle(AppColor.textPrimary)
@@ -235,7 +235,7 @@ struct WeakAreaAnalysisView: View {
                         .foregroundStyle(AppColor.textSecondary)
                 }
                 Spacer()
-                VStack(alignment: .trailing, spacing: 3) {
+                VStack(alignment: .trailing, spacing: 2) {
                     Text("\(Int(userScore.rounded()))")
                         .font(AppFont.title)
                         .foregroundStyle(AppColor.primaryDark)
@@ -245,7 +245,7 @@ struct WeakAreaAnalysisView: View {
                 }
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 Image(systemName: delta >= 0 ? "arrow.up.right.circle.fill" : "arrow.down.right.circle.fill")
                     .foregroundStyle(delta >= 0 ? AppColor.success : AppColor.warning)
                 Text(delta >= 0
@@ -256,19 +256,19 @@ struct WeakAreaAnalysisView: View {
                     .lineSpacing(4)
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .appShadow(AppShadow.card)
     }
 
     private func scoreMapCard(_ analysis: WeakAreaAnalysisResponse) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             sectionHeader(title: "Genel Skor Haritası")
 
             WeakAreaRadarChart(
@@ -278,7 +278,7 @@ struct WeakAreaAnalysisView: View {
             )
             .frame(height: 290)
 
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 Label("Senin ortalaman", systemImage: "circle.fill")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.primaryDark)
@@ -288,19 +288,19 @@ struct WeakAreaAnalysisView: View {
                 Spacer()
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .appShadow(AppShadow.card)
     }
 
     private func specialtyBreakdownCard(_ analysis: WeakAreaAnalysisResponse) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             sectionHeader(title: "Branş Bazlı Analiz")
 
             ForEach(analysis.specialtyBreakdown) { item in
@@ -313,14 +313,14 @@ struct WeakAreaAnalysisView: View {
                 .buttonStyle(PressableButtonStyle())
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .appShadow(AppShadow.card)
     }
 
@@ -329,8 +329,8 @@ struct WeakAreaAnalysisView: View {
         let userRatio = max(0, min(1, item.userAverageScore / 100))
         let globalRatio = max(0, min(1, item.globalAverageScore / 100))
 
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
+        return VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 7) {
                 Text(item.specialtyLabel)
                     .font(AppFont.bodyMedium)
                     .foregroundStyle(AppColor.textPrimary)
@@ -339,13 +339,13 @@ struct WeakAreaAnalysisView: View {
                 Text("\(Int(item.userAverageScore.rounded()))")
                     .font(AppFont.caption)
                     .foregroundStyle(tone.tint)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
                     .background(tone.background)
                     .clipShape(Capsule())
             }
 
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Text("Sen")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.textSecondary)
@@ -361,7 +361,7 @@ struct WeakAreaAnalysisView: View {
                 .frame(height: 7)
             }
 
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Text("Genel")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.textSecondary)
@@ -377,7 +377,7 @@ struct WeakAreaAnalysisView: View {
                 .frame(height: 7)
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 Text("Sen \(Int(item.userAverageScore.rounded())) · Genel \(Int(item.globalAverageScore.rounded()))")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.textSecondary)
@@ -388,7 +388,7 @@ struct WeakAreaAnalysisView: View {
                     .foregroundStyle(AppColor.textSecondary)
             }
         }
-        .padding(12)
+        .padding(10)
         .background(AppColor.surfaceAlt)
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -406,8 +406,8 @@ struct WeakAreaAnalysisView: View {
         let currentTarget = state.weeklyGoalTarget
 
         return AnyView(
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 7) {
                     Image(systemName: "sparkles")
                         .foregroundStyle(AppColor.primaryDark)
                     Text(recommendation.title)
@@ -421,7 +421,7 @@ struct WeakAreaAnalysisView: View {
                     .foregroundStyle(AppColor.textSecondary)
                     .lineSpacing(4)
 
-                HStack(spacing: 8) {
+                HStack(spacing: 7) {
                     Badge(text: recommendation.recommendedSpecialtyLabel, tint: AppColor.primaryDark, background: AppColor.primaryLight)
                     Badge(text: recommendation.recommendedDifficulty, tint: AppColor.warning, background: AppColor.warningLight)
                 }
@@ -433,7 +433,7 @@ struct WeakAreaAnalysisView: View {
                         .lineSpacing(4)
                 }
 
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
                     Button {
                         launchRecommendedCase(recommendation)
                     } label: {
@@ -458,14 +458,14 @@ struct WeakAreaAnalysisView: View {
                     }
                 }
             }
-            .padding(14)
+            .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColor.surfaceElevated)
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .appShadow(AppShadow.card)
         )
     }

@@ -21,11 +21,11 @@ struct AnalysisHubView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 12) {
                     analysisHeroCard
                     summaryStatsRow
 
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Analiz Araçları")
                             .font(AppFont.title2)
                             .foregroundStyle(AppColor.textPrimary)
@@ -86,7 +86,7 @@ struct AnalysisHubView: View {
                     quickCaseFavoriteStatusCard
                     aiRecommendationPreviewCard
                 }
-                .padding(16)
+                .padding(14)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Analiz")
@@ -135,9 +135,9 @@ struct AnalysisHubView: View {
     }
 
     private var analysisHeroCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("Analiz Merkezi")
                         .font(AppFont.largeTitle)
                         .foregroundStyle(.white)
@@ -152,13 +152,13 @@ struct AnalysisHubView: View {
                     .foregroundStyle(.white.opacity(0.95))
             }
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 heroMetric(title: "Skorlu vaka", value: "\(scoredSessions.count)")
                 heroMetric(title: "Son 7 gün", value: "\(last7DayBuckets.map(\.caseCount).reduce(0, +))")
                 heroMetric(title: "Favori kart", value: "\(favoriteCardTotal)")
             }
         }
-        .padding(15)
+        .padding(13)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -168,10 +168,10 @@ struct AnalysisHubView: View {
             )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(.white.opacity(0.2), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .appShadow(AppShadow.elevated)
     }
 
@@ -185,15 +185,15 @@ struct AnalysisHubView: View {
                 .foregroundStyle(.white)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.white.opacity(0.14))
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
                 .stroke(.white.opacity(0.18), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
     }
 
     private var completedSessions: [CaseSession] {
@@ -221,7 +221,7 @@ struct AnalysisHubView: View {
         let strongest = strongestSpecialtyLabel
 
         return ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 DSStatCard(
                     title: "Genel skor trendi",
                     value: avgScoreText,
@@ -311,7 +311,7 @@ struct AnalysisHubView: View {
     private var quickCaseFavoriteStatusCard: some View {
         DSInfoCard(tone: .success) {
             sectionHeader(title: "Hızlı Vaka Favori Kartları")
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 favoriteMetricPill(
                     icon: "star.fill",
                     title: "Toplam Kart",
@@ -535,15 +535,15 @@ struct AnalysisHubView: View {
         tint: Color,
         background: Color
     ) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(tint)
-                .frame(width: 42, height: 42)
+                .frame(width: 40, height: 40)
                 .background(.white.opacity(0.75))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
                     .font(AppFont.title2)
                     .foregroundStyle(AppColor.textPrimary)
@@ -559,14 +559,14 @@ struct AnalysisHubView: View {
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(tint)
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(background)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(tint.opacity(0.30), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityLabel(title)
         .accessibilityHint(subtitle)
