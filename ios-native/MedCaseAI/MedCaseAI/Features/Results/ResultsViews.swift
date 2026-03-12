@@ -136,12 +136,12 @@ struct ResultsView: View {
             HStack(spacing: 8) {
                 Image(systemName: "timer")
                     .foregroundStyle(AppColor.primary)
-                Text("10sn Hızlı Vaka")
+                Text("15sn Hızlı Vaka")
                     .font(AppFont.bodyMedium)
                     .foregroundStyle(AppColor.textPrimary)
             }
 
-            Text("Hızlı karar pratiği için ana sayfadaki 10sn Hızlı Vaka akışına geçebilirsin. Cevap sonrası kartlarını favoriye alıp Analiz sekmesinde görebilirsin.")
+            Text("Hızlı karar pratiği için ana sayfadaki 15sn Hızlı Vaka akışına geçebilirsin. Cevap sonrası kartlarını favoriye alıp Analiz sekmesinde görebilirsin.")
                 .font(AppFont.body)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
@@ -152,7 +152,7 @@ struct ResultsView: View {
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "bolt.fill")
-                    Text("Ana Sayfadan 10sn Hızlı Vaka Aç")
+                    Text("Ana Sayfadan 15sn Hızlı Vaka Aç")
                 }
                 .appPrimaryButtonLabelStyle()
             }

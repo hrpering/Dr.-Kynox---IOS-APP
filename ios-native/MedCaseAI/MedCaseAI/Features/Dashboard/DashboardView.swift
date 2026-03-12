@@ -129,13 +129,13 @@ struct DashboardView: View {
                 } label: {
                     HStack(spacing: AppSpacing.x1) {
                         Image(systemName: "timer")
-                        Text("10sn Hızlı Vaka")
+                        Text("15sn Hızlı Vaka")
                         Spacer()
                         Image(systemName: "arrow.right")
                     }
                 }
                 .buttonStyle(DSSecondaryButtonStyle())
-                .accessibilityLabel("10 saniye hızlı vaka başlat")
+                .accessibilityLabel("15 saniye hızlı vaka başlat")
                 .accessibilityHint("Code Blue hızlı vaka akışını açar")
             }
         }

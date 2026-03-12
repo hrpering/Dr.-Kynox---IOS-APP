@@ -96,7 +96,7 @@ struct FlashcardsHubView: View {
                     .foregroundStyle(AppColor.warning)
             }
 
-            Text("10sn vaka akışında cevap sonrası işaretlediğin ön/arka kartlar burada saklanır.")
+            Text("15sn vaka akışında cevap sonrası işaretlediğin ön/arka kartlar burada saklanır.")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
@@ -106,7 +106,7 @@ struct FlashcardsHubView: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "timer")
-                    Text("10sn Hızlı Vaka Başlat")
+                    Text("15sn Hızlı Vaka Başlat")
                     Spacer()
                     Image(systemName: "arrow.right")
                 }
@@ -135,12 +135,12 @@ struct FlashcardsHubView: View {
             Text("Henüz favori kartın yok")
                 .font(AppFont.title2)
                 .foregroundStyle(AppColor.textPrimary)
-            Text("10sn hızlı vaka çözerken cevap sonrası kartı favoriye eklediğinde burada görünür.")
+            Text("15sn hızlı vaka çözerken cevap sonrası kartı favoriye eklediğinde burada görünür.")
                 .font(AppFont.body)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
 
-            Button("10sn Hızlı Vaka Başlat") {
+            Button("15sn Hızlı Vaka Başlat") {
                 showQuickCase = true
                 Haptic.selection()
             }
@@ -329,6 +329,7 @@ struct CodeBlueSessionView: View {
     @State private var favoriteSavedQuestionIndexes = Set<Int>()
     @State private var timeoutSubmittedForToken: String?
     @State private var now = Date()
+    @State private var countdownDeadline: Date?
 
     private let ticker = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
 
@@ -372,7 +373,7 @@ struct CodeBlueSessionView: View {
         }
         .padding(16)
         .background(AppColor.background.ignoresSafeArea())
-        .navigationTitle("10sn Hızlı Vaka")
+        .navigationTitle("15sn Hızlı Vaka")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -392,6 +393,9 @@ struct CodeBlueSessionView: View {
         }
         .onReceive(ticker) { _ in
             now = Date()
+            if countdownDeadline == nil {
+                syncCountdownDeadline()
+            }
             tickTimerAndResolveTimeoutIfNeeded()
         }
     }
@@ -421,14 +425,17 @@ struct CodeBlueSessionView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "timer")
                         .foregroundStyle(remainingSeconds > 0 ? AppColor.warning : AppColor.error)
-                    Text("Kalan süre: \(remainingSeconds) sn")
-                        .font(AppFont.bodyMedium)
+                    Text(timerLabel)
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .monospacedDigit()
                         .foregroundStyle(remainingSeconds > 0 ? AppColor.textPrimary : AppColor.error)
                     Spacer()
                     Text(question.difficulty)
                         .font(AppFont.caption)
                         .foregroundStyle(AppColor.textSecondary)
                 }
+                ProgressView(value: remainingProgress)
+                    .tint(remainingSeconds > 0 ? AppColor.warning : AppColor.error)
             }
         }
         .padding(12)
@@ -448,12 +455,40 @@ struct CodeBlueSessionView: View {
     }
 
     private var remainingSeconds: Int {
-        guard let expiresAt = session?.currentQuestionExpiresAt,
-              let expiresDate = parseISODate(expiresAt) else {
-            return 0
+        if let deadline = countdownDeadline {
+            let ms = max(0, Int((deadline.timeIntervalSince(now) * 1000).rounded()))
+            return Int(ceil(Double(ms) / 1000.0))
         }
-        let ms = max(0, Int((expiresDate.timeIntervalSince(now) * 1000).rounded()))
-        return Int(ceil(Double(ms) / 1000.0))
+        return max(0, question?.timeLimit ?? 15)
+    }
+
+    private var timerLabel: String {
+        "Kalan süre: \(remainingSeconds) sn"
+    }
+
+    private var remainingProgress: Double {
+        let total = max(1, question?.timeLimit ?? 15)
+        return max(0, min(1, Double(remainingSeconds) / Double(total)))
+    }
+
+    private func syncCountdownDeadline() {
+        if let expiresAt = session?.currentQuestionExpiresAt,
+           let expiresDate = parseISODate(expiresAt) {
+            countdownDeadline = expiresDate
+            return
+        }
+
+        if let remainingMs = session?.timeRemainingMs, remainingMs > 0 {
+            countdownDeadline = now.addingTimeInterval(Double(remainingMs) / 1000.0)
+            return
+        }
+
+        if let question {
+            countdownDeadline = now.addingTimeInterval(Double(max(1, question.timeLimit)))
+            return
+        }
+
+        countdownDeadline = nil
     }
 
     private func questionCard(_ question: CodeBlueQuestion) -> some View {
@@ -576,7 +611,7 @@ struct CodeBlueSessionView: View {
                 .foregroundStyle(AppColor.textPrimary)
 
             HStack(spacing: 10) {
-                Button("Yeni 10sn Oturum Başlat") {
+                Button("Yeni 15sn Oturum Başlat") {
                     Task { await startOrResumeSession() }
                 }
                 .buttonStyle(DSPrimaryButtonStyle())
@@ -737,6 +772,7 @@ struct CodeBlueSessionView: View {
             completionSummary = response.summary
             session = response.session
             question = nil
+            countdownDeadline = nil
             return
         }
 
@@ -747,6 +783,7 @@ struct CodeBlueSessionView: View {
             question = newQuestion
             timeoutSubmittedForToken = nil
         }
+        syncCountdownDeadline()
     }
 
     private func parseISODate(_ raw: String) -> Date? {

@@ -85,7 +85,7 @@ struct AnalysisHubView: View {
                         analysisHubCard(
                             icon: "star.square.on.square.fill",
                             title: "Favori Hızlı Vaka Kartları",
-                            subtitle: "10sn vakalarda işaretlediğin kartları burada tekrar incele.",
+                            subtitle: "15sn vakalarda işaretlediğin kartları burada tekrar incele.",
                             tint: AppColor.success,
                             background: AppColor.successLight
                         )
@@ -267,7 +267,7 @@ struct AnalysisHubView: View {
                     value: isLoadingFavoriteStats ? "..." : latestFavoriteLabel
                 )
             }
-            Text("10sn oturum sonrasında favoriye eklediğin ön/arka kartlar burada birikir.")
+            Text("15sn oturum sonrasında favoriye eklediğin ön/arka kartlar burada birikir.")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
