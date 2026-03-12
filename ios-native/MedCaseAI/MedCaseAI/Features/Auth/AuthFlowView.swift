@@ -75,29 +75,29 @@ struct AuthFlowView: View {
                             Spacer(minLength: 0)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(20)
+                        .padding(16)
                     } else if screen == .checkEmail {
                         ScrollView {
-                            VStack(spacing: 18) {
+                            VStack(spacing: 14) {
                                 checkEmailCard
                                     .transition(transition)
                             }
                             .frame(maxWidth: .infinity, alignment: .top)
-                            .padding(20)
-                            .padding(.bottom, 12)
+                            .padding(16)
+                            .padding(.bottom, 10)
                         }
                         .scrollDismissesKeyboard(.interactively)
                         .keyboardAdaptive()
                     } else {
                         ScrollViewReader { proxy in
                             ScrollView {
-                                VStack(spacing: 16) {
+                                VStack(spacing: 14) {
                                     authForm
                                         .transition(transition)
                                 }
                                 .frame(maxWidth: .infinity, alignment: .top)
-                                .padding(20)
-                                .padding(.bottom, 8)
+                                .padding(16)
+                                .padding(.bottom, 6)
                             }
                             .scrollDismissesKeyboard(.interactively)
                             .safeAreaInset(edge: .bottom) {

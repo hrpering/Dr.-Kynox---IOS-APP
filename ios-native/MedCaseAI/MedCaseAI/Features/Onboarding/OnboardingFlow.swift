@@ -32,7 +32,7 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: AppSpacing.x1_5) {
+            VStack(spacing: AppSpacing.x1) {
                 header
 
                 ZStack {
@@ -76,7 +76,7 @@ struct OnboardingView: View {
                     }
                 }
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: step)
-                .padding(14)
+                .padding(12)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(AppColor.surfaceElevated)
                 .overlay(
@@ -127,9 +127,9 @@ struct OnboardingView: View {
                     }
                 }
             }
-            .padding(.horizontal, AppSpacing.x2)
-            .padding(.top, AppSpacing.x1_5)
-            .padding(.bottom, AppSpacing.x2)
+            .padding(.horizontal, AppSpacing.x1_5)
+            .padding(.top, AppSpacing.x1)
+            .padding(.bottom, AppSpacing.x1_5)
             .background(AppColor.background.ignoresSafeArea())
             .sheet(item: $legalSheetItem) { item in
                 SafariSheet(url: item.url)
@@ -158,9 +158,9 @@ struct OnboardingView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text("Onboarding")
                         .font(AppFont.title2)
                         .foregroundStyle(.white)
@@ -172,27 +172,27 @@ struct OnboardingView: View {
                 Text("%\(completionPercent)")
                     .font(AppFont.bodyMedium)
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
                     .background(.white.opacity(0.18))
                     .clipShape(Capsule())
             }
 
             GeometryReader { geo in
-                let totalSpacing = CGFloat(max(0, totalSteps - 1) * 8)
+                let totalSpacing = CGFloat(max(0, totalSteps - 1) * 7)
                 let rawWidth = (geo.size.width - totalSpacing) / CGFloat(max(totalSteps, 1))
                 let segmentWidth = max(1, rawWidth.isFinite ? rawWidth : 1)
-                HStack(spacing: 8) {
+                HStack(spacing: 7) {
                     ForEach(0..<totalSteps, id: \.self) { idx in
                         Capsule()
                             .fill(idx <= step ? .white : .white.opacity(0.24))
-                            .frame(width: segmentWidth, height: 6)
+                            .frame(width: segmentWidth, height: 5)
                     }
                 }
             }
-            .frame(height: 6)
+            .frame(height: 5)
         }
-        .padding(14)
+        .padding(12)
         .background(
             LinearGradient(
                 colors: [AppColor.primaryDark, AppColor.primary],
@@ -209,13 +209,13 @@ struct OnboardingView: View {
     }
 
     private var onboardingLegalLinks: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 7) {
             Text("Devam etmeden önce metinleri inceleyebilirsin:")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 onboardingLegalButton(title: "Tıbbi Red", page: .medicalDisclaimer)
                 onboardingLegalButton(title: "Açık Rıza", page: .consent)
             }
@@ -224,7 +224,7 @@ struct OnboardingView: View {
                 introLegalAccepted.toggle()
                 Haptic.selection()
             } label: {
-                HStack(alignment: .top, spacing: 10) {
+                HStack(alignment: .top, spacing: 8) {
                     Image(systemName: introLegalAccepted ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(introLegalAccepted ? AppColor.success : AppColor.textTertiary)
@@ -236,8 +236,8 @@ struct OnboardingView: View {
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 0)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 9)
                 .background(AppColor.surface)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)

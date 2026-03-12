@@ -3,9 +3,9 @@ import AVFoundation
 
 struct OnboardingIntroStep: View {
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             OnboardingHeroIllustration()
-                .frame(height: 276)
+                .frame(height: 246)
                 .frame(maxWidth: .infinity)
 
             Text("Klinik pratiğinin yapay zeka asistanı")
@@ -21,7 +21,7 @@ struct OnboardingIntroStep: View {
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .padding(.top, 12)
+        .padding(.top, 8)
     }
 }
 
@@ -34,7 +34,7 @@ struct OnboardingHeroIllustration: View {
 
 struct OnboardingHowItWorksStep: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Nasıl Çalışır")
                 .font(AppFont.title)
                 .foregroundStyle(AppColor.textPrimary)
@@ -44,7 +44,7 @@ struct OnboardingHowItWorksStep: View {
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 7) {
                 HStack {
                     Text("Örnek konuşma")
                         .font(AppFont.bodyMedium)
@@ -66,7 +66,7 @@ struct OnboardingHowItWorksStep: View {
                     isAgent: false
                 )
             }
-            .padding(10)
+            .padding(9)
             .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -74,7 +74,7 @@ struct OnboardingHowItWorksStep: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            HStack(spacing: 8) {
+            HStack(spacing: 7) {
                 onboardingModePill(
                     icon: "mic.fill",
                     title: "Sesli",
@@ -91,7 +91,7 @@ struct OnboardingHowItWorksStep: View {
                 )
             }
 
-            VStack(spacing: 8) {
+            VStack(spacing: 7) {
                 HowItWorksCompactRow(
                     icon: "1.circle.fill",
                     title: "Bölümünü seç",
@@ -143,8 +143,8 @@ struct OnboardingHowItWorksStep: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(background)
         .overlay(
@@ -162,7 +162,7 @@ struct HowItWorksCompactRow: View {
     let tint: Color
 
     var body: some View {
-        HStack(alignment: .top, spacing: 9) {
+        HStack(alignment: .top, spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(tint)
@@ -179,8 +179,8 @@ struct HowItWorksCompactRow: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
@@ -193,7 +193,7 @@ struct HowItWorksCompactRow: View {
 
 struct ConversationScreenshotCard: View {
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             HStack {
                 Text("Örnek konuşma ekranı")
                     .font(AppFont.bodyMedium)
@@ -204,7 +204,7 @@ struct ConversationScreenshotCard: View {
                     .foregroundStyle(AppColor.primary)
             }
 
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 DemoMessageBubble(
                     sender: "Dr. Kynox",
                     text: "35 yaşında erkek hasta, son 3 aydır uyku düzensizliği ve belirgin anksiyete ile başvuruyor.",
@@ -222,7 +222,7 @@ struct ConversationScreenshotCard: View {
                 )
             }
         }
-        .padding(14)
+        .padding(12)
         .background(AppColor.surface)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -233,11 +233,11 @@ struct ConversationScreenshotCard: View {
             Text("Dokun ve büyüt")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.primaryDark)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 5)
                 .background(AppColor.primaryLight)
                 .clipShape(Capsule())
-                .padding(10)
+                .padding(9)
         }
     }
 }
@@ -259,8 +259,8 @@ struct DemoMessageBubble: View {
                     .foregroundStyle(AppColor.textPrimary)
                     .lineSpacing(4)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
             .background(isAgent ? AppColor.surfaceAlt : AppColor.primaryLight)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .frame(maxWidth: 320, alignment: .leading)
@@ -275,7 +275,7 @@ struct ConversationDemoSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 12) {
                     Text("Örnek Vaka Konuşması")
                         .font(AppFont.title)
                         .foregroundStyle(AppColor.textPrimary)
@@ -285,7 +285,7 @@ struct ConversationDemoSheet: View {
                         .foregroundStyle(AppColor.textSecondary)
                         .lineSpacing(4)
 
-                    VStack(spacing: 12) {
+                    VStack(spacing: 10) {
                         DemoMessageBubble(
                             sender: "Dr. Kynox",
                             text: "45 yaşında erkek hasta, göğüs ağrısı ve nefes darlığı ile acile başvuruyor. İlk sorularını alayım.",
@@ -308,7 +308,7 @@ struct ConversationDemoSheet: View {
                         )
                     }
                 }
-                .padding(20)
+                .padding(16)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Demo")

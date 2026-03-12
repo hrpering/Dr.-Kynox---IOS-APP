@@ -12,7 +12,7 @@ extension AuthFlowView {
     var welcomeCard: some View {
         VStack(spacing: AppSpacing.x2) {
             IntroMotionCard(variant: .short)
-                .frame(height: 230)
+                .frame(height: 214)
                 .frame(maxWidth: .infinity)
                 .accessibilityHidden(true)
 
@@ -95,7 +95,7 @@ extension AuthFlowView {
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.primaryDark)
                     .padding(.horizontal, AppSpacing.x3)
-                    .frame(minWidth: 168, minHeight: 46)
+                    .frame(minWidth: 168, minHeight: 44)
                     .background(AppColor.primaryLight.opacity(0.45))
                     .overlay(
                         RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
@@ -119,7 +119,7 @@ extension AuthFlowView {
     }
 
     var legalQuickLinks: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 7) {
             HStack(spacing: 12) {
                 legalMiniLink(title: "Gizlilik", page: .privacy)
                 legalMiniLink(title: "Koşullar", page: .terms)
@@ -132,7 +132,7 @@ extension AuthFlowView {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 4)
+        .padding(.top, 2)
     }
 
     func legalMiniLink(title: String, page: LegalPageLink) -> some View {
@@ -158,16 +158,16 @@ extension AuthFlowView {
     }
 
     var checkEmailCard: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
                     .fill(AppColor.primaryLight)
-                    .frame(width: 132, height: 132)
+                    .frame(width: 120, height: 120)
                 Image(systemName: verificationCompleted ? "checkmark.seal.fill" : (isPasswordResetFlow ? "key.fill" : "envelope"))
-                    .font(.system(size: 46, weight: .semibold))
+                    .font(.system(size: 42, weight: .semibold))
                     .foregroundStyle(verificationCompleted ? AppColor.success : AppColor.primary)
             }
-            .padding(.top, 8)
+            .padding(.top, 6)
 
             Text(
                 verificationCompleted
@@ -200,8 +200,8 @@ extension AuthFlowView {
                 }
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.primaryDark)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 10)
                 .frame(maxWidth: .infinity)
                 .background(AppColor.primaryLight)
                 .overlay(
@@ -239,7 +239,7 @@ extension AuthFlowView {
                 }
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.warning)
-                .padding(.vertical, 10)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
                 .background(AppColor.warningLight)
                 .overlay(
@@ -276,7 +276,7 @@ extension AuthFlowView {
                     .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 12)
-                .frame(minHeight: 52)
+                .frame(minHeight: 48)
                 .background(AppColor.surface)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -290,7 +290,7 @@ extension AuthFlowView {
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(true)
                     .padding(.horizontal, 12)
-                    .frame(minHeight: 52)
+                    .frame(minHeight: 48)
                     .background(AppColor.surface)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -380,14 +380,14 @@ extension AuthFlowView {
             }
             .buttonStyle(PressableButtonStyle())
         }
-        .padding(18)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .top)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     var otpCodeInput: some View {
@@ -426,7 +426,7 @@ extension AuthFlowView {
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
                                 .stroke(isFocused ? AppColor.primary : AppColor.border, lineWidth: isFocused ? 2 : 1)
                         )
-                        .frame(maxWidth: .infinity, minHeight: 52, maxHeight: 52)
+                        .frame(maxWidth: .infinity, minHeight: 48, maxHeight: 48)
                         .overlay(
                             Text(isFilled ? String(digits[index]) : "")
                                 .font(AppFont.bodyMedium)
@@ -446,8 +446,8 @@ extension AuthFlowView {
     }
 
     var authForm: some View {
-        VStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 10) {
+        VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     StethoscopeBadge()
                         .accessibilityHidden(true)
@@ -476,7 +476,7 @@ extension AuthFlowView {
                     authHeroMetric(title: "Güvenlik", value: "Aktif")
                 }
             }
-            .padding(14)
+            .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 LinearGradient(
@@ -496,7 +496,7 @@ extension AuthFlowView {
                 .foregroundStyle(AppColor.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            VStack(spacing: 10) {
+            VStack(spacing: 8) {
                 socialButton(icon: "applelogo", title: "Apple ile Giriş")
                 socialButton(icon: "g.circle", title: "Google ile Giriş")
             }
@@ -524,7 +524,7 @@ extension AuthFlowView {
                 .foregroundColor(AppColor.textPrimary)
                 .keyboardType(.emailAddress)
                 .padding(.horizontal, 12)
-                .frame(minHeight: 52)
+                .frame(minHeight: 48)
                 .background(AppColor.surface)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -570,7 +570,7 @@ extension AuthFlowView {
                 .accessibilityHint("Şifre metnini görünür veya gizli yapar")
             }
             .padding(.horizontal, 12)
-            .frame(minHeight: 52)
+            .frame(minHeight: 48)
             .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -593,7 +593,7 @@ extension AuthFlowView {
                         }
                     }
                     .foregroundStyle(AppColor.primary)
-                    .frame(minHeight: 44)
+                    .frame(minHeight: 42)
                     .buttonStyle(PressableButtonStyle())
                     .accessibilityLabel("Şifremi unuttum")
                     .accessibilityHint("Şifre sıfırlama e-postası gönderir")
@@ -614,14 +614,14 @@ extension AuthFlowView {
                 }
             }
         }
-        .padding(16)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .top)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private func authHeroMetric(title: String, value: String) -> some View {
@@ -634,8 +634,8 @@ extension AuthFlowView {
                 .foregroundStyle(.white)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.white.opacity(0.14))
         .overlay(
@@ -646,7 +646,7 @@ extension AuthFlowView {
     }
 
     var authBottomActions: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             if isSignUp {
                 signupLegalLinks
             }
@@ -681,10 +681,10 @@ extension AuthFlowView {
             }
             .font(AppFont.bodyMedium)
             .foregroundStyle(AppColor.primary)
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .frame(maxWidth: .infinity, minHeight: 42)
             .buttonStyle(PressableButtonStyle())
         }
-        .padding(.top, 4)
+        .padding(.top, 2)
     }
 
     var authBottomDock: some View {
@@ -693,9 +693,9 @@ extension AuthFlowView {
                 .overlay(AppColor.border)
 
             authBottomActions
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
-                .padding(.bottom, 10)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 8)
         }
         .background(AppColor.background)
     }
