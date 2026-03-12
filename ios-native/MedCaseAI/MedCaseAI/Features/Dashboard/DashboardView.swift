@@ -14,7 +14,7 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: AppSpacing.sectionSpacing) {
+                VStack(alignment: .leading, spacing: 18) {
                     primaryActionBlock
                     dailyChallengeBlock
                     weeklyGoalCard
@@ -22,8 +22,9 @@ struct DashboardView: View {
                     weakAreaInsightCard
                     progressBlock
                 }
-                .padding(AppSpacing.x2)
-                .padding(.bottom, AppSpacing.x3)
+                .padding(.horizontal, 14)
+                .padding(.top, 14)
+                .padding(.bottom, 20)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Dr.Kynox")
@@ -101,14 +102,15 @@ struct DashboardView: View {
     }
 
     private var primaryActionBlock: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x1_5) {
+        VStack(alignment: .leading, spacing: 10) {
             greetingSection
             Text("Bugünün ana hedefi: bir vaka başlat ve karar akışını tamamla.")
                 .font(AppFont.body)
                 .foregroundStyle(.white.opacity(0.9))
                 .lineSpacing(4)
+                .lineLimit(2)
 
-            HStack(spacing: AppSpacing.x1) {
+            HStack(spacing: 7) {
                 heroMetricPill(
                     icon: "waveform.path.ecg",
                     title: "Ortalama",
@@ -126,7 +128,7 @@ struct DashboardView: View {
                 )
             }
 
-            VStack(spacing: AppSpacing.x1) {
+            VStack(spacing: 8) {
                 Button {
                     onOpenGenerator()
                 } label: {
@@ -165,7 +167,7 @@ struct DashboardView: View {
                     .lineSpacing(4)
             }
         }
-        .padding(16)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -175,10 +177,10 @@ struct DashboardView: View {
             )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(AppColor.primary.opacity(0.32), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .appShadow(AppShadow.elevated)
     }
 
@@ -197,19 +199,19 @@ struct DashboardView: View {
                 .foregroundStyle(.white)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 9)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.white.opacity(0.14))
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(.white.opacity(0.2), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private var dailyChallengeBlock: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x2) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Günün Vakası")
                 .font(AppFont.h3)
                 .foregroundStyle(AppColor.textPrimary)
@@ -241,7 +243,7 @@ struct DashboardView: View {
     }
 
     private var progressBlock: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x2) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: AppSpacing.x1) {
                 Image(systemName: "chart.bar.xaxis")
                     .foregroundStyle(AppColor.primaryDark)
@@ -279,7 +281,7 @@ struct DashboardView: View {
     }
 
     private var quickAccessRow: some View {
-        HStack(spacing: AppSpacing.x1) {
+        HStack(spacing: 8) {
             compactQuickAction(
                 icon: "arrow.triangle.2.circlepath",
                 title: "Çalışma planı",
@@ -309,7 +311,7 @@ struct DashboardView: View {
             Haptic.selection()
             action()
         } label: {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Image(systemName: icon)
                         .font(.system(size: 13, weight: .semibold))
@@ -328,8 +330,9 @@ struct DashboardView: View {
                     .foregroundStyle(AppColor.textSecondary)
                     .lineLimit(1)
             }
-            .padding(10)
-            .frame(maxWidth: .infinity, minHeight: 66, alignment: .leading)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 9)
+            .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
             .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -374,7 +377,7 @@ struct DashboardView: View {
     }
 
     private var continueBlock: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x1) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: AppSpacing.x1) {
                 Image(systemName: "clock.arrow.circlepath")
                     .foregroundStyle(AppColor.primaryDark)
@@ -522,7 +525,7 @@ struct DashboardView: View {
             showStudyPlanDetail = true
             Haptic.selection()
         } label: {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Çalışma Planı İlerlemesi", systemImage: "arrow.triangle.2.circlepath")
                         .font(AppFont.title2)
@@ -573,7 +576,7 @@ struct DashboardView: View {
                         .foregroundStyle(AppColor.primaryDark)
                 }
             }
-            .padding(14)
+            .padding(12)
             .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -609,7 +612,7 @@ struct DashboardView: View {
             showWeeklyGoalDetail = true
             Haptic.selection()
         } label: {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Haftalık Hedef", systemImage: "target")
                         .font(AppFont.title2)
@@ -621,7 +624,7 @@ struct DashboardView: View {
                         .lineLimit(1)
                 }
 
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     ZStack {
                         Circle()
                             .stroke(AppColor.primary.opacity(0.16), lineWidth: 8)
@@ -665,11 +668,11 @@ struct DashboardView: View {
                     Spacer()
                 }
                 .padding(.horizontal, 10)
-                .padding(.vertical, 8)
+                .padding(.vertical, 7)
                 .background(AppColor.primaryLight)
                 .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
             }
-            .padding(14)
+            .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColor.surface)
             .overlay(
@@ -699,7 +702,7 @@ struct DashboardView: View {
             state.selectedMainTab = "analysis"
             Haptic.selection()
         } label: {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .foregroundStyle(AppColor.primaryDark)
@@ -719,7 +722,7 @@ struct DashboardView: View {
                 }
 
                 if hasData, let weakest {
-                    HStack(alignment: .center, spacing: 10) {
+                    HStack(alignment: .center, spacing: 8) {
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
                             .fill(tone.background)
                             .frame(width: 44, height: 44)
@@ -758,7 +761,7 @@ struct DashboardView: View {
                         .foregroundStyle(AppColor.primaryDark)
                 }
             }
-            .padding(14)
+            .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColor.surface)
             .overlay(
@@ -779,7 +782,7 @@ struct DashboardView: View {
                     .fill(AppColor.primaryDark)
                     .frame(width: 5)
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Günün Vakası")
                             .font(AppFont.title2)
@@ -794,7 +797,7 @@ struct DashboardView: View {
                             .clipShape(Capsule())
                     }
 
-                    HStack(spacing: 8) {
+                    HStack(spacing: 7) {
                         Badge(text: challenge.difficulty, tint: AppColor.warning, background: AppColor.warningLight)
                         Badge(text: SpecialtyOption.label(for: challenge.specialty), tint: AppColor.primary, background: AppColor.primaryLight)
                     }
@@ -840,7 +843,7 @@ struct DashboardView: View {
                         .foregroundStyle(AppColor.textTertiary)
                         .lineSpacing(4)
                 }
-                .padding(14)
+                .padding(12)
             }
         }
         .background(AppColor.surface)
