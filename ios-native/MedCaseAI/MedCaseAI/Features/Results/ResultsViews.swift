@@ -32,6 +32,7 @@ struct ResultsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 resultHeroCard
+                resultMetricRow
                 scoreCard
                 whatHappenedCard
                 summarySection
@@ -63,6 +64,7 @@ struct ResultsView: View {
                 }
                     .buttonStyle(PressableButtonStyle())
 
+                flashcardSection
                 quickCaseSection
                 cblMethodCard
             }
@@ -117,6 +119,7 @@ struct ResultsView: View {
             .overlay(alignment: .top) {
                 Rectangle().fill(AppColor.border).frame(height: 1)
             }
+            .appShadow(AppShadow.card)
         }
         .fullScreenCover(isPresented: $showDetailed) {
             DetailedFeedbackView(result: result, config: config) {
@@ -130,6 +133,35 @@ struct ResultsView: View {
         .onChange(of: result.overallScore) { _ in
             animateScoreGauge()
         }
+    }
+
+    private var resultMetricRow: some View {
+        HStack(spacing: 8) {
+            resultMetric(title: "Mod", value: config.mode == .voice ? "Sesli" : "Yazılı")
+            resultMetric(title: "Mesaj", value: "\(userMessageCount)")
+            resultMetric(title: "Skor", value: showsNumericScore ? "\(Int(result.overallScore.rounded()))" : "--")
+        }
+    }
+
+    private func resultMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     private var quickCaseSection: some View {

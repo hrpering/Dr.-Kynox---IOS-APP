@@ -71,17 +71,22 @@ struct CaseSessionView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
+            VStack(spacing: 10) {
                 topCaseHeader
-                    .padding(.horizontal, 14)
-                    .padding(.top, 8)
-
                 statusStrip
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
 
                 transcriptArea
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppColor.surfaceElevated)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                            .stroke(AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                    .appShadow(AppShadow.card)
             }
+            .padding(.horizontal, 14)
+            .padding(.top, 8)
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle(config.displayTitle)
             .navigationBarTitleDisplayMode(.inline)

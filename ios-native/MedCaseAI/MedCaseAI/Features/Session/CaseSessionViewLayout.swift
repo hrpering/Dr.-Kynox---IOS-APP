@@ -7,41 +7,65 @@ import Sentry
 
 extension CaseSessionView {
     var topCaseHeader: some View {
-        HStack(alignment: .top, spacing: 10) {
-            VStack(alignment: .leading, spacing: 5) {
-                Text(activeHeadline)
-                    .font(AppFont.title2)
-                    .foregroundStyle(AppColor.textPrimary)
-                    .lineLimit(2)
-                Text(SpecialtyOption.label(for: config.specialty))
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textSecondary)
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(activeHeadline)
+                        .font(AppFont.title2)
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                    Text(SpecialtyOption.label(for: config.specialty))
+                        .font(AppFont.caption)
+                        .foregroundStyle(.white.opacity(0.82))
+                }
+                Spacer()
+                Badge(text: config.difficulty, tint: AppColor.primaryDark, background: .white.opacity(0.9))
             }
-            Spacer()
-            Badge(text: config.difficulty, tint: AppColor.primary, background: AppColor.primaryLight)
+
+            HStack(spacing: 8) {
+                sessionHeaderMetric(title: "Mod", value: (config.mode == .voice && !isTextFallbackMode) ? "Sesli" : "Yazılı")
+                sessionHeaderMetric(title: "Mesaj", value: "\(vm.messages.count)")
+                sessionHeaderMetric(title: "Durum", value: hasStarted ? "Aktif" : "Hazırlık")
+            }
         }
-        .padding(12)
+        .padding(14)
         .frame(maxWidth: .infinity)
-        .background(AppColor.surfaceElevated)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.card)
+        .appShadow(AppShadow.elevated)
     }
 
     var statusStrip: some View {
-        HStack(spacing: 10) {
-            statusIcon
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(statusColor)
+        HStack(alignment: .center, spacing: 10) {
+            HStack(spacing: 8) {
+                statusIcon
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(statusColor)
 
-            Text(statusText)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
+                Text(statusText)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+            }
 
             Spacer()
+
+            Text(hasStarted ? "Canlı" : "Beklemede")
+                .font(AppFont.caption)
+                .foregroundStyle(statusColor)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(statusColor.opacity(0.14))
+                .clipShape(Capsule())
         }
         .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, minHeight: 52)
@@ -52,6 +76,27 @@ extension CaseSessionView {
         )
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
         .appShadow(AppShadow.card)
+    }
+
+    private func sessionHeaderMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(.white.opacity(0.75))
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     var transcriptArea: some View {

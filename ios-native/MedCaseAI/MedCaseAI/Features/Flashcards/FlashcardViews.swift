@@ -22,6 +22,9 @@ struct FlashcardsHubView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 headerCard
+                if !loading {
+                    headerMetricsRow
+                }
 
                 if loading {
                     VStack(spacing: 10) {
@@ -32,8 +35,10 @@ struct FlashcardsHubView: View {
                 } else if items.isEmpty {
                     emptyStateCard
                 } else {
-                    ForEach(items) { item in
-                        favoriteRow(item)
+                    LazyVStack(spacing: 10) {
+                        ForEach(items) { item in
+                            favoriteRow(item)
+                        }
                     }
 
                     if hasMore {
@@ -61,7 +66,7 @@ struct FlashcardsHubView: View {
                 }
             }
             .padding(16)
-            .padding(.bottom, 10)
+            .padding(.bottom, 14)
         }
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle("Favori Kartlar")
@@ -80,25 +85,25 @@ struct FlashcardsHubView: View {
     }
 
     private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 11) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Hızlı Vaka Favorileri")
-                        .font(AppFont.title2)
-                        .foregroundStyle(AppColor.textPrimary)
-                    Text("Toplam \(totalCount) kart")
+                        .font(AppFont.title)
+                        .foregroundStyle(.white)
+                    Text("Toplam \(totalCount) kartlık tekrar havuzu")
                         .font(AppFont.caption)
-                        .foregroundStyle(AppColor.textSecondary)
+                        .foregroundStyle(.white.opacity(0.82))
                 }
                 Spacer()
                 Image(systemName: "star.square.on.square.fill")
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(AppColor.warning)
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(.white)
             }
 
             Text("15sn vaka akışında cevap sonrası işaretlediğin ön/arka kartlar burada saklanır.")
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
+                .font(AppFont.body)
+                .foregroundStyle(.white.opacity(0.9))
                 .lineSpacing(4)
 
             Button {
@@ -111,24 +116,56 @@ struct FlashcardsHubView: View {
                     Image(systemName: "arrow.right")
                 }
                 .font(AppFont.bodyMedium)
-                .frame(maxWidth: .infinity, minHeight: 46)
+                .foregroundStyle(AppColor.primaryDark)
+                .frame(maxWidth: .infinity, minHeight: 48)
+                .background(.white.opacity(0.95))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
-            .buttonStyle(DSPrimaryButtonStyle())
+            .buttonStyle(PressableButtonStyle())
         }
         .padding(14)
         .background(
             LinearGradient(
-                colors: [AppColor.warningLight, AppColor.surface],
+                colors: [AppColor.primaryDark, AppColor.primary],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(AppColor.warning.opacity(0.2), lineWidth: 1)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.card)
+        .appShadow(AppShadow.elevated)
+    }
+
+    private var headerMetricsRow: some View {
+        HStack(spacing: 8) {
+            headerMetric(title: "Bu hafta", value: "\(items.prefix(7).count)")
+            headerMetric(title: "Yüklenen", value: "\(items.count)")
+            headerMetric(title: "Toplam", value: "\(totalCount)")
+        }
+    }
+
+    private func headerMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     private var emptyStateCard: some View {
@@ -159,15 +196,26 @@ struct FlashcardsHubView: View {
     }
 
     private func favoriteRow(_ item: CodeBlueFavoriteCard) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 8) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(item.specialty.isEmpty ? "Genel" : SpecialtyOption.label(for: item.specialty))
-                        .font(AppFont.bodyMedium)
-                        .foregroundStyle(AppColor.textPrimary)
-                    Text(item.difficulty.isEmpty ? "-" : item.difficulty)
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.textSecondary)
+                    HStack(spacing: 6) {
+                        Text(item.specialty.isEmpty ? "Genel" : SpecialtyOption.label(for: item.specialty))
+                            .font(AppFont.bodyMedium)
+                            .foregroundStyle(AppColor.textPrimary)
+                        Text(item.difficulty.isEmpty ? "-" : item.difficulty)
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.primaryDark)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(AppColor.primaryLight)
+                            .clipShape(Capsule())
+                    }
+                    if let createdAt = item.createdAt, !createdAt.isEmpty {
+                        Text(prettyDate(createdAt))
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textSecondary)
+                    }
                 }
                 Spacer()
                 Button {
@@ -208,20 +256,15 @@ struct FlashcardsHubView: View {
                     .lineSpacing(4)
             }
 
-            if let createdAt = item.createdAt, !createdAt.isEmpty {
-                Text("Eklenme: \(prettyDate(createdAt))")
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textTertiary)
-            }
         }
-        .padding(12)
+        .padding(13)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         .appShadow(AppShadow.card)
     }
 

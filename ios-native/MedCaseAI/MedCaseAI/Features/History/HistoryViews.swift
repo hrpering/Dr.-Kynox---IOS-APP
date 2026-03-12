@@ -12,7 +12,8 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
+                    historyHeroCard
                     historySummaryCard
 
                     if state.caseHistory.isEmpty {
@@ -38,13 +39,15 @@ struct HistoryView: View {
                                 .appShadow(AppShadow.card)
                         }
                     } else {
-                        ForEach(state.caseHistory) { item in
-                            Button {
-                                selectedSession = item
-                            } label: {
-                                HistoryCard(item: item)
+                        LazyVStack(spacing: 10) {
+                            ForEach(state.caseHistory) { item in
+                                Button {
+                                    selectedSession = item
+                                } label: {
+                                    HistoryCard(item: item)
+                                }
+                                .buttonStyle(PressableButtonStyle())
                             }
-                            .buttonStyle(PressableButtonStyle())
                         }
                     }
                 }
@@ -78,6 +81,33 @@ struct HistoryView: View {
         }
     }
 
+    private var historyHeroCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Vaka Geçmişi")
+                .font(AppFont.title)
+                .foregroundStyle(.white)
+            Text("Tamamladığın oturumları skor, branş ve detay çıktılarıyla tek akışta incele.")
+                .font(AppFont.body)
+                .foregroundStyle(.white.opacity(0.9))
+                .lineSpacing(4)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.elevated)
+    }
+
     private var historySummaryCard: some View {
         HStack(spacing: 10) {
             summaryPill(title: "Toplam", value: "\(state.caseHistory.count)")
@@ -94,6 +124,7 @@ struct HistoryView: View {
             Text(value)
                 .font(AppFont.bodyMedium)
                 .foregroundStyle(AppColor.textPrimary)
+                .lineLimit(1)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
