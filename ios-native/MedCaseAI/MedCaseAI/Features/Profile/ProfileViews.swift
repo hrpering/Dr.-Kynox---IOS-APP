@@ -63,6 +63,19 @@ struct ProfileView: View {
 
                     sectionTitle("Hesap")
                     NavigationLink {
+                        ProfileLanguagePreferencesView()
+                            .environmentObject(state)
+                    } label: {
+                        profileRowButton(
+                            icon: "globe",
+                            title: "Dil ve Bölge",
+                            subtitle: "Uygulama dili, ülke ve RTL ayarları",
+                            tint: AppColor.primaryDark
+                        )
+                    }
+                    .buttonStyle(PressableButtonStyle())
+
+                    NavigationLink {
                         ProfileNotificationPreferencesView()
                     } label: {
                         profileRowButton(
@@ -306,4 +319,3 @@ struct ProfileView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
-

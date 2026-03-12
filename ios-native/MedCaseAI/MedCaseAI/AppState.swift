@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import UIKit
+import SwiftUI
 
 @MainActor
 final class AppState: ObservableObject {
@@ -29,6 +30,31 @@ final class AppState: ObservableObject {
 
     var accessToken: String? { authViewModel.accessToken }
     var profile: UserProfile? { authViewModel.profile }
+    var uiLanguageCode: String {
+        AppLanguage.normalizeBCP47(profile?.preferredLanguageCode, fallback: "tr")
+    }
+    var uiLanguageName: String {
+        AppLanguage.displayName(for: uiLanguageCode)
+    }
+    var uiCountryCode: String {
+        let fromProfile = AppCountry.normalize(profile?.countryCode)
+        if !fromProfile.isEmpty {
+            return fromProfile
+        }
+        return AppCountry.normalize(Locale.current.region?.identifier)
+    }
+    var uiLocale: Locale {
+        let region = uiCountryCode
+        let language = uiLanguageCode
+        if region.isEmpty {
+            return Locale(identifier: language)
+        }
+        return Locale(identifier: "\(language)-\(region)")
+    }
+    var uiLayoutDirection: LayoutDirection {
+        let isRTL = AppLanguage.supported.first(where: { $0.code == uiLanguageCode })?.isRTL == true
+        return isRTL ? .rightToLeft : .leftToRight
+    }
 
     var challenge: DailyChallenge? { dashboardViewModel.challenge }
     var challengeTimeLeft: ChallengeTimeLeft? { dashboardViewModel.challengeTimeLeft }
@@ -135,6 +161,17 @@ final class AppState: ObservableObject {
         await syncPushRegistrationIfPossible(force: false)
     }
 
+    func updateLanguagePreferences(preferredLanguageCode: String,
+                                   countryCode: String?,
+                                   source: String = "profile_edit") async throws {
+        let updated = try await supabase.updateLanguagePreferences(
+            preferredLanguageCode: preferredLanguageCode,
+            countryCode: countryCode,
+            languageSource: source
+        )
+        authViewModel.updateProfile(updated)
+    }
+
     func refreshDashboard(showBusy: Bool = true) async {
         do {
             let result = try await dashboardViewModel.refreshDashboard(showBusy: showBusy, routeIsHome: route == .home)
@@ -216,6 +253,7 @@ final class AppState: ObservableObject {
             missedOpportunities: missedOpportunities,
             dimensions: dimensions,
             nextPracticeSuggestions: nextPracticeSuggestions,
+            uiLanguageCode: uiLanguageCode,
             maxCards: maxCards
         )
     }
@@ -429,7 +467,8 @@ final class AppState: ObservableObject {
             accessToken: token,
             mode: mode,
             transcript: transcript,
-            optionalCaseWrapup: wrapup
+            optionalCaseWrapup: wrapup,
+            uiLanguageCode: uiLanguageCode
         )
     }
 

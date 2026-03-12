@@ -346,6 +346,11 @@ extension AgentConversationViewModel {
         vars["challenge_type"] = config.challengeType
         vars["session_id"] = config.id
         vars["mode"] = activeMode.rawValue
+        vars["ui_language_code"] = state.uiLanguageCode
+        vars["ui_language_name"] = state.uiLanguageName
+        if !state.uiCountryCode.isEmpty {
+            vars["country_code"] = state.uiCountryCode
+        }
 
         let allowedKeys = Set([
             "specialty",
@@ -363,7 +368,10 @@ extension AgentConversationViewModel {
             "patient_gender",
             "patient_age",
             "specialty_localized",
-            "specialty_canonical"
+            "specialty_canonical",
+            "ui_language_code",
+            "ui_language_name",
+            "country_code"
         ])
 
         return vars.reduce(into: [String: String]()) { partialResult, entry in

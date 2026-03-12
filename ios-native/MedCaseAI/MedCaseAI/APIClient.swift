@@ -200,13 +200,15 @@ final class APIClient {
     func scoreConversation(accessToken: String,
                            mode: String,
                            transcript: [ConversationLine],
-                           optionalCaseWrapup: String) async throws -> ScoreResponse {
+                           optionalCaseWrapup: String,
+                           uiLanguageCode: String?) async throws -> ScoreResponse {
         let url = try buildURL(path: "/api/score")
         let payload = ScoreRequestPayload(
             conversation: transcript,
             rubricPrompt: ScoreRequestPayload.defaultRubric,
             mode: mode,
-            optionalCaseWrapup: optionalCaseWrapup
+            optionalCaseWrapup: optionalCaseWrapup,
+            uiLanguageCode: uiLanguageCode
         )
         return try await request(
             url: url,
@@ -343,6 +345,7 @@ final class APIClient {
                             missedOpportunities: [String],
                             dimensions: [ScoreDimension],
                             nextPracticeSuggestions: [PracticeSuggestion],
+                            uiLanguageCode: String?,
                             maxCards: Int = 6) async throws -> FlashcardGenerateResponse {
         let url = try buildURL(path: "/api/flashcards/generate")
         struct Payload: Encodable {
@@ -360,6 +363,7 @@ final class APIClient {
             let missedOpportunities: [String]
             let dimensions: [ScoreDimension]
             let nextPracticeSuggestions: [PracticeSuggestion]
+            let uiLanguageCode: String?
             let maxCards: Int
         }
 
@@ -385,6 +389,7 @@ final class APIClient {
                 missedOpportunities: missedOpportunities,
                 dimensions: dimensions,
                 nextPracticeSuggestions: nextPracticeSuggestions,
+                uiLanguageCode: uiLanguageCode,
                 maxCards: max(3, min(10, maxCards))
             ),
             timeout: 40

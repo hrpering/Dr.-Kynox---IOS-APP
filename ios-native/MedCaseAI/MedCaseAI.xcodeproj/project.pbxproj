@@ -34,6 +34,8 @@
 		F11B22C033D44E5500000009 /* Media/Sounds/ambient_bed.wav in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000009 /* Media/Sounds/ambient_bed.wav */; };
 		F11B22C033D44E5500000010 /* Media/Lottie/intro_orb_short.json in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000010 /* Media/Lottie/intro_orb_short.json */; };
 		F11B22C033D44E5500000011 /* Media/Lottie/intro_orb_long.json in Resources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000011 /* Media/Lottie/intro_orb_long.json */; };
+		B6C44A1D5E9B4D0AA2000001 /* ui_strings.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B6C44A1D5E9B4D0AA1000001 /* ui_strings.xcstrings */; };
+		B6C44A1D5E9B4D0AA2000002 /* medical_terms.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B6C44A1D5E9B4D0AA1000002 /* medical_terms.xcstrings */; };
 		F11B22C033D44E5500000012 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = F11B22C133D44E5500000012 /* Lottie */; };
 		F11B22C033D44E5500000013 /* PushNotificationBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11B22C133D44E5500000013 /* PushNotificationBridge.swift */; };
 		A11B22C033D44E5500000101 /* Features/Auth/AuthFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B22C133D44E5500000101 /* Features/Auth/AuthFlowView.swift */; };
@@ -128,6 +130,8 @@
 		F11B22C133D44E5500000009 /* Media/Sounds/ambient_bed.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Media/Sounds/ambient_bed.wav; sourceTree = "<group>"; };
 		F11B22C133D44E5500000010 /* Media/Lottie/intro_orb_short.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Media/Lottie/intro_orb_short.json; sourceTree = "<group>"; };
 		F11B22C133D44E5500000011 /* Media/Lottie/intro_orb_long.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Media/Lottie/intro_orb_long.json; sourceTree = "<group>"; };
+		B6C44A1D5E9B4D0AA1000001 /* ui_strings.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = ui_strings.xcstrings; sourceTree = "<group>"; };
+		B6C44A1D5E9B4D0AA1000002 /* medical_terms.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = medical_terms.xcstrings; sourceTree = "<group>"; };
 		F11B22C133D44E5500000013 /* PushNotificationBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationBridge.swift; sourceTree = "<group>"; };
 		A11B22C133D44E5500000101 /* Features/Auth/AuthFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Auth/AuthFlowView.swift; sourceTree = "<group>"; };
 		A11B22C133D44E5500000102 /* Features/Onboarding/OnboardingFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Features/Onboarding/OnboardingFlow.swift; sourceTree = "<group>"; };
@@ -276,6 +280,8 @@
 				F11B22C133D44E5500000005 /* Media/intro_long.mp4 */,
 				F11B22C133D44E5500000010 /* Media/Lottie/intro_orb_short.json */,
 				F11B22C133D44E5500000011 /* Media/Lottie/intro_orb_long.json */,
+				B6C44A1D5E9B4D0AA1000001 /* ui_strings.xcstrings */,
+				B6C44A1D5E9B4D0AA1000002 /* medical_terms.xcstrings */,
 				F11B22C133D44E5500000006 /* Media/Sounds/ui_tap.wav */,
 				F11B22C133D44E5500000007 /* Media/Sounds/ui_success.wav */,
 				F11B22C133D44E5500000008 /* Media/Sounds/ui_error.wav */,
@@ -405,6 +411,8 @@
 				F11B22C033D44E5500000005 /* Media/intro_long.mp4 in Resources */,
 				F11B22C033D44E5500000010 /* Media/Lottie/intro_orb_short.json in Resources */,
 				F11B22C033D44E5500000011 /* Media/Lottie/intro_orb_long.json in Resources */,
+				B6C44A1D5E9B4D0AA2000001 /* ui_strings.xcstrings in Resources */,
+				B6C44A1D5E9B4D0AA2000002 /* medical_terms.xcstrings in Resources */,
 				F11B22C033D44E5500000006 /* Media/Sounds/ui_tap.wav in Resources */,
 				F11B22C033D44E5500000007 /* Media/Sounds/ui_success.wav in Resources */,
 				F11B22C033D44E5500000008 /* Media/Sounds/ui_error.wav in Resources */,

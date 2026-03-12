@@ -13,6 +13,8 @@ struct MedCaseAIApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(appState)
+                .environment(\.locale, appState.uiLocale)
+                .environment(\.layoutDirection, appState.uiLayoutDirection)
                 .preferredColorScheme(.light)
                 .task {
                     await appState.bootstrap()

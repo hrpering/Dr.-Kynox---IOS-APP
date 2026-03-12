@@ -245,7 +245,7 @@ private struct HistorySessionArtifactsView: View {
                 }
 
                 if !errorText.isEmpty {
-                    ErrorStateCard(message: errorText, action: onRetry)
+                    ErrorStateCard(message: errorText, retry: onRetry)
                 }
             }
             .padding(16)

@@ -13,6 +13,8 @@ struct OnboardingView: View {
     @State private var onboardingFirstName = ""
     @State private var onboardingLastName = ""
     @State private var onboardingPhone = ""
+    @State private var selectedLanguageCode = "tr"
+    @State private var selectedCountryCode = "TR"
     @State private var selectedTrack: UserTrack = .student
     @State private var selectedExamTarget: StudyExamTarget = .tus
     @State private var selectedExamWindow: StudyExamWindow = .threeToSixMonths
@@ -22,7 +24,7 @@ struct OnboardingView: View {
     @State private var legalSheetItem: LegalSheetItem?
     @State private var introLegalAccepted = false
 
-    private let totalSteps = 6
+    private let totalSteps = 7
     private var transition: AnyTransition { reduceMotion ? .opacity : .move(edge: .trailing) }
 
     var body: some View {
@@ -39,16 +41,22 @@ struct OnboardingView: View {
                         OnboardingHowItWorksStep()
                             .transition(transition)
                     case 2:
+                        OnboardingLanguageCountryStep(
+                            selectedLanguageCode: $selectedLanguageCode,
+                            selectedCountryCode: $selectedCountryCode
+                        )
+                        .transition(transition)
+                    case 3:
                         OnboardingIdentityStep(
                             firstName: $onboardingFirstName,
                             lastName: $onboardingLastName,
                             phoneNumber: $onboardingPhone
                         )
                         .transition(transition)
-                    case 3:
+                    case 4:
                         OnboardingLevelStep(selectedTrack: $selectedTrack)
                             .transition(transition)
-                    case 4:
+                    case 5:
                         OnboardingStudyPlanSetupStep(
                             selectedExamTarget: $selectedExamTarget,
                             selectedExamWindow: $selectedExamWindow,
@@ -118,12 +126,12 @@ struct OnboardingView: View {
                 seedIdentityFromProfileIfNeeded()
             }
             .toolbar {
-                if step < 2 {
+                if step < 3 {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Geç") {
                             Haptic.selection()
                             withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
-                                step = 2
+                                step = 3
                             }
                         }
                         .font(AppFont.bodyMedium)
@@ -268,7 +276,10 @@ struct OnboardingView: View {
             goals: enrichedGoals,
             interestAreas: enrichedInterests,
             learningLevel: "\(selectedTrack.learningLevel) · \(studyMode.title)",
-            onboardingCompleted: true
+            onboardingCompleted: true,
+            preferredLanguageCode: AppLanguage.normalizeBCP47(selectedLanguageCode, fallback: "tr"),
+            countryCode: AppCountry.normalize(selectedCountryCode).isEmpty ? nil : AppCountry.normalize(selectedCountryCode),
+            languageSource: "onboarding"
         )
 
         do {
@@ -292,6 +303,9 @@ struct OnboardingView: View {
         case 0:
             return introLegalAccepted
         case 2:
+            return !AppLanguage.normalizeBCP47(selectedLanguageCode, fallback: "").isEmpty &&
+                !AppCountry.normalize(selectedCountryCode).isEmpty
+        case 3:
             return isIdentityStepValid
         default:
             return true
@@ -329,10 +343,11 @@ struct OnboardingView: View {
         switch step {
         case 0: return "Devam et"
         case 1: return "Anladım, Başlayalım"
-        case 2: return "Seviyeni Seç"
-        case 3: return "Çalışma Planına Geç"
-        case 4: return "Planım Hazır"
-        case 5: return "Onboarding'i Tamamla"
+        case 2: return "Dil ve Ülke Kaydet"
+        case 3: return "Seviyeni Seç"
+        case 4: return "Çalışma Planına Geç"
+        case 5: return "Planım Hazır"
+        case 6: return "Onboarding'i Tamamla"
         default: return "Devam et"
         }
     }
@@ -352,6 +367,18 @@ struct OnboardingView: View {
         }
         if onboardingPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             onboardingPhone = state.profile?.phoneNumber ?? ""
+        }
+        selectedLanguageCode = AppLanguage.normalizeBCP47(
+            state.profile?.preferredLanguageCode ?? Locale.current.identifier,
+            fallback: "tr"
+        )
+        let seedCountry = AppCountry.normalize(state.profile?.countryCode)
+        if !seedCountry.isEmpty {
+            selectedCountryCode = seedCountry
+        } else {
+            selectedCountryCode = AppCountry.normalize(Locale.current.region?.identifier).isEmpty
+                ? "TR"
+                : AppCountry.normalize(Locale.current.region?.identifier)
         }
     }
 }
@@ -553,4 +580,3 @@ enum StudyExamWindow: String, CaseIterable {
         }
     }
 }
-

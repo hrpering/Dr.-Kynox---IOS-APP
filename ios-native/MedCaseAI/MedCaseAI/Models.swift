@@ -68,6 +68,9 @@ struct UserProfile: Codable {
     let goals: [String]
     let interestAreas: [String]
     let learningLevel: String
+    let preferredLanguageCode: String
+    let countryCode: String
+    let languageSource: String
 
     static let empty = UserProfile(
         id: "",
@@ -80,7 +83,10 @@ struct UserProfile: Codable {
         role: "",
         goals: [],
         interestAreas: [],
-        learningLevel: ""
+        learningLevel: "",
+        preferredLanguageCode: "tr",
+        countryCode: "",
+        languageSource: "default"
     )
 
     var firstName: String {
@@ -102,6 +108,9 @@ struct ProfileRow: Codable {
     let goals: [String]?
     let interestAreas: [String]?
     let learningLevel: String?
+    let preferredLanguageCode: String?
+    let countryCode: String?
+    let languageSource: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -115,10 +124,16 @@ struct ProfileRow: Codable {
         case goals
         case interestAreas = "interest_areas"
         case learningLevel = "learning_level"
+        case preferredLanguageCode = "preferred_language_code"
+        case countryCode = "country_code"
+        case languageSource = "language_source"
     }
 
     func normalized() -> UserProfile {
-        UserProfile(
+        let language = AppLanguage.normalizeBCP47(preferredLanguageCode, fallback: "tr")
+        let country = AppCountry.normalize(countryCode)
+        let source = AppLanguageSource.normalize(languageSource, fallback: "default")
+        return UserProfile(
             id: id,
             email: (email ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
             fullName: (fullName ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
@@ -129,7 +144,10 @@ struct ProfileRow: Codable {
             role: (role ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
             goals: goals ?? [],
             interestAreas: interestAreas ?? [],
-            learningLevel: (learningLevel ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            learningLevel: (learningLevel ?? "").trimmingCharacters(in: .whitespacesAndNewlines),
+            preferredLanguageCode: language,
+            countryCode: country,
+            languageSource: source
         )
     }
 }
@@ -512,6 +530,114 @@ struct SubscriptionStatusResponse: Decodable {
     let subscription: Subscription
 }
 
+struct AppLanguage: Identifiable, Hashable {
+    let code: String
+    let englishName: String
+    let nativeName: String
+
+    var id: String { code }
+
+    var isRTL: Bool {
+        code == "ar" || code == "he"
+    }
+
+    static let supported: [AppLanguage] = [
+        .init(code: "tr", englishName: "Turkish", nativeName: "Türkçe"),
+        .init(code: "en", englishName: "English", nativeName: "English"),
+        .init(code: "de", englishName: "German", nativeName: "Deutsch"),
+        .init(code: "fr", englishName: "French", nativeName: "Français"),
+        .init(code: "ar", englishName: "Arabic", nativeName: "العربية"),
+        .init(code: "he", englishName: "Hebrew", nativeName: "עברית"),
+        .init(code: "it", englishName: "Italian", nativeName: "Italiano"),
+        .init(code: "ja", englishName: "Japanese", nativeName: "日本語"),
+        .init(code: "ko", englishName: "Korean", nativeName: "한국어"),
+        .init(code: "pt-BR", englishName: "Portuguese (Brazil)", nativeName: "Português (Brasil)"),
+        .init(code: "pt-PT", englishName: "Portuguese (Portugal)", nativeName: "Português (Portugal)"),
+        .init(code: "es-ES", englishName: "Spanish (Spain)", nativeName: "Español (España)")
+    ]
+
+    private static let aliasMap: [String: String] = [
+        "tr": "tr", "tr-tr": "tr",
+        "en": "en", "en-us": "en", "en-gb": "en",
+        "de": "de", "de-de": "de",
+        "fr": "fr", "fr-fr": "fr",
+        "ar": "ar", "ar-sa": "ar",
+        "he": "he", "he-il": "he",
+        "it": "it", "it-it": "it",
+        "ja": "ja", "ja-jp": "ja",
+        "ko": "ko", "ko-kr": "ko",
+        "pt-br": "pt-BR",
+        "pt-pt": "pt-PT",
+        "pt": "pt-PT",
+        "es-es": "es-ES",
+        "es": "es-ES"
+    ]
+
+    static func normalizeBCP47(_ raw: String?, fallback: String = "tr") -> String {
+        let normalized = (raw ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "_", with: "-")
+            .lowercased()
+        if let mapped = aliasMap[normalized], supported.contains(where: { $0.code == mapped }) {
+            return mapped
+        }
+        if supported.contains(where: { $0.code.lowercased() == normalized }) {
+            return supported.first(where: { $0.code.lowercased() == normalized })?.code ?? fallback
+        }
+        return fallback
+    }
+
+    static func displayName(for code: String) -> String {
+        let normalized = normalizeBCP47(code, fallback: "tr")
+        return supported.first(where: { $0.code == normalized })?.englishName ?? "Turkish"
+    }
+}
+
+struct AppCountry: Identifiable, Hashable {
+    let code: String
+    let name: String
+
+    var id: String { code }
+
+    static let supported: [AppCountry] = [
+        .init(code: "TR", name: "Türkiye"),
+        .init(code: "US", name: "United States"),
+        .init(code: "DE", name: "Germany"),
+        .init(code: "FR", name: "France"),
+        .init(code: "SA", name: "Saudi Arabia"),
+        .init(code: "IL", name: "Israel"),
+        .init(code: "IT", name: "Italy"),
+        .init(code: "JP", name: "Japan"),
+        .init(code: "KR", name: "South Korea"),
+        .init(code: "BR", name: "Brazil"),
+        .init(code: "PT", name: "Portugal"),
+        .init(code: "ES", name: "Spain")
+    ]
+
+    static func normalize(_ raw: String?) -> String {
+        let value = (raw ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        guard value.range(of: "^[A-Z]{2}$", options: .regularExpression) != nil else {
+            return ""
+        }
+        return value
+    }
+}
+
+enum AppLanguageSource {
+    static func normalize(_ raw: String?, fallback: String = "default") -> String {
+        let value = (raw ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        let allowed = ["default", "device", "onboarding", "profile_edit", "admin"]
+        if allowed.contains(value) {
+            return value
+        }
+        return allowed.contains(fallback) ? fallback : "default"
+    }
+}
+
 struct OnboardingPayload: Encodable {
     let fullName: String
     let phoneNumber: String
@@ -522,6 +648,9 @@ struct OnboardingPayload: Encodable {
     let interestAreas: [String]
     let learningLevel: String
     let onboardingCompleted: Bool
+    let preferredLanguageCode: String
+    let countryCode: String?
+    let languageSource: String
 }
 
 struct StudyPlanSnapshot: Equatable {
@@ -1276,6 +1405,7 @@ struct ScoreRequestPayload: Encodable {
     let rubricPrompt: String
     let mode: String
     let optionalCaseWrapup: String
+    let uiLanguageCode: String?
 
     static let defaultRubric = "Klinik muhakeme, güvenlik, zamanlama ve iletişim başlıklarında 0-100 arası JSON skor üret."
 }

@@ -1,0 +1,23 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "medical.term.myocardial_infarction": {
+      "comment": "Canonical medical term; should stay in English for all locales",
+      "localizations": {
+        "ar": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "de": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "es-ES": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "fr": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "he": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "it": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "ja": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "ko": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "pt-BR": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "pt-PT": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } },
+        "tr": { "stringUnit": { "state": "translated", "value": "Myocardial infarction" } }
+      }
+    }
+  },
+  "version": "1.0"
+}

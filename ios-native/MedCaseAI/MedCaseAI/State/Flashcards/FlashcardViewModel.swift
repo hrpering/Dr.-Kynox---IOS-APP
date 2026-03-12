@@ -26,6 +26,7 @@ final class FlashcardViewModel: ObservableObject {
                             missedOpportunities: [String],
                             dimensions: [ScoreDimension],
                             nextPracticeSuggestions: [PracticeSuggestion],
+                            uiLanguageCode: String?,
                             maxCards: Int = 6) async throws -> FlashcardGenerateResponse {
         guard let token = try await supabase.currentAccessToken(), !token.isEmpty else {
             throw AppError.sessionMissing
@@ -47,6 +48,7 @@ final class FlashcardViewModel: ObservableObject {
             missedOpportunities: missedOpportunities,
             dimensions: dimensions,
             nextPracticeSuggestions: nextPracticeSuggestions,
+            uiLanguageCode: uiLanguageCode,
             maxCards: maxCards
         )
     }

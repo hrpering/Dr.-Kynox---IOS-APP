@@ -192,6 +192,9 @@ final class SupabaseService {
             goals: nil,
             interestAreas: nil,
             learningLevel: nil,
+            preferredLanguageCode: nil,
+            countryCode: nil,
+            languageSource: nil,
             updatedAt: ISO8601DateFormatter().string(from: Date())
         )
 
@@ -233,6 +236,9 @@ final class SupabaseService {
             goals: [],
             interestAreas: [],
             learningLevel: nil,
+            preferredLanguageCode: AppLanguage.normalizeBCP47(Locale.current.identifier, fallback: "tr"),
+            countryCode: AppCountry.normalize(Locale.current.region?.identifier),
+            languageSource: "device",
             updatedAt: ISO8601DateFormatter().string(from: Date())
         )
 
@@ -276,6 +282,9 @@ final class SupabaseService {
             goals: payload.goals,
             interestAreas: payload.interestAreas,
             learningLevel: payload.learningLevel,
+            preferredLanguageCode: AppLanguage.normalizeBCP47(payload.preferredLanguageCode, fallback: "tr"),
+            countryCode: AppCountry.normalize(payload.countryCode),
+            languageSource: AppLanguageSource.normalize(payload.languageSource, fallback: "onboarding"),
             updatedAt: ISO8601DateFormatter().string(from: Date())
         )
 
@@ -286,6 +295,44 @@ final class SupabaseService {
 
         return try await fetchProfile()
         #else
+        throw AppError.dependencyMissing("Supabase Swift SDK bulunamadı. Xcode'da supabase-swift paketi eklenmeli.")
+        #endif
+    }
+
+    func updateLanguagePreferences(preferredLanguageCode: String,
+                                   countryCode: String?,
+                                   languageSource: String = "profile_edit") async throws -> UserProfile {
+        #if canImport(Supabase)
+        let client = try await buildClient()
+        let context = try await currentAuthContext(client)
+        let row = ProfileUpsertRow(
+            id: context.userId,
+            email: context.email,
+            fullName: nil,
+            phoneNumber: nil,
+            marketingOptIn: nil,
+            onboardingCompleted: nil,
+            ageRange: nil,
+            role: nil,
+            goals: nil,
+            interestAreas: nil,
+            learningLevel: nil,
+            preferredLanguageCode: AppLanguage.normalizeBCP47(preferredLanguageCode, fallback: "tr"),
+            countryCode: AppCountry.normalize(countryCode),
+            languageSource: AppLanguageSource.normalize(languageSource, fallback: "profile_edit"),
+            updatedAt: ISO8601DateFormatter().string(from: Date())
+        )
+
+        _ = try await client
+            .from("profiles")
+            .upsert(row, onConflict: "id")
+            .execute()
+
+        return try await fetchProfile()
+        #else
+        _ = preferredLanguageCode
+        _ = countryCode
+        _ = languageSource
         throw AppError.dependencyMissing("Supabase Swift SDK bulunamadı. Xcode'da supabase-swift paketi eklenmeli.")
         #endif
     }
@@ -652,6 +699,9 @@ private struct ProfileUpsertRow: Encodable {
     let goals: [String]?
     let interestAreas: [String]?
     let learningLevel: String?
+    let preferredLanguageCode: String?
+    let countryCode: String?
+    let languageSource: String?
     let updatedAt: String
 
     enum CodingKeys: String, CodingKey {
@@ -666,6 +716,9 @@ private struct ProfileUpsertRow: Encodable {
         case goals
         case interestAreas = "interest_areas"
         case learningLevel = "learning_level"
+        case preferredLanguageCode = "preferred_language_code"
+        case countryCode = "country_code"
+        case languageSource = "language_source"
         case updatedAt = "updated_at"
     }
 }

@@ -596,6 +596,84 @@ struct OnboardingIdentityStep: View {
     }
 }
 
+struct OnboardingLanguageCountryStep: View {
+    @Binding var selectedLanguageCode: String
+    @Binding var selectedCountryCode: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Dil ve Ülke Seçimi")
+                .font(AppFont.largeTitle)
+                .foregroundStyle(AppColor.textPrimary)
+
+            Text("Uygulama metinleri, agent çıktıları ve skor geri bildirimi bu dile göre gösterilir.")
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+                .lineSpacing(4)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Uygulama Dili")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                Picker("Uygulama Dili", selection: $selectedLanguageCode) {
+                    ForEach(AppLanguage.supported) { language in
+                        Text("\(language.nativeName) · \(language.englishName)").tag(language.code)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 11)
+                .background(AppColor.surface)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(AppColor.border, lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Ülke")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                Picker("Ülke", selection: $selectedCountryCode) {
+                    ForEach(AppCountry.supported) { country in
+                        Text(country.name).tag(country.code)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 11)
+                .background(AppColor.surface)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(AppColor.border, lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+
+            HStack(spacing: 8) {
+                Image(systemName: "globe")
+                    .foregroundStyle(AppColor.primary)
+                Text("BCP-47 dil kodu kullanılır. Arapça/İbranice için arayüz sağdan sola hizalanır.")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .lineSpacing(4)
+            }
+            .padding(.top, 2)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxHeight: .infinity, alignment: .top)
+        .onAppear {
+            selectedLanguageCode = AppLanguage.normalizeBCP47(selectedLanguageCode, fallback: "tr")
+            let normalizedCountry = AppCountry.normalize(selectedCountryCode)
+            selectedCountryCode = normalizedCountry.isEmpty ? "TR" : normalizedCountry
+        }
+    }
+}
+
 struct OnboardingLevelStep: View {
     @Binding var selectedTrack: UserTrack
 
@@ -1067,4 +1145,3 @@ struct WidgetPreviewCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
-

@@ -1,5 +1,119 @@
 import SwiftUI
 
+struct ProfileLanguagePreferencesView: View {
+    @EnvironmentObject private var state: AppState
+    @State private var selectedLanguageCode = "tr"
+    @State private var selectedCountryCode = "TR"
+    @State private var isSaving = false
+    @State private var statusText = ""
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                DSInfoCard(tone: .primary) {
+                    Text("Dil ve Bölge")
+                        .font(AppFont.title2)
+                        .foregroundStyle(AppColor.textPrimary)
+                    Text("Agent, skor ve flashcard çıktıları bu dile zorlanır. Arapça/İbranice için RTL aktif olur.")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineSpacing(4)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Uygulama dili")
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(AppColor.textPrimary)
+                    Picker("Uygulama dili", selection: $selectedLanguageCode) {
+                        ForEach(AppLanguage.supported) { language in
+                            Text("\(language.nativeName) · \(language.englishName)").tag(language.code)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 11)
+                    .background(AppColor.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Ülke")
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(AppColor.textPrimary)
+                    Picker("Ülke", selection: $selectedCountryCode) {
+                        ForEach(AppCountry.supported) { country in
+                            Text(country.name).tag(country.code)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 11)
+                    .background(AppColor.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+
+                Button {
+                    Task { await savePreferences() }
+                } label: {
+                    HStack(spacing: 8) {
+                        if isSaving {
+                            ProgressView().tint(.white)
+                        }
+                        Text("Kaydet")
+                    }
+                    .appPrimaryButtonLabelStyle()
+                }
+                .buttonStyle(PressableButtonStyle())
+                .disabled(isSaving)
+                .opacity(isSaving ? 0.65 : 1)
+
+                if !statusText.isEmpty {
+                    Text(statusText)
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineSpacing(4)
+                }
+            }
+            .padding(16)
+            .padding(.bottom, 12)
+        }
+        .background(AppColor.background.ignoresSafeArea())
+        .navigationTitle("Dil ve Bölge")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            selectedLanguageCode = AppLanguage.normalizeBCP47(state.profile?.preferredLanguageCode, fallback: "tr")
+            let normalizedCountry = AppCountry.normalize(state.profile?.countryCode)
+            selectedCountryCode = normalizedCountry.isEmpty ? "TR" : normalizedCountry
+        }
+    }
+
+    private func savePreferences() async {
+        if isSaving { return }
+        isSaving = true
+        defer { isSaving = false }
+        do {
+            try await state.updateLanguagePreferences(
+                preferredLanguageCode: selectedLanguageCode,
+                countryCode: selectedCountryCode,
+                source: "profile_edit"
+            )
+            statusText = "Dil tercihleri güncellendi."
+        } catch {
+            statusText = error.localizedDescription
+        }
+    }
+}
+
 struct ProfileNotificationPreferencesView: View {
     @EnvironmentObject private var state: AppState
     @AppStorage("settings.notifications.daily_reminder") private var dailyReminder = false
