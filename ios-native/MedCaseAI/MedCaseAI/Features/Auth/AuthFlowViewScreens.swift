@@ -447,18 +447,49 @@ extension AuthFlowView {
 
     var authForm: some View {
         VStack(spacing: 14) {
-            StethoscopeBadge()
-                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    StethoscopeBadge()
+                        .accessibilityHidden(true)
+                    Spacer()
+                    Text(isSignUp ? "Yeni Hesap" : "Tekrar Hoş Geldin")
+                        .font(AppFont.caption)
+                        .foregroundStyle(.white.opacity(0.9))
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 5)
+                        .background(.white.opacity(0.18))
+                        .clipShape(Capsule())
+                }
 
-            Text(isSignUp ? "Hesap oluştur" : "Giriş yap")
-                .font(AppFont.largeTitle)
-                .foregroundStyle(AppColor.textPrimary)
+                Text(isSignUp ? "Hesap oluştur" : "Giriş yap")
+                    .font(AppFont.largeTitle)
+                    .foregroundStyle(.white)
 
-            Text(isSignUp ? "Klinik pratiğine başlamak için hesap oluştur." : "Kaldığın yerden devam etmek için giriş yap.")
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
+                Text(isSignUp ? "Klinik pratiğine başlamak için hesap oluştur." : "Kaldığın yerden devam etmek için giriş yap.")
+                    .font(AppFont.body)
+                    .foregroundStyle(.white.opacity(0.88))
+                    .lineSpacing(4)
+
+                HStack(spacing: 8) {
+                    authHeroMetric(title: "Akış", value: isSignUp ? "Kayıt" : "Giriş")
+                    authHeroMetric(title: "Doğrulama", value: "E-posta")
+                    authHeroMetric(title: "Güvenlik", value: "Aktif")
+                }
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(
+                    colors: [AppColor.primaryDark, AppColor.primary],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(.white.opacity(0.2), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             Text("Hızlı giriş seçenekleri")
                 .font(AppFont.caption)
@@ -591,6 +622,27 @@ extension AuthFlowView {
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func authHeroMetric(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(.white.opacity(0.74))
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(.white)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.white.opacity(0.14))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     var authBottomActions: some View {

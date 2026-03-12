@@ -32,7 +32,7 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: AppSpacing.x2) {
+            VStack(spacing: AppSpacing.x1_5) {
                 header
 
                 ZStack {
@@ -76,6 +76,15 @@ struct OnboardingView: View {
                     }
                 }
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: step)
+                .padding(14)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .background(AppColor.surfaceElevated)
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                        .stroke(AppColor.border, lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                .appShadow(AppShadow.card)
 
                 if step == 0 {
                     onboardingLegalLinks
@@ -149,15 +158,24 @@ struct OnboardingView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.x1) {
-            HStack {
-                Text("STEP \(step + 1) OF \(totalSteps)")
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textSecondary)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Onboarding")
+                        .font(AppFont.title2)
+                        .foregroundStyle(.white)
+                    Text("Adım \(step + 1) / \(totalSteps)")
+                        .font(AppFont.caption)
+                        .foregroundStyle(.white.opacity(0.82))
+                }
                 Spacer()
                 Text("%\(completionPercent)")
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.primaryDark)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(.white.opacity(0.18))
+                    .clipShape(Capsule())
             }
 
             GeometryReader { geo in
@@ -167,15 +185,27 @@ struct OnboardingView: View {
                 HStack(spacing: 8) {
                     ForEach(0..<totalSteps, id: \.self) { idx in
                         Capsule()
-                            .fill(idx <= step ? AppColor.primary : AppColor.border)
+                            .fill(idx <= step ? .white : .white.opacity(0.24))
                             .frame(width: segmentWidth, height: 6)
                     }
                 }
             }
             .frame(height: 6)
-
         }
-        .padding(.top, AppSpacing.x1 / 2)
+        .padding(14)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var onboardingLegalLinks: some View {
