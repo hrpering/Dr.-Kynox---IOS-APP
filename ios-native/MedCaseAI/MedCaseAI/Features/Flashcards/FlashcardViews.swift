@@ -472,14 +472,14 @@ struct CodeBlueSessionView: View {
     }
 
     private func syncCountdownDeadline() {
-        if let expiresAt = session?.currentQuestionExpiresAt,
-           let expiresDate = parseISODate(expiresAt) {
-            countdownDeadline = expiresDate
+        if let remainingMs = session?.timeRemainingMs, remainingMs > 0 {
+            countdownDeadline = now.addingTimeInterval(Double(remainingMs) / 1000.0)
             return
         }
 
-        if let remainingMs = session?.timeRemainingMs, remainingMs > 0 {
-            countdownDeadline = now.addingTimeInterval(Double(remainingMs) / 1000.0)
+        if let expiresAt = session?.currentQuestionExpiresAt,
+           let expiresDate = parseISODate(expiresAt) {
+            countdownDeadline = expiresDate
             return
         }
 
