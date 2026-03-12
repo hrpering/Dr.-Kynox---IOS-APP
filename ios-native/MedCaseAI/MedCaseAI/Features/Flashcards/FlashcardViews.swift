@@ -20,22 +20,22 @@ struct FlashcardsHubView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 12) {
                 headerCard
                 if !loading {
                     headerMetricsRow
                 }
 
                 if loading {
-                    VStack(spacing: 10) {
-                        ShimmerView().frame(height: 110)
-                        ShimmerView().frame(height: 110)
-                        ShimmerView().frame(height: 110)
+                    VStack(spacing: 8) {
+                        ShimmerView().frame(height: 102)
+                        ShimmerView().frame(height: 102)
+                        ShimmerView().frame(height: 102)
                     }
                 } else if items.isEmpty {
                     emptyStateCard
                 } else {
-                    LazyVStack(spacing: 10) {
+                    LazyVStack(spacing: 8) {
                         ForEach(items) { item in
                             favoriteRow(item)
                         }
@@ -52,7 +52,7 @@ struct FlashcardsHubView: View {
                                 Text(loadingMore ? "Yükleniyor..." : "Daha Fazla Yükle")
                                     .font(AppFont.bodyMedium)
                             }
-                            .frame(maxWidth: .infinity, minHeight: 46)
+                            .frame(maxWidth: .infinity, minHeight: 44)
                         }
                         .buttonStyle(DSSecondaryButtonStyle())
                         .disabled(loadingMore)
@@ -65,8 +65,8 @@ struct FlashcardsHubView: View {
                     }
                 }
             }
-            .padding(16)
-            .padding(.bottom, 14)
+            .padding(14)
+            .padding(.bottom, 12)
         }
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle("Favori Kartlar")
@@ -85,9 +85,9 @@ struct FlashcardsHubView: View {
     }
 
     private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 11) {
+        VStack(alignment: .leading, spacing: 9) {
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text("Hızlı Vaka Favorileri")
                         .font(AppFont.title)
                         .foregroundStyle(.white)
@@ -117,13 +117,13 @@ struct FlashcardsHubView: View {
                 }
                 .font(AppFont.bodyMedium)
                 .foregroundStyle(AppColor.primaryDark)
-                .frame(maxWidth: .infinity, minHeight: 48)
+                .frame(maxWidth: .infinity, minHeight: 46)
                 .background(.white.opacity(0.95))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
             .buttonStyle(PressableButtonStyle())
         }
-        .padding(14)
+        .padding(12)
         .background(
             LinearGradient(
                 colors: [AppColor.primaryDark, AppColor.primary],
@@ -140,7 +140,7 @@ struct FlashcardsHubView: View {
     }
 
     private var headerMetricsRow: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 7) {
             headerMetric(title: "Bu hafta", value: "\(items.prefix(7).count)")
             headerMetric(title: "Yüklenen", value: "\(items.count)")
             headerMetric(title: "Toplam", value: "\(totalCount)")
@@ -157,8 +157,8 @@ struct FlashcardsHubView: View {
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(1)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
@@ -169,7 +169,7 @@ struct FlashcardsHubView: View {
     }
 
     private var emptyStateCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Henüz favori kartın yok")
                 .font(AppFont.title2)
                 .foregroundStyle(AppColor.textPrimary)
@@ -184,7 +184,7 @@ struct FlashcardsHubView: View {
             }
             .appPrimaryButton()
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
@@ -196,9 +196,9 @@ struct FlashcardsHubView: View {
     }
 
     private func favoriteRow(_ item: CodeBlueFavoriteCard) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 6) {
                         Text(item.specialty.isEmpty ? "Genel" : SpecialtyOption.label(for: item.specialty))
                             .font(AppFont.bodyMedium)
@@ -206,8 +206,8 @@ struct FlashcardsHubView: View {
                         Text(item.difficulty.isEmpty ? "-" : item.difficulty)
                             .font(AppFont.caption)
                             .foregroundStyle(AppColor.primaryDark)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
                             .background(AppColor.primaryLight)
                             .clipShape(Capsule())
                     }
@@ -234,7 +234,7 @@ struct FlashcardsHubView: View {
                 .foregroundStyle(AppColor.error)
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text("Ön Yüz")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.primaryDark)
@@ -246,7 +246,7 @@ struct FlashcardsHubView: View {
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text("Arka Yüz")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.success)
@@ -257,7 +257,7 @@ struct FlashcardsHubView: View {
             }
 
         }
-        .padding(13)
+        .padding(11)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
