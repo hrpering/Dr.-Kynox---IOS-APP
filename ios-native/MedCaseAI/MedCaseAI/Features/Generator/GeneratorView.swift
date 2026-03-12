@@ -255,15 +255,30 @@ struct GeneratorView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Adım \(step)")
                 .font(AppFont.caption)
-                .foregroundStyle(AppColor.primaryDark)
+                .foregroundStyle(Color.white.opacity(0.9))
             Text(title)
                 .font(AppFont.title)
-                .foregroundStyle(AppColor.textPrimary)
+                .foregroundStyle(.white)
             Text(subtitle)
                 .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
+                .foregroundStyle(.white.opacity(0.86))
                 .lineSpacing(4)
         }
+        .padding(AppSpacing.cardPadding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(AppColor.primary.opacity(0.3), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var selectedSpecialtyLabel: String {
@@ -294,4 +309,3 @@ struct GeneratorView: View {
         case mode(specialty: String, difficulty: String)
     }
 }
-

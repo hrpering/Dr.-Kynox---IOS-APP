@@ -116,12 +116,13 @@ struct WeeklyGoalDetailView: View {
             }
         }
         .padding(14)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var goalSetterCard: some View {
@@ -148,12 +149,13 @@ struct WeeklyGoalDetailView: View {
                 .lineSpacing(4)
         }
         .padding(14)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var thisWeekCasesCard: some View {
@@ -198,12 +200,13 @@ struct WeeklyGoalDetailView: View {
             }
         }
         .padding(14)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var historyCalendarCard: some View {
@@ -240,12 +243,13 @@ struct WeeklyGoalDetailView: View {
             }
         }
         .padding(14)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private func statPill(icon: String, label: String, value: String) -> some View {
@@ -347,4 +351,3 @@ struct WeeklyGoalDetailView: View {
         }
     }
 }
-

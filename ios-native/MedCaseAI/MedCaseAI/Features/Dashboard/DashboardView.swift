@@ -263,12 +263,13 @@ struct DashboardView: View {
             }
             .padding(10)
             .frame(maxWidth: .infinity, minHeight: 66, alignment: .leading)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(tone.border, lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .appShadow(AppShadow.card)
         }
         .buttonStyle(PressableButtonStyle())
     }
@@ -781,6 +782,7 @@ struct DashboardView: View {
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var preferredSpecialty: String {

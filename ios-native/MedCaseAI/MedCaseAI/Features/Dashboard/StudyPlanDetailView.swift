@@ -70,12 +70,13 @@ struct StudyPlanDetailView: View {
             }
         }
         .padding(AppSpacing.cardPadding)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var loopProgressCard: some View {
@@ -127,12 +128,13 @@ struct StudyPlanDetailView: View {
             }
         }
         .padding(AppSpacing.cardPadding)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var loopTimelineCard: some View {
@@ -197,12 +199,13 @@ struct StudyPlanDetailView: View {
             }
         }
         .padding(AppSpacing.cardPadding)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var completedCaseCount: Int {
