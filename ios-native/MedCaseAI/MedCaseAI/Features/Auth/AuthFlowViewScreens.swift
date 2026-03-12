@@ -16,21 +16,17 @@ extension AuthFlowView {
                 .frame(maxWidth: .infinity)
                 .accessibilityHidden(true)
 
-            Text("Dr.Kynox")
-                .font(AppFont.h1)
-                .foregroundStyle(AppColor.textPrimary)
-
-            Text("Klinik pratiğinin yapay zeka asistanı")
-                .font(AppFont.title)
-                .foregroundStyle(AppColor.textPrimary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
-
-            Text("Gerçek klinik vakalar üzerinde düşün.\nTanı koy, test iste, yönetim planı oluştur.")
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .multilineTextAlignment(.center)
-                .lineSpacing(4)
+            HeroHeader(
+                eyebrow: "Dr.Kynox",
+                title: "Klinik pratiğinin yapay zeka asistanı",
+                subtitle: "Gerçek klinik vakalar üzerinde düşün. Tanı koy, test iste, yönetim planı oluştur.",
+                icon: "stethoscope",
+                metrics: [
+                    HeroMetricItem(title: "Etkileşim", value: "Sesli + Yazılı", icon: "waveform"),
+                    HeroMetricItem(title: "Kapsam", value: "Gerçek Vakalar", icon: "cross.case"),
+                    HeroMetricItem(title: "Takip", value: "Anlık Geri Bildirim", icon: "chart.line.uptrend.xyaxis")
+                ]
+            )
 
             VStack(spacing: AppSpacing.x1) {
                 FeatureHighlightRow(
@@ -158,39 +154,29 @@ extension AuthFlowView {
     }
 
     var checkEmailCard: some View {
-        VStack(spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(AppColor.primaryLight)
-                    .frame(width: 120, height: 120)
-                Image(systemName: verificationCompleted ? "checkmark.seal.fill" : (isPasswordResetFlow ? "key.fill" : "envelope"))
-                    .font(.system(size: 42, weight: .semibold))
-                    .foregroundStyle(verificationCompleted ? AppColor.success : AppColor.primary)
-            }
-            .padding(.top, 6)
+        let heroTitle = verificationCompleted
+            ? "E-posta doğrulandı"
+            : (isPasswordResetFlow ? (resetCodeVerified ? "Yeni şifreni belirle" : "Şifre sıfırlama kodu") : "E-postanı kontrol et")
+        let heroSubtitle = verificationCompleted
+            ? "Hesabın aktifleştirildi. Şimdi giriş ekranına geçip e-posta ve şifrenle tekrar giriş yap."
+            : (isPasswordResetFlow
+               ? (resetCodeVerified
+                  ? "Kod doğrulandı. Güvenli bir yeni şifre belirleyip devam et."
+                  : "Şifre sıfırlama kodunu \(pendingVerificationEmail.isEmpty ? "e-posta adresine" : pendingVerificationEmail) gönderdik.")
+               : "Doğrulama kodunu \(pendingVerificationEmail.isEmpty ? "e-posta adresine" : pendingVerificationEmail) gönderdik. Gelen kutunu ve spam klasörünü kontrol et.")
 
-            Text(
-                verificationCompleted
-                ? "E-posta doğrulandı"
-                : (isPasswordResetFlow ? (resetCodeVerified ? "Yeni şifreni belirle" : "Şifre sıfırlama kodu") : "E-postanı kontrol et")
+        return VStack(spacing: 12) {
+            HeroHeader(
+                eyebrow: isPasswordResetFlow ? "Şifre Kurtarma" : "E-posta Doğrulama",
+                title: heroTitle,
+                subtitle: heroSubtitle,
+                icon: verificationCompleted ? "checkmark.seal.fill" : (isPasswordResetFlow ? "key.fill" : "envelope"),
+                metrics: [
+                    HeroMetricItem(title: "Akış", value: isPasswordResetFlow ? "Şifre Sıfırla" : "Kayıt", icon: "shuffle"),
+                    HeroMetricItem(title: "Durum", value: verificationCompleted ? "Tamamlandı" : "Kod Bekleniyor", icon: "checkmark.circle"),
+                    HeroMetricItem(title: "Kod", value: "\(verificationCode.count)/\(otpMaxLength)", icon: "number")
+                ]
             )
-                .font(AppFont.largeTitle)
-                .foregroundStyle(AppColor.textPrimary)
-                .multilineTextAlignment(.center)
-
-            Text(
-                verificationCompleted
-                    ? "Hesabın aktifleştirildi. Şimdi giriş ekranına geçip e-posta ve şifrenle tekrar giriş yap."
-                    : (isPasswordResetFlow
-                       ? (resetCodeVerified
-                          ? "Kod doğrulandı. Güvenli bir yeni şifre belirleyip devam et."
-                          : "Şifre sıfırlama kodunu \(pendingVerificationEmail.isEmpty ? "e-posta adresine" : pendingVerificationEmail) gönderdik.")
-                       : "Doğrulama kodunu \(pendingVerificationEmail.isEmpty ? "e-posta adresine" : pendingVerificationEmail) gönderdik. Gelen kutunu ve spam klasörünü kontrol et.")
-            )
-            .font(AppFont.body)
-            .foregroundStyle(AppColor.textSecondary)
-            .multilineTextAlignment(.center)
-            .lineSpacing(4)
 
             if verificationCompleted, let remaining = signInRedirectRemaining {
                 HStack(spacing: 8) {
@@ -447,49 +433,17 @@ extension AuthFlowView {
 
     var authForm: some View {
         VStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    StethoscopeBadge()
-                        .accessibilityHidden(true)
-                    Spacer()
-                    Text(isSignUp ? "Yeni Hesap" : "Tekrar Hoş Geldin")
-                        .font(AppFont.caption)
-                        .foregroundStyle(.white.opacity(0.9))
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 5)
-                        .background(.white.opacity(0.18))
-                        .clipShape(Capsule())
-                }
-
-                Text(isSignUp ? "Hesap oluştur" : "Giriş yap")
-                    .font(AppFont.largeTitle)
-                    .foregroundStyle(.white)
-
-                Text(isSignUp ? "Klinik pratiğine başlamak için hesap oluştur." : "Kaldığın yerden devam etmek için giriş yap.")
-                    .font(AppFont.body)
-                    .foregroundStyle(.white.opacity(0.88))
-                    .lineSpacing(4)
-
-                HStack(spacing: 8) {
-                    authHeroMetric(title: "Akış", value: isSignUp ? "Kayıt" : "Giriş")
-                    authHeroMetric(title: "Doğrulama", value: "E-posta")
-                    authHeroMetric(title: "Güvenlik", value: "Aktif")
-                }
-            }
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                LinearGradient(
-                    colors: [AppColor.primaryDark, AppColor.primary],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
+            HeroHeader(
+                eyebrow: isSignUp ? "Yeni Hesap" : "Tekrar Hoş Geldin",
+                title: isSignUp ? "Hesap oluştur" : "Giriş yap",
+                subtitle: isSignUp ? "Klinik pratiğine başlamak için hesap oluştur." : "Kaldığın yerden devam etmek için giriş yap.",
+                icon: "stethoscope",
+                metrics: [
+                    HeroMetricItem(title: "Akış", value: isSignUp ? "Kayıt" : "Giriş", icon: "arrow.triangle.branch"),
+                    HeroMetricItem(title: "Doğrulama", value: "E-posta", icon: "envelope"),
+                    HeroMetricItem(title: "Güvenlik", value: "Aktif", icon: "lock.shield")
+                ]
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(.white.opacity(0.2), lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             Text("Hızlı giriş seçenekleri")
                 .font(AppFont.caption)
@@ -624,27 +578,6 @@ extension AuthFlowView {
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    private func authHeroMetric(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(.white.opacity(0.74))
-            Text(value)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(.white)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.white.opacity(0.14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-    }
-
     var authBottomActions: some View {
         VStack(spacing: 8) {
             if isSignUp {
@@ -688,16 +621,9 @@ extension AuthFlowView {
     }
 
     var authBottomDock: some View {
-        VStack(spacing: 0) {
-            Divider()
-                .overlay(AppColor.border)
-
+        BottomCTADock {
             authBottomActions
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 8)
         }
-        .background(AppColor.background)
     }
 
     var signupLegalLinks: some View {

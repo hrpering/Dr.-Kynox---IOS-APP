@@ -89,48 +89,14 @@ struct OnboardingView: View {
                 if step == 0 {
                     onboardingLegalLinks
                 }
-
-                Button {
-                    guard canAdvanceCurrentStep else {
-                        if step == 2 {
-                            errorText = "Ad, soyad ve telefon bilgisi zorunlu."
-                        }
-                        Haptic.error()
-                        return
-                    }
-                    if step < (totalSteps - 1) {
-                        Haptic.selection()
-                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
-                            step = min(step + 1, totalSteps - 1)
-                        }
-                    } else {
-                        Task { await completeOnboarding() }
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        if isSaving {
-                            ProgressView().tint(.white)
-                        }
-                        Text(onboardingButtonTitle)
-                    }
-                    .appPrimaryButtonLabelStyle()
-                }
-                .buttonStyle(PressableButtonStyle())
-                .disabled(isSaving || !canAdvanceCurrentStep)
-                .opacity((isSaving || !canAdvanceCurrentStep) ? 0.55 : 1)
-                .accessibilityLabel(step == totalSteps - 1 ? "Onboarding'i Tamamla" : "Devam et")
-                .accessibilityHint(step == totalSteps - 1 ? "Onboarding tamamlanır ve ana sayfaya geçilir" : "Sonraki onboarding adımına geçer")
-
-                if !errorText.isEmpty {
-                    ErrorStateCard(message: errorText) {
-                        errorText = ""
-                    }
-                }
             }
             .padding(.horizontal, AppSpacing.x1_5)
             .padding(.top, AppSpacing.x1)
-            .padding(.bottom, AppSpacing.x1_5)
+            .padding(.bottom, AppSpacing.x1)
             .background(AppColor.background.ignoresSafeArea())
+            .safeAreaInset(edge: .bottom) {
+                onboardingBottomDock
+            }
             .sheet(item: $legalSheetItem) { item in
                 SafariSheet(url: item.url)
             }
@@ -158,26 +124,17 @@ struct OnboardingView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Onboarding")
-                        .font(AppFont.title2)
-                        .foregroundStyle(.white)
-                    Text("Adım \(step + 1) / \(totalSteps)")
-                        .font(AppFont.caption)
-                        .foregroundStyle(.white.opacity(0.82))
-                }
-                Spacer()
-                Text("%\(completionPercent)")
-                    .font(AppFont.bodyMedium)
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(.white.opacity(0.18))
-                    .clipShape(Capsule())
-            }
-
+        HeroHeader(
+            eyebrow: "Onboarding",
+            title: "Adım \(step + 1) / \(totalSteps)",
+            subtitle: onboardingStepSubtitle,
+            icon: "person.text.rectangle",
+            metrics: [
+                HeroMetricItem(title: "Tamamlanma", value: "%\(completionPercent)", icon: "chart.bar.fill"),
+                HeroMetricItem(title: "Dil", value: selectedLanguageCode.uppercased(), icon: "globe"),
+                HeroMetricItem(title: "Hedef", value: selectedExamTarget.title, icon: "target")
+            ]
+        ) {
             GeometryReader { geo in
                 let totalSpacing = CGFloat(max(0, totalSteps - 1) * 7)
                 let rawWidth = (geo.size.width - totalSpacing) / CGFloat(max(totalSteps, 1))
@@ -192,20 +149,66 @@ struct OnboardingView: View {
             }
             .frame(height: 5)
         }
-        .padding(12)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.card)
+    }
+
+    private var onboardingBottomDock: some View {
+        BottomCTADock {
+            Button {
+                guard canAdvanceCurrentStep else {
+                    if step == 2 {
+                        errorText = "Ad, soyad ve telefon bilgisi zorunlu."
+                    }
+                    Haptic.error()
+                    return
+                }
+                if step < (totalSteps - 1) {
+                    Haptic.selection()
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                        step = min(step + 1, totalSteps - 1)
+                    }
+                } else {
+                    Task { await completeOnboarding() }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    if isSaving {
+                        ProgressView().tint(.white)
+                    }
+                    Text(onboardingButtonTitle)
+                }
+                .appPrimaryButtonLabelStyle()
+            }
+            .buttonStyle(PressableButtonStyle())
+            .disabled(isSaving || !canAdvanceCurrentStep)
+            .opacity((isSaving || !canAdvanceCurrentStep) ? 0.55 : 1)
+            .accessibilityLabel(step == totalSteps - 1 ? "Onboarding'i Tamamla" : "Devam et")
+            .accessibilityHint(step == totalSteps - 1 ? "Onboarding tamamlanır ve ana sayfaya geçilir" : "Sonraki onboarding adımına geçer")
+        } secondary: {
+            if !errorText.isEmpty {
+                ErrorStateCard(message: errorText) {
+                    errorText = ""
+                }
+            }
+        }
+    }
+
+    private var onboardingStepSubtitle: String {
+        switch step {
+        case 0:
+            return "Uygulama kapsamını ve yasal çerçeveyi hızlıca netleştir."
+        case 1:
+            return "Vaka akışının nasıl ilerlediğini kısa bir turla gör."
+        case 2:
+            return "Dil ve ülke ayarlarını belirleyip deneyimi kişiselleştir."
+        case 3:
+            return "Profil bilgilerini tamamlayarak öğrenme takibini etkinleştir."
+        case 4:
+            return "Hedef seviyeni seçerek önerileri doğru zorlukta al."
+        case 5:
+            return "Sınav hedefi ve çalışma temposunu planla."
+        default:
+            return "Planını onayla ve ana ekrana geçerek vaka pratiğine başla."
+        }
     }
 
     private var onboardingLegalLinks: some View {

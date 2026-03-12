@@ -42,35 +42,17 @@ struct ModeSelectionPage: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: AppSpacing.x2) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Adım 3/3")
-                        .font(AppFont.caption)
-                        .foregroundStyle(.white.opacity(0.9))
-
-                    Text(pageTitle)
-                        .font(AppFont.title)
-                        .foregroundStyle(.white)
-
-                    Text("Bölüm ve zorluk seçildi. Şimdi nasıl ilerlemek istediğini belirle.")
-                        .font(AppFont.body)
-                        .foregroundStyle(.white.opacity(0.88))
-                        .lineSpacing(4)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(14)
-                .background(
-                    LinearGradient(
-                        colors: [AppColor.primaryDark, AppColor.primary],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
+                HeroHeader(
+                    eyebrow: "Adım 3/3",
+                    title: pageTitle,
+                    subtitle: "Bölüm ve zorluk seçildi. Şimdi nasıl ilerlemek istediğini belirle.",
+                    icon: "slider.horizontal.3",
+                    metrics: [
+                        HeroMetricItem(title: "Bölüm", value: selectedSpecialtyLabel, icon: "cross.case"),
+                        HeroMetricItem(title: "Zorluk", value: selectedDifficultyLabel, icon: "speedometer"),
+                        HeroMetricItem(title: "Seçim", value: selectedMode == nil ? "Bekleniyor" : "Hazır", icon: "checkmark.circle")
+                    ]
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(AppColor.primary.opacity(0.3), lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .shadow(color: AppColor.primary.opacity(0.22), radius: 10, x: 0, y: 5)
 
                 modeCard(
                     mode: .voice,
@@ -102,14 +84,9 @@ struct ModeSelectionPage: View {
         }
         .background(AppColor.background.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 0) {
-                Divider()
+            BottomCTADock {
                 startSessionButton
-                    .padding(.horizontal, AppSpacing.x2)
-                    .padding(.top, 10)
-                    .padding(.bottom, 8)
             }
-            .background(AppColor.surface)
         }
         .navigationTitle("Mod seç")
         .navigationBarTitleDisplayMode(.inline)

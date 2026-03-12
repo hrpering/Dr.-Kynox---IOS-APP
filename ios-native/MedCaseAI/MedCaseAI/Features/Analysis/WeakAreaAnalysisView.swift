@@ -65,59 +65,22 @@ struct WeakAreaAnalysisView: View {
     }
 
     private var analysisHeaderBand: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Zayıf Alan Merkezi")
-                .font(AppFont.title)
-                .foregroundStyle(.white)
-            Text("Branş kırılımı, trend ve AI önerilerini aynı panelde takip et.")
-                .font(AppFont.body)
-                .foregroundStyle(.white.opacity(0.88))
-                .lineSpacing(4)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+        HeroHeader(
+            eyebrow: "Analiz Merkezi",
+            title: "Zayıf Alan Merkezi",
+            subtitle: "Branş kırılımı, trend ve AI önerilerini aynı panelde takip et.",
+            icon: "chart.xyaxis.line"
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .appShadow(AppShadow.elevated)
     }
 
     private func overviewMetricRow(_ analysis: WeakAreaAnalysisResponse) -> some View {
-        HStack(spacing: 7) {
-            overviewMetric(title: "Skorlu vaka", value: "\(analysis.summary.userCaseCount)")
-            overviewMetric(title: "Ortalama", value: "\(Int(analysis.summary.userAverageScore.rounded()))")
-            overviewMetric(title: "Global", value: "\(Int(analysis.summary.globalAverageScore.rounded()))")
-        }
-    }
-
-    private func overviewMetric(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
-            Text(value)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
+        MetricBand(
+            items: [
+                HeroMetricItem(title: "Skorlu vaka", value: "\(analysis.summary.userCaseCount)", icon: "doc.text"),
+                HeroMetricItem(title: "Ortalama", value: "\(Int(analysis.summary.userAverageScore.rounded()))", icon: "chart.bar"),
+                HeroMetricItem(title: "Global", value: "\(Int(analysis.summary.globalAverageScore.rounded()))", icon: "globe")
+            ]
         )
-        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     private func refresh() async {

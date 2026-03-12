@@ -258,48 +258,23 @@ struct GeneratorView: View {
     }
 
     private func stepHeader(step: String, title: String, subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Text("Adım \(step)")
-                    .font(AppFont.caption)
-                    .foregroundStyle(Color.white.opacity(0.9))
-                Spacer()
-                HStack(spacing: 4) {
-                    Capsule().fill(.white.opacity(0.95)).frame(width: 22, height: 4)
-                    Capsule().fill(.white.opacity(0.45)).frame(width: 14, height: 4)
-                    Capsule().fill(.white.opacity(0.28)).frame(width: 14, height: 4)
-                }
-            }
-
-            Text(title)
-                .font(AppFont.title)
-                .foregroundStyle(.white)
-            Text(subtitle)
-                .font(AppFont.body)
-                .foregroundStyle(.white.opacity(0.86))
-                .lineSpacing(4)
-
+        HeroHeader(
+            eyebrow: "Adım \(step)",
+            title: title,
+            subtitle: subtitle,
+            icon: "slider.horizontal.3",
+            metrics: [
+                HeroMetricItem(title: "Bölüm", value: selectedSpecialtyLabel, icon: "cross.case"),
+                HeroMetricItem(title: "Zorluk", value: difficulty.isEmpty ? "Seçilmedi" : difficulty, icon: "speedometer"),
+                HeroMetricItem(title: "Akış", value: "3 Aşama", icon: "list.number")
+            ]
+        ) {
             Text(selectedSpecialtyFocusLine)
                 .font(AppFont.caption)
                 .foregroundStyle(Color.white.opacity(0.9))
                 .lineSpacing(4)
                 .lineLimit(2)
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(AppColor.primary.opacity(0.3), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.card)
     }
 
     private func generatorMetric(icon: String, title: String, value: String) -> some View {
