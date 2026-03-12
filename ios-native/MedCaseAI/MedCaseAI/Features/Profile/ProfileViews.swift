@@ -15,13 +15,15 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     profileHeader
 
-                    HStack(spacing: 8) {
-                        miniStat(title: "Vaka", value: "\(state.caseHistory.count)")
-                        miniStat(title: "Skor", value: averageScore)
-                        miniStat(title: "Seri", value: "\(streakDays)")
-                    }
+                    MetricBand(
+                        items: [
+                            .init(title: "Vaka", value: "\(state.caseHistory.count)"),
+                            .init(title: "Skor", value: averageScore),
+                            .init(title: "Seri", value: "\(streakDays)")
+                        ]
+                    )
 
-                    sectionCard(title: "Çalışma", subtitle: "Hedef ve performans alanları") {
+                    SectionCard(title: "Çalışma", subtitle: "Hedef ve performans alanları") {
                         NavigationLink {
                             ProfilePerformanceView()
                                 .environmentObject(state)
@@ -62,7 +64,7 @@ struct ProfileView: View {
                         .buttonStyle(PressableButtonStyle())
                     }
 
-                    sectionCard(title: "Hesap", subtitle: "Kişiselleştirme ve güvenlik") {
+                    SectionCard(title: "Hesap", subtitle: "Kişiselleştirme ve güvenlik") {
                         NavigationLink {
                             ProfileLanguagePreferencesView()
                                 .environmentObject(state)
@@ -139,7 +141,7 @@ struct ProfileView: View {
                         .buttonStyle(PressableButtonStyle())
                     }
 
-                    sectionCard(title: "Destek ve Yasal", subtitle: "Yardım, geri bildirim ve metinler") {
+                    SectionCard(title: "Destek ve Yasal", subtitle: "Yardım, geri bildirim ve metinler") {
                         NavigationLink {
                             ProfileSupportView()
                                 .environmentObject(state)
@@ -193,48 +195,28 @@ struct ProfileView: View {
     }
 
     private var profileHeader: some View {
-        HStack(spacing: 10) {
-            Circle()
-                .fill(.white.opacity(0.2))
-                .frame(width: 58, height: 58)
-                .overlay(
-                    Text(initials)
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                )
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(state.profile?.fullName.isEmpty == false ? (state.profile?.fullName ?? "") : "Kullanıcı")
-                    .font(AppFont.title)
-                    .foregroundStyle(.white)
-                Text(readableRole)
+        HeroHeader(
+            eyebrow: readableRole,
+            title: state.profile?.fullName.isEmpty == false ? (state.profile?.fullName ?? "") : "Kullanıcı",
+            subtitle: targetExamLabel,
+            icon: "person.crop.circle.fill"
+        ) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(.white.opacity(0.2))
+                    .frame(width: 44, height: 44)
+                    .overlay(
+                        Text(initials)
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                    )
+                Text("Klinik profil ve ayarların burada yönetilir.")
                     .font(AppFont.caption)
-                    .foregroundStyle(AppColor.primaryDark)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(.white.opacity(0.9))
-                    .clipShape(Capsule())
-                Text(targetExamLabel)
-                    .font(AppFont.caption)
-                    .foregroundStyle(.white.opacity(0.86))
-                    .lineSpacing(4)
+                    .foregroundStyle(.white.opacity(0.85))
+                    .lineSpacing(3)
+                Spacer()
             }
-            Spacer()
         }
-        .padding(12)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.elevated)
     }
 
     private func sectionCard<Content: View>(title: String,

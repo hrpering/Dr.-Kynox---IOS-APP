@@ -251,17 +251,9 @@ struct GeneratorView: View {
         }
         .background(AppColor.background.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 0) {
-                Rectangle()
-                    .fill(AppColor.border)
-                    .frame(height: 1)
+            BottomCTADock {
                 bottom()
-                    .padding(.horizontal, 14)
-                    .padding(.top, 8)
-                    .padding(.bottom, 8)
             }
-            .background(AppColor.surface)
-            .appShadow(AppShadow.card)
         }
     }
 

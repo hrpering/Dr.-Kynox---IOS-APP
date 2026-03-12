@@ -1059,3 +1059,324 @@ extension View {
         modifier(KeyboardAdaptiveModifier())
     }
 }
+
+struct HeroMetricItem: Identifiable, Hashable {
+    let id: String
+    let title: String
+    let value: String
+    let icon: String?
+
+    init(title: String, value: String, icon: String? = nil) {
+        self.title = title
+        self.value = value
+        self.icon = icon
+        self.id = "\(title)-\(icon ?? "none")"
+    }
+}
+
+struct HeroHeader<Content: View>: View {
+    let eyebrow: String?
+    let title: String
+    let subtitle: String
+    let icon: String?
+    let metrics: [HeroMetricItem]
+    @ViewBuilder var content: Content
+
+    init(eyebrow: String? = nil,
+         title: String,
+         subtitle: String,
+         icon: String? = nil,
+         metrics: [HeroMetricItem] = [],
+         @ViewBuilder content: () -> Content = { EmptyView() }) {
+        self.eyebrow = eyebrow
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+        self.metrics = metrics
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    if let eyebrow, !eyebrow.isEmpty {
+                        Text(eyebrow)
+                            .font(AppFont.caption)
+                            .foregroundStyle(.white.opacity(0.85))
+                    }
+                    Text(title)
+                        .font(AppFont.title)
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                    Text(subtitle)
+                        .font(AppFont.body)
+                        .foregroundStyle(.white.opacity(0.9))
+                        .lineSpacing(4)
+                }
+                Spacer(minLength: 0)
+                if let icon, !icon.isEmpty {
+                    Image(systemName: icon)
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.95))
+                }
+            }
+
+            if !metrics.isEmpty {
+                MetricBand(items: metrics, style: .hero)
+            }
+
+            content
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [AppColor.primaryDark, AppColor.primary],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(.white.opacity(0.2), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.elevated)
+    }
+}
+
+struct MetricBand: View {
+    enum Style {
+        case hero
+        case surface
+    }
+
+    let items: [HeroMetricItem]
+    let style: Style
+
+    init(items: [HeroMetricItem], style: Style = .surface) {
+        self.items = items
+        self.style = style
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(items) { item in
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 4) {
+                        if let icon = item.icon, !icon.isEmpty {
+                            Image(systemName: icon)
+                                .font(.system(size: 10, weight: .semibold))
+                        }
+                        Text(item.title)
+                            .font(AppFont.caption)
+                    }
+                    .foregroundStyle(titleColor)
+
+                    Text(item.value)
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(valueColor)
+                        .lineLimit(1)
+                }
+                .padding(.horizontal, 9)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(itemBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 11, style: .continuous)
+                        .stroke(itemBorder, lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+            }
+        }
+    }
+
+    private var titleColor: Color {
+        style == .hero ? .white.opacity(0.82) : AppColor.textSecondary
+    }
+
+    private var valueColor: Color {
+        style == .hero ? .white : AppColor.textPrimary
+    }
+
+    private var itemBackground: Color {
+        style == .hero ? .white.opacity(0.14) : AppColor.surfaceElevated
+    }
+
+    private var itemBorder: Color {
+        style == .hero ? .white.opacity(0.2) : AppColor.border
+    }
+}
+
+struct SectionCard<Content: View>: View {
+    let title: String
+    let subtitle: String?
+    @ViewBuilder var content: Content
+
+    init(title: String,
+         subtitle: String? = nil,
+         @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.subtitle = subtitle
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(AppFont.title2)
+                    .foregroundStyle(AppColor.textPrimary)
+                if let subtitle, !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineSpacing(3)
+                }
+            }
+            content
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
+    }
+}
+
+struct StateCard<Content: View>: View {
+    let tone: AppSemanticTone
+    @ViewBuilder var content: Content
+
+    init(tone: AppSemanticTone = .neutral, @ViewBuilder content: () -> Content) {
+        self.tone = tone
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            content
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(tone.background)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                .stroke(tone.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.card)
+    }
+}
+
+struct CompactListRow<Accessory: View>: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    @ViewBuilder var accessory: Accessory
+
+    init(icon: String,
+         title: String,
+         subtitle: String,
+         @ViewBuilder accessory: () -> Accessory = { Image(systemName: "chevron.right").foregroundStyle(AppColor.textTertiary) }) {
+        self.icon = icon
+        self.title = title
+        self.subtitle = subtitle
+        self.accessory = accessory()
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 9) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(AppColor.primary)
+                .frame(width: 18, height: 18)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                    .lineLimit(1)
+                Text(subtitle)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .lineSpacing(3)
+                    .lineLimit(2)
+            }
+            Spacer(minLength: 0)
+            accessory
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
+struct BottomCTADock<Primary: View, Secondary: View>: View {
+    @ViewBuilder let primary: Primary
+    @ViewBuilder let secondary: Secondary
+
+    init(@ViewBuilder primary: () -> Primary,
+         @ViewBuilder secondary: () -> Secondary = { EmptyView() }) {
+        self.primary = primary()
+        self.secondary = secondary()
+    }
+
+    var body: some View {
+        VStack(spacing: 8) {
+            primary
+            secondary
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 8)
+        .padding(.bottom, 6)
+        .background(AppColor.surface)
+        .overlay(alignment: .top) {
+            Rectangle().fill(AppColor.border).frame(height: 1)
+        }
+        .appShadow(AppShadow.card)
+    }
+}
+
+struct SheetScaffold<Content: View, Footer: View>: View {
+    let title: String
+    @ViewBuilder let content: Content
+    @ViewBuilder let footer: Footer
+
+    init(title: String,
+         @ViewBuilder content: () -> Content,
+         @ViewBuilder footer: () -> Footer = { EmptyView() }) {
+        self.title = title
+        self.content = content()
+        self.footer = footer()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(AppFont.title2)
+                .foregroundStyle(AppColor.textPrimary)
+            content
+            footer
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+    }
+}

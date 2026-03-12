@@ -73,7 +73,7 @@ struct ResultsView: View {
         }
         .background(AppColor.background.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
-            VStack(spacing: 8) {
+            BottomCTADock {
                 Button {
                     onRetry()
                 } label: {
@@ -83,7 +83,7 @@ struct ResultsView: View {
                 .buttonStyle(PressableButtonStyle())
                 .accessibilityLabel("Bir Tur Daha Dene")
                 .accessibilityHint("Aynı bölüm ve zorlukla yeni vakaya başlar")
-
+            } secondary: {
                 HStack(spacing: 10) {
                     Button("Ana Sayfa") { onClose() }
                         .font(AppFont.bodyMedium)
@@ -112,14 +112,6 @@ struct ResultsView: View {
                     .buttonStyle(PressableButtonStyle())
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 8)
-            .padding(.bottom, 6)
-            .background(AppColor.surface)
-            .overlay(alignment: .top) {
-                Rectangle().fill(AppColor.border).frame(height: 1)
-            }
-            .appShadow(AppShadow.card)
         }
         .fullScreenCover(isPresented: $showDetailed) {
             DetailedFeedbackView(result: result, config: config) {
@@ -136,32 +128,13 @@ struct ResultsView: View {
     }
 
     private var resultMetricRow: some View {
-        HStack(spacing: 7) {
-            resultMetric(title: "Mod", value: config.mode == .voice ? "Sesli" : "Yazılı")
-            resultMetric(title: "Mesaj", value: "\(userMessageCount)")
-            resultMetric(title: "Skor", value: showsNumericScore ? "\(Int(result.overallScore.rounded()))" : "--")
-        }
-    }
-
-    private func resultMetric(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
-            Text(value)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
+        MetricBand(
+            items: [
+                .init(title: "Mod", value: config.mode == .voice ? "Sesli" : "Yazılı"),
+                .init(title: "Mesaj", value: "\(userMessageCount)"),
+                .init(title: "Skor", value: showsNumericScore ? "\(Int(result.overallScore.rounded()))" : "--")
+            ]
         )
-        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     private var quickCaseSection: some View {
@@ -202,39 +175,21 @@ struct ResultsView: View {
     }
 
     private var resultHeroCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Vaka tamamlandı")
-                    .font(AppFont.title)
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-            }
-
+        HeroHeader(
+            eyebrow: "Results",
+            title: "Vaka tamamlandı",
+            subtitle: heroSubtitle,
+            icon: "checkmark.seal.fill"
+        ) {
             HStack(spacing: 8) {
-                Badge(text: SpecialtyOption.label(for: config.specialty), tint: AppColor.primaryDark, background: .white.opacity(0.92))
+                Badge(
+                    text: SpecialtyOption.label(for: config.specialty),
+                    tint: AppColor.primaryDark,
+                    background: .white.opacity(0.92)
+                )
                 Badge(text: config.difficulty, tint: AppColor.warning, background: .white.opacity(0.92))
             }
-
-            Text(heroSubtitle)
-                .font(AppFont.caption)
-                .foregroundStyle(.white.opacity(0.9))
-                .lineSpacing(4)
-                .lineLimit(3)
         }
-        .padding(12)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(AppColor.primary.opacity(0.25), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.elevated)
     }
 
     private var summarySection: some View {

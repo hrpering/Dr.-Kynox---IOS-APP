@@ -135,65 +135,17 @@ struct AnalysisHubView: View {
     }
 
     private var analysisHeroCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Analiz Merkezi")
-                        .font(AppFont.largeTitle)
-                        .foregroundStyle(.white)
-                    Text("Skor trendi, branş haritası ve hızlı vaka kartlarını tek panelde yönet.")
-                        .font(AppFont.body)
-                        .foregroundStyle(.white.opacity(0.88))
-                        .lineSpacing(4)
-                }
-                Spacer()
-                Image(systemName: "waveform.path.ecg.rectangle")
-                    .font(.system(size: 30, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.95))
-            }
-
-            HStack(spacing: 7) {
-                heroMetric(title: "Skorlu vaka", value: "\(scoredSessions.count)")
-                heroMetric(title: "Son 7 gün", value: "\(last7DayBuckets.map(\.caseCount).reduce(0, +))")
-                heroMetric(title: "Favori kart", value: "\(favoriteCardTotal)")
-            }
-        }
-        .padding(13)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+        HeroHeader(
+            eyebrow: "Analiz",
+            title: "Analiz Merkezi",
+            subtitle: "Skor trendi, branş haritası ve hızlı vaka kartlarını tek panelde yönet.",
+            icon: "waveform.path.ecg.rectangle",
+            metrics: [
+                .init(title: "Skorlu vaka", value: "\(scoredSessions.count)"),
+                .init(title: "Son 7 gün", value: "\(last7DayBuckets.map(\.caseCount).reduce(0, +))"),
+                .init(title: "Favori kart", value: "\(favoriteCardTotal)")
+            ]
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .appShadow(AppShadow.elevated)
-    }
-
-    private func heroMetric(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(.white.opacity(0.78))
-            Text(value)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(.white)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.white.opacity(0.14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                .stroke(.white.opacity(0.18), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
     }
 
     private var completedSessions: [CaseSession] {
@@ -220,29 +172,13 @@ struct AnalysisHubView: View {
         let last7Count = last7DayBuckets.map(\.caseCount).reduce(0, +)
         let strongest = strongestSpecialtyLabel
 
-        return ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                DSStatCard(
-                    title: "Genel skor trendi",
-                    value: avgScoreText,
-                    subtitle: "Ortalama puan",
-                    tone: .primary
-                )
-                DSStatCard(
-                    title: "Son 7 gün vaka",
-                    value: "\(last7Count)",
-                    subtitle: "Tamamlanan vaka",
-                    tone: .success
-                )
-                DSStatCard(
-                    title: "Öne çıkan bölüm",
-                    value: strongest,
-                    subtitle: "Güçlü alan",
-                    tone: .warning
-                )
-            }
-            .padding(.vertical, 2)
-        }
+        return MetricBand(
+            items: [
+                .init(title: "Ortalama", value: avgScoreText, icon: "chart.line.uptrend.xyaxis"),
+                .init(title: "Son 7 gün", value: "\(last7Count)", icon: "calendar"),
+                .init(title: "Öne çıkan", value: strongest, icon: "sparkles")
+            ]
+        )
     }
 
     private var scoreTrendCard: some View {

@@ -14,7 +14,6 @@ struct HistoryView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
                     historyHeroCard
-                    historySummaryCard
 
                     if state.caseHistory.isEmpty {
                         if state.isBusy {
@@ -82,60 +81,27 @@ struct HistoryView: View {
     }
 
     private var historyHeroCard: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            Text("Vaka Geçmişi")
-                .font(AppFont.title)
-                .foregroundStyle(.white)
-            Text("Tamamladığın oturumları skor, branş ve detay çıktılarıyla tek akışta incele.")
-                .font(AppFont.body)
-                .foregroundStyle(.white.opacity(0.9))
-                .lineSpacing(4)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+        HeroHeader(
+            eyebrow: "History",
+            title: "Vaka Geçmişi",
+            subtitle: "Tamamladığın oturumları skor, branş ve detay çıktılarıyla tek akışta incele.",
+            icon: "clock.arrow.circlepath",
+            metrics: [
+                .init(title: "Toplam", value: "\(state.caseHistory.count)"),
+                .init(title: "Skorlu", value: "\(scoredCaseCount)"),
+                .init(title: "Ortalama", value: averageScoreText)
+            ]
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.elevated)
     }
 
     private var historySummaryCard: some View {
-        HStack(spacing: 8) {
-            summaryPill(title: "Toplam", value: "\(state.caseHistory.count)")
-            summaryPill(title: "Skorlu", value: "\(scoredCaseCount)")
-            summaryPill(title: "Ortalama", value: averageScoreText)
-        }
-    }
-
-    private func summaryPill(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
-            Text(value)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
+        MetricBand(
+            items: [
+                .init(title: "Toplam", value: "\(state.caseHistory.count)"),
+                .init(title: "Skorlu", value: "\(scoredCaseCount)"),
+                .init(title: "Ortalama", value: averageScoreText)
+            ]
         )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-        .appShadow(AppShadow.card)
     }
 
     private var scoredCaseCount: Int {

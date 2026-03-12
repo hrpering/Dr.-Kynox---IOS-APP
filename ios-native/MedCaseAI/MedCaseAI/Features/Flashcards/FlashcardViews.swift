@@ -22,9 +22,6 @@ struct FlashcardsHubView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 headerCard
-                if !loading {
-                    headerMetricsRow
-                }
 
                 if loading {
                     VStack(spacing: 8) {
@@ -85,27 +82,17 @@ struct FlashcardsHubView: View {
     }
 
     private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Hızlı Vaka Favorileri")
-                        .font(AppFont.title)
-                        .foregroundStyle(.white)
-                    Text("Toplam \(totalCount) kartlık tekrar havuzu")
-                        .font(AppFont.caption)
-                        .foregroundStyle(.white.opacity(0.82))
-                }
-                Spacer()
-                Image(systemName: "star.square.on.square.fill")
-                    .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
-
-            Text("15sn vaka akışında cevap sonrası işaretlediğin ön/arka kartlar burada saklanır.")
-                .font(AppFont.body)
-                .foregroundStyle(.white.opacity(0.9))
-                .lineSpacing(4)
-
+        HeroHeader(
+            eyebrow: "Flashcards",
+            title: "Hızlı Vaka Favorileri",
+            subtitle: "15sn vaka akışında cevap sonrası işaretlediğin ön/arka kartlar burada saklanır.",
+            icon: "star.square.on.square.fill",
+            metrics: [
+                .init(title: "Bu hafta", value: "\(items.prefix(7).count)"),
+                .init(title: "Yüklenen", value: "\(items.count)"),
+                .init(title: "Toplam", value: "\(totalCount)")
+            ]
+        ) {
             Button {
                 showQuickCase = true
             } label: {
@@ -123,49 +110,16 @@ struct FlashcardsHubView: View {
             }
             .buttonStyle(PressableButtonStyle())
         }
-        .padding(12)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.elevated)
     }
 
     private var headerMetricsRow: some View {
-        HStack(spacing: 7) {
-            headerMetric(title: "Bu hafta", value: "\(items.prefix(7).count)")
-            headerMetric(title: "Yüklenen", value: "\(items.count)")
-            headerMetric(title: "Toplam", value: "\(totalCount)")
-        }
-    }
-
-    private func headerMetric(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
-            Text(value)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
+        MetricBand(
+            items: [
+                .init(title: "Bu hafta", value: "\(items.prefix(7).count)"),
+                .init(title: "Yüklenen", value: "\(items.count)"),
+                .init(title: "Toplam", value: "\(totalCount)")
+            ]
         )
-        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     private var emptyStateCard: some View {

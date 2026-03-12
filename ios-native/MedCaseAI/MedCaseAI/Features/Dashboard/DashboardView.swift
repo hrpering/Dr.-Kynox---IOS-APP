@@ -102,32 +102,21 @@ struct DashboardView: View {
     }
 
     private var primaryActionBlock: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            greetingSection
-            Text("Bugünün ana hedefi: bir vaka başlat ve karar akışını tamamla.")
-                .font(AppFont.body)
-                .foregroundStyle(.white.opacity(0.9))
-                .lineSpacing(4)
-                .lineLimit(2)
-
-            HStack(spacing: 7) {
-                heroMetricPill(
-                    icon: "waveform.path.ecg",
-                    title: "Ortalama",
-                    value: averageScoreText
-                )
-                heroMetricPill(
-                    icon: "flame.fill",
-                    title: "Seri",
-                    value: "\(streakDays) gün"
-                )
-                heroMetricPill(
-                    icon: "target",
+        HeroHeader(
+            eyebrow: "Ana Hedef",
+            title: greetingTitle,
+            subtitle: "Bugünün ana hedefi: bir vaka başlat ve karar akışını tamamla.",
+            icon: "stethoscope.circle.fill",
+            metrics: [
+                .init(title: "Ortalama", value: averageScoreText, icon: "waveform.path.ecg"),
+                .init(title: "Seri", value: "\(streakDays) gün", icon: "flame.fill"),
+                .init(
                     title: "Haftalık",
-                    value: "\(state.weeklyGoalSummary.completedCount)/\(state.weeklyGoalSummary.target)"
+                    value: "\(state.weeklyGoalSummary.completedCount)/\(state.weeklyGoalSummary.target)",
+                    icon: "target"
                 )
-            }
-
+            ]
+        ) {
             VStack(spacing: 8) {
                 Button {
                     onOpenGenerator()
@@ -167,47 +156,6 @@ struct DashboardView: View {
                     .lineSpacing(4)
             }
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(AppColor.primary.opacity(0.32), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .appShadow(AppShadow.elevated)
-    }
-
-    private func heroMetricPill(icon: String, title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.95))
-                Text(title)
-                    .font(AppFont.caption)
-                    .foregroundStyle(.white.opacity(0.78))
-            }
-            Text(value)
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(.white)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.white.opacity(0.14))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
     private var dailyChallengeBlock: some View {
@@ -311,28 +259,11 @@ struct DashboardView: View {
             Haptic.selection()
             action()
         } label: {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Image(systemName: icon)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(tone.foreground)
-                    Text(title)
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.textPrimary)
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(AppColor.textTertiary)
-                }
-                Text(subtitle)
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textSecondary)
-                    .lineLimit(1)
+            CompactListRow(icon: icon, title: title, subtitle: subtitle) {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(AppColor.textTertiary)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 9)
-            .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
             .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -410,6 +341,12 @@ struct DashboardView: View {
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var greetingTitle: String {
+        let firstName = state.profile?.firstName.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let displayName = firstName.isEmpty ? "" : " \(firstName)"
+        return "\(timeGreeting)\(displayName) 👋"
     }
 
     private var timeGreeting: String {

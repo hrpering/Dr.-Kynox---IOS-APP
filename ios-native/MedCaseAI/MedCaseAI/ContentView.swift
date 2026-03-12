@@ -77,25 +77,23 @@ private extension AppState.Route {
 
 private struct LoadingScreen: View {
     var body: some View {
-        VStack(spacing: 18) {
-            IntroMotionCard(variant: .short)
-                .frame(height: 212)
-                .frame(maxWidth: .infinity)
+        VStack(spacing: 14) {
+            HeroHeader(
+                eyebrow: "Loading",
+                title: "Dr.Kynox",
+                subtitle: "Klinik çalışma alanın hazırlanıyor",
+                icon: "bolt.heart.fill"
+            ) {
+                IntroMotionCard(variant: .short)
+                    .frame(height: 196)
+                    .frame(maxWidth: .infinity)
 
-            Text("Dr.Kynox")
-                .font(AppFont.title)
-                .foregroundStyle(AppColor.textPrimary)
-
-            Text("Klinik çalışma alanın hazırlanıyor")
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
-                .multilineTextAlignment(.center)
-
-            ProgressView()
-                .controlSize(.regular)
-                .tint(AppColor.primary)
+                ProgressView()
+                    .controlSize(.regular)
+                    .tint(.white)
+            }
         }
+        .padding(14)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColor.background)
     }
