@@ -216,6 +216,11 @@ struct ProfileAudioPreferencesView: View {
 }
 
 struct ProfileSubscriptionView: View {
+    @EnvironmentObject private var state: AppState
+    @State private var isLoading = false
+    @State private var payload: SubscriptionStatusResponse?
+    @State private var errorText = ""
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
@@ -223,33 +228,37 @@ struct ProfileSubscriptionView: View {
                     Text("Abonelik")
                         .font(AppFont.title2)
                         .foregroundStyle(AppColor.textPrimary)
-                    Text("Mevcut planın: Ücretsiz")
+                    Text("Mevcut planın: \(resolvedPlanLabel)")
                         .font(AppFont.bodyMedium)
                         .foregroundStyle(AppColor.textPrimary)
-                    Text("Abonelik ve faturalama seçenekleri yakında bu ekrana eklenecek.")
+                    Text(resolvedPeriodText)
                         .font(AppFont.body)
                         .foregroundStyle(AppColor.textSecondary)
                         .lineSpacing(4)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Aylık vaka limiti")
-                            .font(AppFont.body)
-                            .foregroundStyle(AppColor.textSecondary)
-                        Spacer()
-                        Text("Plan bazlı")
-                            .font(AppFont.bodyMedium)
-                            .foregroundStyle(AppColor.textPrimary)
+                    if isLoading && payload == nil {
+                        ProgressView("Yükleniyor...")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 8)
+                    } else {
+                        ForEach(payload?.subscription.features ?? [], id: \.featureKey) { feature in
+                            HStack {
+                                Text(featureLabel(feature.featureKey))
+                                    .font(AppFont.body)
+                                    .foregroundStyle(AppColor.textSecondary)
+                                Spacer()
+                                Text(featureValueText(feature))
+                                    .font(AppFont.bodyMedium)
+                                    .foregroundStyle(AppColor.textPrimary)
+                            }
+                        }
                     }
-                    HStack {
-                        Text("Skorlama kredisi")
-                            .font(AppFont.body)
-                            .foregroundStyle(AppColor.textSecondary)
-                        Spacer()
-                        Text("Aktif")
-                            .font(AppFont.bodyMedium)
-                            .foregroundStyle(AppColor.success)
+                    if !errorText.isEmpty {
+                        Text(errorText)
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.warning)
                     }
                 }
                 .padding(12)
@@ -266,6 +275,57 @@ struct ProfileSubscriptionView: View {
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle("Abonelik")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await loadSubscription()
+        }
+    }
+
+    private var resolvedPlanLabel: String {
+        let code = payload?.subscription.planCode.lowercased() ?? "free"
+        switch code {
+        case "pro": return "Pro"
+        case "basic": return "Basic"
+        default: return "Free"
+        }
+    }
+
+    private var resolvedPeriodText: String {
+        if let periodEnd = payload?.subscription.currentPeriodEnd, !periodEnd.isEmpty {
+            return "Dönem sonu: \(periodEnd.prefix(10))"
+        }
+        return "Plan, limit ve kullanım özeti."
+    }
+
+    private func featureLabel(_ key: String) -> String {
+        switch key {
+        case "case_starts": return "Vaka başlatma"
+        case "tool_calls": return "Tool kullanım"
+        case "premium_analytics": return "Premium analiz"
+        case "monthly_characters": return "Aylık karakter"
+        default: return key
+        }
+    }
+
+    private func featureValueText(_ feature: SubscriptionStatusResponse.Subscription.Feature) -> String {
+        if feature.isUnlimited == true || feature.limit == nil {
+            return "Sınırsız"
+        }
+        let consumed = feature.consumed ?? 0
+        let limit = feature.limit ?? 0
+        let remaining = max(0, (feature.remaining ?? (limit - consumed)))
+        return "\(consumed)/\(limit) · kalan \(remaining)"
+    }
+
+    private func loadSubscription() async {
+        if isLoading { return }
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            payload = try await state.fetchSubscriptionStatus()
+            errorText = ""
+        } catch {
+            errorText = error.localizedDescription
+        }
     }
 }
 

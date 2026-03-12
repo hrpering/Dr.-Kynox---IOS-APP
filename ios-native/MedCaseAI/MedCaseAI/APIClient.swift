@@ -503,6 +503,71 @@ final class APIClient {
         )
     }
 
+    func fetchWeakAreaHistory(accessToken: String, rangeDays: Int = 30) async throws -> WeakAreaHistoryResponse {
+        var components = URLComponents(url: try buildURL(path: "/api/analytics/weak-areas/history"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            .init(name: "range", value: String(rangeDays))
+        ]
+        guard let url = components?.url else {
+            throw AppError.invalidURL
+        }
+        return try await request(
+            url: url,
+            method: "GET",
+            headers: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            timeout: 30
+        )
+    }
+
+    func fetchCaseDetail(accessToken: String, sessionId: String) async throws -> CaseSessionDetailResponse {
+        let safeSessionId = sessionId.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !safeSessionId.isEmpty else {
+            throw AppError.httpError("Geçerli sessionId gerekli.")
+        }
+        let encodedSessionId = safeSessionId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? safeSessionId
+        let url = try buildURL(path: "/api/cases/\(encodedSessionId)/detail")
+        return try await request(
+            url: url,
+            method: "GET",
+            headers: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            timeout: 30
+        )
+    }
+
+    func fetchFlashcardPerformance(accessToken: String, rangeDays: Int = 30) async throws -> FlashcardPerformanceResponse {
+        var components = URLComponents(url: try buildURL(path: "/api/flashcards/performance"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            .init(name: "range", value: String(rangeDays))
+        ]
+        guard let url = components?.url else {
+            throw AppError.invalidURL
+        }
+        return try await request(
+            url: url,
+            method: "GET",
+            headers: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            timeout: 30
+        )
+    }
+
+    func fetchSubscriptionStatus(accessToken: String) async throws -> SubscriptionStatusResponse {
+        let url = try buildURL(path: "/api/subscription/me")
+        return try await request(
+            url: url,
+            method: "GET",
+            headers: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            timeout: 20
+        )
+    }
+
     func resendVerificationEmail(email: String, fullName: String?) async throws -> BasicResponse {
         let url = try buildURL(path: "/api/auth/resend-verification")
         struct Payload: Encodable {

@@ -780,3 +780,106 @@ final class AgentConversationViewModel: ObservableObject {
         handledToolCallIds = []
     }
 }
+
+extension AgentConversationViewModel {
+    func exportCaseToolResults() -> [SaveCasePayload.ToolResult] {
+        let sortedToolCallIds = resultsByToolCallId.keys.sorted()
+        return sortedToolCallIds.compactMap { toolCallId in
+            guard let payload = resultsByToolCallId[toolCallId] else { return nil }
+            let toolName = toolCallNameMap[toolCallId] ?? "unknown_tool"
+            switch payload {
+            case .panel(let panel):
+                let statuses = panel.metrics.map(\.status)
+                if statuses.contains(.unknown) {
+                    logWarning("[tool-export] panel contains unknown status toolCallId=\(toolCallId) tool=\(toolName)")
+                }
+                let derivedStatus = statuses.reduce(nil as ToolMetricStatus?) { partial, next in
+                    guard let partial else { return next }
+                    return ToolMetricStatus.mostSevere(partial, next)
+                }?.rawValue
+                let metrics = panel.metrics.map { metric in
+                    SaveCasePayload.ToolMetric(
+                        key: metric.id,
+                        label: metric.title,
+                        valueText: metric.valueText,
+                        unit: metric.unit,
+                        status: metric.status.rawValue,
+                        referenceRange: metric.referenceRange
+                    )
+                }
+                return SaveCasePayload.ToolResult(
+                    id: toolCallId,
+                    toolCallId: toolCallId,
+                    toolName: toolName,
+                    category: "panel",
+                    title: panel.title,
+                    status: derivedStatus,
+                    summary: panel.verbalSummary,
+                    metrics: metrics
+                )
+            case .vitals(let vitals):
+                let statuses = vitals.metrics.map(\.status)
+                if statuses.contains(.unknown) {
+                    logWarning("[tool-export] vitals contains unknown status toolCallId=\(toolCallId) tool=\(toolName)")
+                }
+                let derivedStatus = statuses.reduce(nil as ToolMetricStatus?) { partial, next in
+                    guard let partial else { return next }
+                    return ToolMetricStatus.mostSevere(partial, next)
+                }?.rawValue
+                let metrics = vitals.metrics.map { metric in
+                    SaveCasePayload.ToolMetric(
+                        key: metric.id,
+                        label: metric.title,
+                        valueText: metric.valueText,
+                        unit: metric.unit,
+                        status: metric.status.rawValue,
+                        referenceRange: nil
+                    )
+                }
+                return SaveCasePayload.ToolResult(
+                    id: toolCallId,
+                    toolCallId: toolCallId,
+                    toolName: toolName,
+                    category: "vitals",
+                    title: vitals.title,
+                    status: derivedStatus,
+                    summary: vitals.verbalSummary,
+                    metrics: metrics
+                )
+            case .imaging(let imaging):
+                let statuses = imaging.findings.map(\.status)
+                if statuses.contains(.unknown) {
+                    logWarning("[tool-export] imaging contains unknown status toolCallId=\(toolCallId) tool=\(toolName)")
+                }
+                let derivedStatus = statuses.reduce(nil as ToolMetricStatus?) { partial, next in
+                    guard let partial else { return next }
+                    return ToolMetricStatus.mostSevere(partial, next)
+                }?.rawValue
+                let metrics = imaging.findings.map { finding in
+                    SaveCasePayload.ToolMetric(
+                        key: finding.id,
+                        label: finding.title,
+                        valueText: finding.detail,
+                        unit: nil,
+                        status: finding.status.rawValue,
+                        referenceRange: nil
+                    )
+                }
+                let summaryText = [imaging.verbalSummary, imaging.impression]
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: "\n")
+                return SaveCasePayload.ToolResult(
+                    id: toolCallId,
+                    toolCallId: toolCallId,
+                    toolName: toolName,
+                    category: "imaging",
+                    title: imaging.title,
+                    status: derivedStatus,
+                    summary: summaryText,
+                    metrics: metrics
+                )
+            }
+        }
+    }
+}

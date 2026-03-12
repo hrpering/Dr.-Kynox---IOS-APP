@@ -250,6 +250,34 @@ final class AppState: ObservableObject {
         try await flashcardViewModel.reviewFlashcard(cardId: cardId, rating: rating)
     }
 
+    func fetchCaseDetail(sessionId: String) async throws -> CaseSessionDetailResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        return try await api.fetchCaseDetail(accessToken: token, sessionId: sessionId)
+    }
+
+    func fetchWeakAreaHistory(rangeDays: Int = 30) async throws -> WeakAreaHistoryResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        return try await api.fetchWeakAreaHistory(accessToken: token, rangeDays: rangeDays)
+    }
+
+    func fetchFlashcardPerformance(rangeDays: Int = 30) async throws -> FlashcardPerformanceResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        return try await api.fetchFlashcardPerformance(accessToken: token, rangeDays: rangeDays)
+    }
+
+    func fetchSubscriptionStatus() async throws -> SubscriptionStatusResponse {
+        guard let token = try await authViewModel.currentAccessToken(), !token.isEmpty else {
+            throw AppError.sessionMissing
+        }
+        return try await api.fetchSubscriptionStatus(accessToken: token)
+    }
+
     func handleDeepLink(_ url: URL) {
         let scheme = url.scheme?.lowercased() ?? ""
         guard scheme == "drkynox" else { return }

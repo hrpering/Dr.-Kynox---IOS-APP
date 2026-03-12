@@ -15,6 +15,8 @@ struct FlashcardsHubView: View {
     @State private var selectedType: String = "all"
     @State private var showStudy = false
     @State private var showSampleCards = false
+    @State private var performanceRangeDays: Int = 30
+    @State private var performance: FlashcardPerformanceResponse?
 
     private var specialties: [String] {
         let values = Set(collectionCards.compactMap { card in
@@ -61,6 +63,7 @@ struct FlashcardsHubView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 todayReviewCard
+                performanceCard
 
                 filterSection
 
@@ -196,6 +199,106 @@ struct FlashcardsHubView: View {
                 }
             }
         }
+    }
+
+    private var performanceCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Performans Geçmişi")
+                    .font(AppFont.title2)
+                    .foregroundStyle(AppColor.textPrimary)
+                Spacer()
+                Picker("Aralık", selection: $performanceRangeDays) {
+                    Text("7g").tag(7)
+                    Text("30g").tag(30)
+                    Text("90g").tag(90)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 170)
+                .onChange(of: performanceRangeDays) { _ in
+                    Task { await loadData(force: true) }
+                }
+            }
+
+            let summary = performance?.summary
+            HStack(spacing: 10) {
+                statChip(title: "Review", value: "\(summary?.totalReviews ?? 0)")
+                statChip(title: "Retention", value: "\(Int((summary?.retentionRate ?? 0).rounded()))%")
+                statChip(title: "Aralık", value: String(format: "%.1fg", summary?.avgIntervalDays ?? 0))
+            }
+
+            let rows = groupedPerformanceRows
+            if rows.isEmpty {
+                Text("Henüz performans geçmişi oluşmadı.")
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+            } else {
+                ForEach(rows.prefix(6), id: \.date) { row in
+                    HStack(spacing: 10) {
+                        Text(shortDate(row.date))
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textSecondary)
+                            .frame(width: 56, alignment: .leading)
+                        GeometryReader { proxy in
+                            let ratio = max(0, min(1, row.retention / 100))
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(AppColor.surfaceAlt)
+                                Capsule()
+                                    .fill(AppColor.success)
+                                    .frame(width: proxy.size.width * ratio)
+                            }
+                        }
+                        .frame(height: 8)
+                        Text("\(Int(row.retention.rounded()))%")
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textPrimary)
+                            .frame(width: 42, alignment: .trailing)
+                    }
+                    .frame(height: 20)
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func statChip(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(AppColor.surfaceAlt)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private var groupedPerformanceRows: [(date: String, retention: Double)] {
+        let snapshots = performance?.snapshots ?? []
+        let grouped = Dictionary(grouping: snapshots, by: { $0.snapshotDate })
+        return grouped.compactMap { date, rows in
+            let values = rows.compactMap { $0.retentionRate }
+            guard !values.isEmpty else { return nil }
+            let avg = values.reduce(0, +) / Double(values.count)
+            return (date: date, retention: avg)
+        }
+        .sorted { $0.date > $1.date }
+    }
+
+    private func shortDate(_ token: String) -> String {
+        let parts = token.split(separator: "-")
+        guard parts.count == 3 else { return token }
+        return "\(parts[2]).\(parts[1])"
     }
 
     private func filterDropdown(
@@ -409,6 +512,11 @@ struct FlashcardsHubView: View {
             let (dueCards, all) = try await (due, collection)
             todayCards = dueCards
             collectionCards = all.cards
+            do {
+                performance = try await state.fetchFlashcardPerformance(rangeDays: performanceRangeDays)
+            } catch {
+                performance = nil
+            }
             errorText = ""
         } catch {
             errorText = error.localizedDescription

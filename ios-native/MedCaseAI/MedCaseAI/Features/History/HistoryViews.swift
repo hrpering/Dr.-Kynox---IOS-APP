@@ -81,6 +81,10 @@ struct HistorySessionDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     let item: CaseSession
+    @State private var showSessionArtifacts = false
+    @State private var detail: CaseSessionDetailResponse?
+    @State private var loadingArtifacts = false
+    @State private var artifactsError = ""
 
     var body: some View {
         Group {
@@ -134,8 +138,28 @@ struct HistorySessionDetailView: View {
                 .background(AppColor.background.ignoresSafeArea())
             }
         }
+        .sheet(isPresented: $showSessionArtifacts) {
+            NavigationStack {
+                HistorySessionArtifactsView(
+                    item: item,
+                    detail: detail,
+                    isLoading: loadingArtifacts,
+                    errorText: artifactsError,
+                    onRetry: {
+                        Task { await loadArtifacts(force: true) }
+                    }
+                )
+            }
+        }
         .navigationTitle("Vaka Detayı")
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Kayıtlar") {
+                    showSessionArtifacts = true
+                    Task { await loadArtifacts(force: false) }
+                }
+                .foregroundStyle(AppColor.primary)
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Kapat") {
                     state.selectedMainTab = "home"
@@ -143,6 +167,9 @@ struct HistorySessionDetailView: View {
                 }
                     .foregroundStyle(AppColor.primary)
             }
+        }
+        .task {
+            await loadArtifacts(force: false)
         }
     }
 
@@ -162,5 +189,182 @@ struct HistorySessionDetailView: View {
             patientAge: nil,
             expectedDiagnosis: item.caseContext?.expectedDiagnosis
         )
+    }
+
+    private func loadArtifacts(force: Bool) async {
+        if loadingArtifacts { return }
+        if !force, detail != nil { return }
+        loadingArtifacts = true
+        artifactsError = ""
+        defer { loadingArtifacts = false }
+
+        do {
+            detail = try await state.fetchCaseDetail(sessionId: item.sessionId)
+        } catch {
+            artifactsError = error.localizedDescription
+            if detail == nil {
+                detail = nil
+            }
+        }
+    }
+}
+
+private struct HistorySessionArtifactsView: View {
+    enum Tab: String, CaseIterable, Identifiable {
+        case transcript = "Transcript"
+        case tools = "Toollar"
+        case tests = "Testler"
+
+        var id: String { rawValue }
+    }
+
+    let item: CaseSession
+    let detail: CaseSessionDetailResponse?
+    let isLoading: Bool
+    let errorText: String
+    let onRetry: () -> Void
+
+    @State private var selectedTab: Tab = .transcript
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Picker("Sekme", selection: $selectedTab) {
+                    ForEach(Tab.allCases) { tab in
+                        Text(tab.rawValue).tag(tab)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                if isLoading && detail == nil {
+                    ProgressView("Yükleniyor...")
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 24)
+                } else {
+                    contentView
+                }
+
+                if !errorText.isEmpty {
+                    ErrorStateCard(message: errorText, action: onRetry)
+                }
+            }
+            .padding(16)
+        }
+        .background(AppColor.background.ignoresSafeArea())
+        .navigationTitle("Kayıt Detayı")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder
+    private var contentView: some View {
+        switch selectedTab {
+        case .transcript:
+            transcriptSection
+        case .tools:
+            toolsSection(detail?.tools ?? [])
+        case .tests:
+            toolsSection(detail?.testResults ?? [])
+        }
+    }
+
+    private var transcriptEntries: [CaseSessionTranscriptEntry] {
+        if let rows = detail?.transcript, !rows.isEmpty {
+            return rows
+        }
+        let fallback = item.transcript ?? []
+        return fallback.enumerated().map { index, line in
+            CaseSessionTranscriptEntry(
+                lineIndex: index,
+                source: line.source,
+                message: line.message,
+                timestampMs: line.timestamp,
+                createdAt: nil
+            )
+        }
+    }
+
+    private var transcriptSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if transcriptEntries.isEmpty {
+                Text("Transcript kaydı bulunamadı.")
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+            } else {
+                ForEach(transcriptEntries) { entry in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(entry.source.uppercased())
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textSecondary)
+                        Text(entry.message)
+                            .font(AppFont.body)
+                            .foregroundStyle(AppColor.textPrimary)
+                            .lineSpacing(4)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(AppColor.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+            }
+        }
+    }
+
+    private func toolsSection(_ rows: [CaseSessionToolResult]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if rows.isEmpty {
+                Text("Bu bölüm için kayıt bulunamadı.")
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+            } else {
+                ForEach(rows) { row in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(row.title ?? row.toolName ?? "Tool Sonucu")
+                                .font(AppFont.bodyMedium)
+                                .foregroundStyle(AppColor.textPrimary)
+                                .lineLimit(1)
+                            Spacer()
+                            if let status = row.status, !status.isEmpty {
+                                Text(status.uppercased())
+                                    .font(AppFont.caption)
+                                    .foregroundStyle(AppColor.textSecondary)
+                            }
+                        }
+                        if let summary = row.summary, !summary.isEmpty {
+                            Text(summary)
+                                .font(AppFont.body)
+                                .foregroundStyle(AppColor.textSecondary)
+                                .lineSpacing(4)
+                        }
+                        if !row.metrics.isEmpty {
+                            Divider().foregroundStyle(AppColor.border)
+                            ForEach(row.metrics) { metric in
+                                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                    Text(metric.metricLabel ?? metric.metricKey)
+                                        .font(AppFont.caption)
+                                        .foregroundStyle(AppColor.textSecondary)
+                                    Spacer()
+                                    Text(metric.valueText ?? "-")
+                                        .font(AppFont.bodyMedium)
+                                        .foregroundStyle(AppColor.textPrimary)
+                                }
+                            }
+                        }
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(AppColor.surface)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ struct CaseResultFlowView: View {
     let config: CaseLaunchConfig
     let startedAt: Date
     let transcript: [ConversationLine]
+    let toolResults: [SaveCasePayload.ToolResult]
     let mode: CaseLaunchConfig.Mode
 
     @State private var isLoading = true
@@ -318,6 +319,10 @@ struct CaseResultFlowView: View {
                                   status: String,
                                   transcript: [ConversationLine]) -> SaveCasePayload {
         let duration = max(1, Int(endedAt.timeIntervalSince(startedAt) / 60))
+        let testCategories = Set(["panel", "vitals", "imaging", "test"])
+        let normalizedResults = toolResults.filter { !$0.toolCallId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        let testResults = normalizedResults.filter { testCategories.contains($0.category.lowercased()) }
+        let genericToolResults = normalizedResults.filter { !testCategories.contains($0.category.lowercased()) }
         return SaveCasePayload(
             sessionId: config.id,
             mode: mode.rawValue,
@@ -337,7 +342,9 @@ struct CaseResultFlowView: View {
             ),
             transcript: transcript,
             score: score,
-            textRuntime: nil
+            textRuntime: nil,
+            toolResults: genericToolResults.isEmpty ? nil : genericToolResults,
+            testResults: testResults.isEmpty ? nil : testResults
         )
     }
 }

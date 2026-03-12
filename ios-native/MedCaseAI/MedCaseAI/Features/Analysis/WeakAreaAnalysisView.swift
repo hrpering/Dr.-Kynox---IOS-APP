@@ -5,6 +5,8 @@ struct WeakAreaAnalysisView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var loading = false
     @State private var selectedSpecialty: WeakAreaSpecialtyStat?
+    @State private var selectedHistoryRangeDays: Int = 30
+    @State private var weakAreaHistory: WeakAreaHistoryResponse?
 
     var body: some View {
         ScrollView {
@@ -18,6 +20,7 @@ struct WeakAreaAnalysisView: View {
                         .frame(height: 160)
                 } else if let analysis = state.weakAreaAnalysis, analysis.hasData {
                     summaryHeader(analysis)
+                    trendHistoryCard
                     scoreMapCard(analysis)
                     specialtyBreakdownCard(analysis)
                     aiRecommendationCard(analysis)
@@ -60,8 +63,100 @@ struct WeakAreaAnalysisView: View {
 
     private func refresh() async {
         loading = true
-        await state.refreshDashboard(showBusy: false)
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                await state.refreshDashboard(showBusy: false)
+            }
+            group.addTask {
+                do {
+                    let history = try await state.fetchWeakAreaHistory(rangeDays: selectedHistoryRangeDays)
+                    await MainActor.run {
+                        weakAreaHistory = history
+                    }
+                } catch {
+                    await MainActor.run {
+                        weakAreaHistory = nil
+                    }
+                }
+            }
+        }
         loading = false
+    }
+
+    private var trendHistoryCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                sectionHeader(title: "Zaman Trendi")
+                Spacer()
+                Picker("Aralık", selection: $selectedHistoryRangeDays) {
+                    Text("7g").tag(7)
+                    Text("30g").tag(30)
+                    Text("90g").tag(90)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 170)
+                .onChange(of: selectedHistoryRangeDays) { _ in
+                    Task { await refresh() }
+                }
+            }
+
+            let grouped = groupedHistoryRows
+            if grouped.isEmpty {
+                Text("Trend verisi henüz oluşmadı.")
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+            } else {
+                ForEach(grouped.prefix(8), id: \.date) { item in
+                    HStack(spacing: 10) {
+                        Text(shortDate(item.date))
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textSecondary)
+                            .frame(width: 56, alignment: .leading)
+                        GeometryReader { proxy in
+                            let ratio = max(0, min(1, item.avgScore / 100))
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(AppColor.surfaceAlt)
+                                Capsule()
+                                    .fill(AppColor.primary)
+                                    .frame(width: proxy.size.width * ratio)
+                            }
+                        }
+                        .frame(height: 8)
+                        Text("\(Int(item.avgScore.rounded()))")
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textPrimary)
+                            .frame(width: 36, alignment: .trailing)
+                    }
+                    .frame(height: 20)
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var groupedHistoryRows: [(date: String, avgScore: Double)] {
+        let rows = weakAreaHistory?.snapshots ?? []
+        let grouped = Dictionary(grouping: rows, by: { $0.snapshotDate })
+        return grouped.compactMap { key, values in
+            let scores = values.compactMap { $0.userAvgScore }
+            guard !scores.isEmpty else { return nil }
+            let avg = scores.reduce(0, +) / Double(scores.count)
+            return (date: key, avgScore: avg)
+        }
+        .sorted { $0.date > $1.date }
+    }
+
+    private func shortDate(_ token: String) -> String {
+        let parts = token.split(separator: "-")
+        guard parts.count == 3 else { return token }
+        return "\(parts[2]).\(parts[1])"
     }
 
     private func summaryHeader(_ analysis: WeakAreaAnalysisResponse) -> some View {

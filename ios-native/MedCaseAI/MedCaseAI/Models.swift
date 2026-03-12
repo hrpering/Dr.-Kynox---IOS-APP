@@ -279,6 +279,239 @@ struct CaseSession: Decodable, Identifiable {
     }
 }
 
+struct CaseSessionDetailResponse: Decodable {
+    let `case`: CaseSession
+    let transcript: [CaseSessionTranscriptEntry]
+    let tools: [CaseSessionToolResult]
+    let testResults: [CaseSessionToolResult]
+    let weakAreaFacts: [CaseSessionWeakAreaFact]
+
+    enum CodingKeys: String, CodingKey {
+        case `case`
+        case transcript
+        case tools
+        case testResults = "test_results"
+        case weakAreaFacts = "weak_area_facts"
+    }
+}
+
+struct CaseSessionTranscriptEntry: Decodable, Identifiable {
+    let lineIndex: Int
+    let source: String
+    let message: String
+    let timestampMs: Int?
+    let createdAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case lineIndex = "line_index"
+        case source
+        case message
+        case timestampMs = "timestamp_ms"
+        case createdAt = "created_at"
+    }
+
+    var id: String { "\(lineIndex)-\(source)" }
+}
+
+struct CaseSessionToolMetric: Decodable, Identifiable {
+    let metricKey: String
+    let metricLabel: String?
+    let valueText: String?
+    let unit: String?
+    let status: String?
+    let referenceRange: String?
+
+    enum CodingKeys: String, CodingKey {
+        case metricKey = "metric_key"
+        case metricLabel = "metric_label"
+        case valueText = "value_text"
+        case unit
+        case status
+        case referenceRange = "reference_range"
+    }
+
+    var id: String { metricKey }
+}
+
+struct CaseSessionToolResult: Decodable, Identifiable {
+    let id: String
+    let toolCallId: String?
+    let toolName: String?
+    let toolCategory: String?
+    let title: String?
+    let status: String?
+    let summary: String?
+    let metrics: [CaseSessionToolMetric]
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case toolCallId = "tool_call_id"
+        case toolName = "tool_name"
+        case toolCategory = "tool_category"
+        case title
+        case status
+        case summary
+        case metrics
+    }
+}
+
+struct CaseSessionWeakAreaFact: Decodable, Identifiable {
+    let dimensionKey: String
+    let dimensionLabel: String?
+    let scorePct: Double?
+    let specialty: String?
+    let difficulty: String?
+    let explanation: String?
+    let recommendation: String?
+    let occurredAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case dimensionKey = "dimension_key"
+        case dimensionLabel = "dimension_label"
+        case scorePct = "score_pct"
+        case specialty
+        case difficulty
+        case explanation
+        case recommendation
+        case occurredAt = "occurred_at"
+    }
+
+    var id: String { dimensionKey }
+}
+
+struct WeakAreaHistoryResponse: Decodable {
+    let ok: Bool?
+    let rangeDays: Int?
+    let snapshots: [WeakAreaHistorySnapshot]
+    let generatedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case rangeDays = "range_days"
+        case snapshots
+        case generatedAt = "generated_at"
+    }
+}
+
+struct WeakAreaHistorySnapshot: Decodable, Identifiable {
+    let snapshotDate: String
+    let specialty: String?
+    let difficulty: String?
+    let dimensionKey: String
+    let dimensionLabel: String?
+    let userAvgScore: Double?
+    let userCaseCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case snapshotDate = "snapshot_date"
+        case specialty
+        case difficulty
+        case dimensionKey = "dimension_key"
+        case dimensionLabel = "dimension_label"
+        case userAvgScore = "user_avg_score"
+        case userCaseCount = "user_case_count"
+    }
+
+    var id: String { "\(snapshotDate)-\(dimensionKey)-\(specialty ?? "")-\(difficulty ?? "")" }
+}
+
+struct FlashcardPerformanceResponse: Decodable {
+    struct Summary: Decodable {
+        let totalReviews: Int?
+        let retentionRate: Double?
+        let avgIntervalDays: Double?
+
+        enum CodingKeys: String, CodingKey {
+            case totalReviews = "total_reviews"
+            case retentionRate = "retention_rate"
+            case avgIntervalDays = "avg_interval_days"
+        }
+    }
+
+    let ok: Bool?
+    let rangeDays: Int?
+    let snapshots: [FlashcardPerformanceSnapshot]
+    let summary: Summary?
+    let generatedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case rangeDays = "range_days"
+        case snapshots
+        case summary
+        case generatedAt = "generated_at"
+    }
+}
+
+struct FlashcardPerformanceSnapshot: Decodable, Identifiable {
+    let snapshotDate: String
+    let specialty: String?
+    let cardType: String?
+    let reviewCount: Int?
+    let successCount: Int?
+    let retentionRate: Double?
+    let avgIntervalDays: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case snapshotDate = "snapshot_date"
+        case specialty
+        case cardType = "card_type"
+        case reviewCount = "review_count"
+        case successCount = "success_count"
+        case retentionRate = "retention_rate"
+        case avgIntervalDays = "avg_interval_days"
+    }
+
+    var id: String { "\(snapshotDate)-\(specialty ?? "")-\(cardType ?? "")" }
+}
+
+struct SubscriptionStatusResponse: Decodable {
+    struct Subscription: Decodable {
+        struct Feature: Decodable, Identifiable {
+            let featureKey: String
+            let consumed: Int?
+            let limit: Int?
+            let remaining: Int?
+            let isUnlimited: Bool?
+
+            enum CodingKeys: String, CodingKey {
+                case featureKey = "feature_key"
+                case consumed
+                case limit
+                case remaining
+                case isUnlimited = "is_unlimited"
+            }
+
+            var id: String { featureKey }
+        }
+
+        let planCode: String
+        let status: String
+        let source: String?
+        let productId: String?
+        let currentPeriodStart: String?
+        let currentPeriodEnd: String?
+        let cancelAtPeriodEnd: Bool?
+        let hardStopEnabled: Bool?
+        let features: [Feature]
+
+        enum CodingKeys: String, CodingKey {
+            case planCode = "plan_code"
+            case status
+            case source
+            case productId = "product_id"
+            case currentPeriodStart = "current_period_start"
+            case currentPeriodEnd = "current_period_end"
+            case cancelAtPeriodEnd = "cancel_at_period_end"
+            case hardStopEnabled = "hard_stop_enabled"
+            case features
+        }
+    }
+
+    let ok: Bool?
+    let subscription: Subscription
+}
+
 struct OnboardingPayload: Encodable {
     let fullName: String
     let phoneNumber: String
@@ -1212,6 +1445,35 @@ struct ScoreResponse: Codable {
 }
 
 struct SaveCasePayload: Encodable {
+    struct ToolMetric: Encodable {
+        let key: String
+        let label: String?
+        let valueText: String?
+        let unit: String?
+        let status: String?
+        let referenceRange: String?
+
+        enum CodingKeys: String, CodingKey {
+            case key
+            case label
+            case valueText = "valueText"
+            case unit
+            case status
+            case referenceRange = "referenceRange"
+        }
+    }
+
+    struct ToolResult: Encodable, Identifiable {
+        let id: String
+        let toolCallId: String
+        let toolName: String
+        let category: String
+        let title: String?
+        let status: String?
+        let summary: String?
+        let metrics: [ToolMetric]
+    }
+
     let sessionId: String
     let mode: String
     let status: String
@@ -1224,6 +1486,8 @@ struct SaveCasePayload: Encodable {
     let transcript: [ConversationLine]
     let score: ScoreResponse?
     let textRuntime: TextRuntime?
+    let toolResults: [ToolResult]?
+    let testResults: [ToolResult]?
 
     struct CaseContext: Codable {
         let title: String

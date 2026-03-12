@@ -252,7 +252,9 @@ extension AgentConversationViewModel {
                     didReachActiveState: didReachActiveState,
                     disconnectDiagnostic: lastDisconnectDiagnostic
                 )
-                : nil
+                : nil,
+            toolResults: nil,
+            testResults: nil
         )
     }
 

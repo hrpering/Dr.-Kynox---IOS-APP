@@ -31,6 +31,7 @@ struct CaseSessionView: View {
     @State var textInput = ""
     @State var showResultFlow = false
     @State var finishedTranscript: [ConversationLine] = []
+    @State var finishedToolResults: [SaveCasePayload.ToolResult] = []
     @State var wasSessionEnded = false
     @State var userRequestedEnd = false
     @State var hasStarted = false
@@ -143,6 +144,7 @@ struct CaseSessionView: View {
                     config: config,
                     startedAt: vm.startedAt,
                     transcript: finishedTranscript,
+                    toolResults: finishedToolResults,
                     mode: config.mode
                 )
             }

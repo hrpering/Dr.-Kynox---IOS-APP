@@ -685,6 +685,7 @@ extension CaseSessionView {
         activeToolSheetRoute = nil
         let snapshotBeforeEnd = vm.stableTranscript
         finishedTranscript = snapshotBeforeEnd
+        finishedToolResults = vm.exportCaseToolResults()
         if finishedTranscript.isEmpty, !vm.messages.isEmpty {
             finishedTranscript = vm.messages.map {
                 ConversationLine(
@@ -717,6 +718,7 @@ extension CaseSessionView {
         wasSessionEnded = false
         hasStarted = false
         finishedTranscript = []
+        finishedToolResults = []
         vm.cleanup()
     }
 
