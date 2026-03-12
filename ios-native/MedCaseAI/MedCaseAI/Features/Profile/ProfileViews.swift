@@ -12,10 +12,10 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 12) {
                     profileHeader
 
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         miniStat(title: "Vaka", value: "\(state.caseHistory.count)")
                         miniStat(title: "Skor", value: averageScore)
                         miniStat(title: "Seri", value: "\(streakDays)")
@@ -180,8 +180,8 @@ struct ProfileView: View {
                         .buttonStyle(PressableButtonStyle())
                     }
                 }
-                .padding(16)
-                .padding(.bottom, 14)
+                .padding(14)
+                .padding(.bottom, 12)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Profil")
@@ -193,25 +193,25 @@ struct ProfileView: View {
     }
 
     private var profileHeader: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             Circle()
                 .fill(.white.opacity(0.2))
-                .frame(width: 64, height: 64)
+                .frame(width: 58, height: 58)
                 .overlay(
                     Text(initials)
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                 )
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(state.profile?.fullName.isEmpty == false ? (state.profile?.fullName ?? "") : "Kullanıcı")
                     .font(AppFont.title)
                     .foregroundStyle(.white)
                 Text(readableRole)
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.primaryDark)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
                     .background(.white.opacity(0.9))
                     .clipShape(Capsule())
                 Text(targetExamLabel)
@@ -221,7 +221,7 @@ struct ProfileView: View {
             }
             Spacer()
         }
-        .padding(14)
+        .padding(12)
         .background(
             LinearGradient(
                 colors: [AppColor.primaryDark, AppColor.primary],
@@ -240,8 +240,8 @@ struct ProfileView: View {
     private func sectionCard<Content: View>(title: String,
                                             subtitle: String,
                                             @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(title)
                     .font(AppFont.title2)
                     .foregroundStyle(AppColor.textPrimary)
@@ -253,7 +253,7 @@ struct ProfileView: View {
 
             content()
         }
-        .padding(12)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
@@ -265,15 +265,15 @@ struct ProfileView: View {
     }
 
     private func profileRowButton(icon: String, title: String, subtitle: String, tint: Color) -> some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(tint)
-                .frame(width: 38, height: 38)
+                .frame(width: 34, height: 34)
                 .background(tint.opacity(0.14))
-                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(AppFont.bodyMedium)
                     .foregroundStyle(AppColor.textPrimary)
@@ -288,9 +288,9 @@ struct ProfileView: View {
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(AppColor.textTertiary)
-                .padding(.top, 4)
+                .padding(.top, 3)
         }
-        .padding(12)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
@@ -344,7 +344,7 @@ struct ProfileView: View {
     }
 
     private func miniStat(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 3) {
             Text(title)
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
@@ -352,9 +352,9 @@ struct ProfileView: View {
                 .font(AppFont.title2)
                 .foregroundStyle(AppColor.textPrimary)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .frame(maxWidth: .infinity, minHeight: 68, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
