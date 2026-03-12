@@ -853,7 +853,14 @@ extension View {
         self
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.primary)
+            .background(
+                LinearGradient(
+                    colors: [AppColor.primaryDark, AppColor.primary],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 
@@ -861,11 +868,12 @@ extension View {
         self
             .foregroundStyle(AppColor.primary)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.primary.opacity(0.4), lineWidth: 1)
             )
+            .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 }
@@ -873,23 +881,31 @@ extension View {
 extension Text {
     func appPrimaryButtonLabel() -> some View {
         self
-            .font(AppFont.bodyMedium)
+            .font(AppFont.button)
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.primary)
+            .background(
+                LinearGradient(
+                    colors: [AppColor.primaryDark, AppColor.primary],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 
     func appSecondaryButtonLabel() -> some View {
         self
-            .font(AppFont.bodyMedium)
+            .font(AppFont.button)
             .foregroundStyle(AppColor.primary)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.primary.opacity(0.4), lineWidth: 1)
             )
+            .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 

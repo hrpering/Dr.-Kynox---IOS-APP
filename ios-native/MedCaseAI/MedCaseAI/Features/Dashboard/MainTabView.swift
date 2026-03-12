@@ -18,9 +18,13 @@ struct MainTabView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        Self.applyTabAppearance()
+    }
+
+    private static func applyTabAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(AppColor.surface)
+        appearance.backgroundColor = UIColor(AppColor.tabBarSurface)
         appearance.shadowColor = UIColor(AppColor.border)
 
         let normal = appearance.stackedLayoutAppearance.normal
@@ -92,7 +96,7 @@ struct MainTabView: View {
                 }
                 .tag(Tab.profile)
         }
-        .toolbarBackground(AppColor.surface, for: .tabBar)
+        .toolbarBackground(AppColor.tabBarSurface, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .overlay(alignment: .top) {
             if let banner = state.inAppBanner {
@@ -116,9 +120,13 @@ struct MainTabView: View {
         }
         .animation(.spring(response: 0.28, dampingFraction: 0.88), value: state.inAppBanner?.id)
         .onAppear {
+            Self.applyTabAppearance()
             Task {
                 await state.onAppDidBecomeActive()
             }
+        }
+        .onChange(of: state.themeMode) { _ in
+            Self.applyTabAppearance()
         }
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }

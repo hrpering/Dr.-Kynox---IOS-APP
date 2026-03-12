@@ -7,6 +7,7 @@ import UIKit
 struct RootView: View {
     @EnvironmentObject private var state: AppState
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Group {
@@ -25,10 +26,14 @@ struct RootView: View {
         .tint(AppColor.primary)
         .onAppear {
             UISoundEngine.shared.preloadIfNeeded()
+            state.updateSystemColorScheme(colorScheme)
             trackRouteChange(state.route)
         }
         .onChange(of: state.route) { route in
             trackRouteChange(route)
+        }
+        .onChange(of: colorScheme) { scheme in
+            state.updateSystemColorScheme(scheme)
         }
         .onOpenURL { url in
             state.handleDeepLink(url)

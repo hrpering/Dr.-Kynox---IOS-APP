@@ -1,26 +1,5 @@
 import SwiftUI
 
-enum AppSpacing {
-    static let x1: CGFloat = 8
-    static let x2: CGFloat = 16
-    static let x3: CGFloat = 24
-    static let x4: CGFloat = 32
-    static let x5: CGFloat = 40
-
-    static let cardPadding: CGFloat = x2
-    static let sectionSpacing: CGFloat = x3
-    static let elementSpacing: CGFloat = x2
-    static let buttonHeight: CGFloat = 52
-    static let listRowHeight: CGFloat = 56
-}
-
-enum AppRadius {
-    static let sm: CGFloat = 8
-    static let md: CGFloat = 12
-    static let lg: CGFloat = 16
-    static let xl: CGFloat = 20
-}
-
 enum AppSemanticTone {
     case primary
     case success
@@ -62,10 +41,17 @@ enum AppSemanticTone {
 struct DSPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(AppFont.bodyMedium)
+            .font(AppFont.button)
             .foregroundStyle(Color.white)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.primary)
+            .background(
+                LinearGradient(
+                    colors: [AppColor.primaryDark, AppColor.primary],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
@@ -75,14 +61,15 @@ struct DSPrimaryButtonStyle: ButtonStyle {
 struct DSSecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(AppFont.bodyMedium)
+            .font(AppFont.button)
             .foregroundStyle(AppColor.primary)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.primary.opacity(0.42), lineWidth: 1)
             )
+            .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
@@ -124,6 +111,7 @@ struct DSInfoCard<Content: View>: View {
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(tone.border, lineWidth: 1)
         )
+        .appShadow(AppShadow.card)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 }
@@ -171,11 +159,12 @@ struct DSStatCard: View {
         }
         .padding(AppSpacing.cardPadding)
         .frame(width: 136, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(tone == .neutral ? AppColor.border : tone.border, lineWidth: 1)
         )
+        .appShadow(AppShadow.card)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 }
@@ -250,11 +239,12 @@ struct DSNavigationRow<Accessory: View>: View {
         }
         .padding(.horizontal, AppSpacing.cardPadding)
         .frame(minHeight: AppSpacing.listRowHeight)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
+        .appShadow(AppShadow.card)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
     }
 }

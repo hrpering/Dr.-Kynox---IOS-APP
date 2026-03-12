@@ -55,6 +55,8 @@ final class AppState: ObservableObject {
         let isRTL = AppLanguage.supported.first(where: { $0.code == uiLanguageCode })?.isRTL == true
         return isRTL ? .rightToLeft : .leftToRight
     }
+    var themeMode: ThemeMode { themeManager.mode }
+    var preferredColorScheme: ColorScheme? { themeManager.preferredColorScheme }
 
     var challenge: DailyChallenge? { dashboardViewModel.challenge }
     var challengeTimeLeft: ChallengeTimeLeft? { dashboardViewModel.challengeTimeLeft }
@@ -74,6 +76,7 @@ final class AppState: ObservableObject {
     private let dashboardViewModel: DashboardViewModel
     private let flashcardViewModel: FlashcardViewModel
     private let notificationManager: NotificationManager
+    private let themeManager: ThemeManager
 
     private var didBootstrap = false
     private var cancellables = Set<AnyCancellable>()
@@ -88,6 +91,7 @@ final class AppState: ObservableObject {
         self.dashboardViewModel = DashboardViewModel(api: api, supabase: supabase)
         self.flashcardViewModel = FlashcardViewModel(api: api, supabase: supabase)
         self.notificationManager = NotificationManager(api: api, supabase: supabase)
+        self.themeManager = ThemeManager.shared
 
         route = authViewModel.hasSessionHint ? .loading : .auth
 
@@ -185,6 +189,14 @@ final class AppState: ObservableObject {
     func signOut() {
         authViewModel.signOut()
         resetToAuthState()
+    }
+
+    func updateThemeMode(_ mode: ThemeMode) {
+        themeManager.setMode(mode)
+    }
+
+    func updateSystemColorScheme(_ scheme: ColorScheme) {
+        themeManager.setSystemColorScheme(scheme)
     }
 
     func deleteMyData() async throws {
@@ -572,6 +584,12 @@ final class AppState: ObservableObject {
             .store(in: &cancellables)
 
         notificationManager.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+
+        themeManager.objectWillChange
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
             }
