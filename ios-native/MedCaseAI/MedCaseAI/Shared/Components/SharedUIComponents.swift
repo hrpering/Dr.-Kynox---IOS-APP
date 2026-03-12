@@ -72,12 +72,13 @@ struct HistoryCard: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 }
 
@@ -257,12 +258,13 @@ struct HowItWorksCard: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 }
 
@@ -296,10 +298,10 @@ struct VoiceFeatureMiniDemo: View {
         .padding(.vertical, 12)
         .background(AppColor.primaryLight)
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.sm, style: .continuous)
                 .stroke(AppColor.primary.opacity(0.25), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.sm, style: .continuous))
         .onAppear {
             guard !reduceMotion else { return }
             withAnimation(.linear(duration: 1.1).repeatForever(autoreverses: false)) {
@@ -354,12 +356,13 @@ struct ModeExplainerCard: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 136, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(tint.opacity(0.35), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.card)
         .onAppear {
             guard !reduceMotion else { return }
             withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
@@ -544,6 +547,7 @@ struct BrandLogoImage: View {
                     .stroke(AppColor.border, lineWidth: 1)
             )
             .shadow(color: Color.black.opacity(0.06), radius: 10, x: 0, y: 4)
+            .appShadow(AppShadow.card)
     }
 }
 

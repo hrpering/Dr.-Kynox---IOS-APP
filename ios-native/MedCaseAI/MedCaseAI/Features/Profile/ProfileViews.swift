@@ -100,6 +100,19 @@ struct ProfileView: View {
                     .buttonStyle(PressableButtonStyle())
 
                     NavigationLink {
+                        ProfileThemePreferencesView()
+                            .environmentObject(state)
+                    } label: {
+                        profileRowButton(
+                            icon: "paintbrush.fill",
+                            title: "Tema",
+                            subtitle: "Sistem, açık veya koyu görünüm seçimi",
+                            tint: AppColor.primaryDark
+                        )
+                    }
+                    .buttonStyle(PressableButtonStyle())
+
+                    NavigationLink {
                         ProfileSubscriptionView()
                     } label: {
                         profileRowButton(
@@ -206,12 +219,13 @@ struct ProfileView: View {
             Spacer()
         }
         .padding(12)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private func sectionTitle(_ text: String) -> some View {
@@ -249,12 +263,13 @@ struct ProfileView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var targetExamLabel: String {
@@ -311,11 +326,12 @@ struct ProfileView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, minHeight: 68, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 }

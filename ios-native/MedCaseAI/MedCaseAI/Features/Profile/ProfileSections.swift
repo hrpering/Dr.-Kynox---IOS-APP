@@ -335,6 +335,59 @@ struct ProfileAudioPreferencesView: View {
     }
 }
 
+struct ProfileThemePreferencesView: View {
+    @EnvironmentObject private var state: AppState
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                DSInfoCard(tone: .primary) {
+                    Text("Tema")
+                        .font(AppFont.title2)
+                        .foregroundStyle(AppColor.textPrimary)
+                    Text("Uygulama görünümünü sistem temasına bağlayabilir veya manuel olarak açık/koyu seçebilirsin.")
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineSpacing(4)
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Görünüm Modu")
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(AppColor.textPrimary)
+
+                    Picker("Tema", selection: Binding(
+                        get: { state.themeMode },
+                        set: { state.updateThemeMode($0) }
+                    )) {
+                        ForEach(ThemeMode.allCases) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+                .padding(12)
+                .background(AppColor.surface)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(AppColor.border, lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                Text("Tema değişikliği tüm ekranlarda anında uygulanır.")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .lineSpacing(4)
+            }
+            .padding(16)
+            .padding(.bottom, 12)
+        }
+        .background(AppColor.background.ignoresSafeArea())
+        .navigationTitle("Tema")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 struct ProfileSubscriptionView: View {
     @EnvironmentObject private var state: AppState
     @State private var isLoading = false

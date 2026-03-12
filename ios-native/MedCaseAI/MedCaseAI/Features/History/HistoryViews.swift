@@ -13,6 +13,8 @@ struct HistoryView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 10) {
+                    historySummaryCard
+
                     if state.caseHistory.isEmpty {
                         if state.isBusy {
                             VStack(spacing: 10) {
@@ -27,12 +29,13 @@ struct HistoryView: View {
                                 .lineSpacing(4)
                                 .padding(14)
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(AppColor.surface)
+                                .background(AppColor.surfaceElevated)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                                         .stroke(AppColor.border, lineWidth: 1)
                                 )
-                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                                .appShadow(AppShadow.card)
                         }
                     } else {
                         ForEach(state.caseHistory) { item in
@@ -73,6 +76,46 @@ struct HistoryView: View {
                 }
             }
         }
+    }
+
+    private var historySummaryCard: some View {
+        HStack(spacing: 10) {
+            summaryPill(title: "Toplam", value: "\(state.caseHistory.count)")
+            summaryPill(title: "Skorlu", value: "\(scoredCaseCount)")
+            summaryPill(title: "Ortalama", value: averageScoreText)
+        }
+    }
+
+    private func summaryPill(title: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+            Text(value)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.card)
+    }
+
+    private var scoredCaseCount: Int {
+        state.caseHistory.filter { $0.score != nil }.count
+    }
+
+    private var averageScoreText: String {
+        let values = state.caseHistory.compactMap { $0.score?.overallScore }
+        guard !values.isEmpty else { return "--" }
+        let avg = values.reduce(0, +) / Double(values.count)
+        return "\(Int(avg.rounded()))"
     }
 }
 

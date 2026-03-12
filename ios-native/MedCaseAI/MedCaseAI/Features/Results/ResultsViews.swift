@@ -53,12 +53,13 @@ struct ResultsView: View {
                     .foregroundStyle(AppColor.primary)
                     .padding(.horizontal, 14)
                     .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(AppColor.surface)
+                    .background(AppColor.surfaceElevated)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                             .stroke(AppColor.primary.opacity(0.25), lineWidth: 1)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                    .appShadow(AppShadow.card)
                 }
                     .buttonStyle(PressableButtonStyle())
 
@@ -159,12 +160,13 @@ struct ResultsView: View {
             .buttonStyle(PressableButtonStyle())
         }
         .padding(12)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var resultHeroCard: some View {
@@ -196,11 +198,11 @@ struct ResultsView: View {
             )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.primary.opacity(0.25), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .shadow(color: AppColor.primary.opacity(0.22), radius: 10, x: 0, y: 5)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.elevated)
     }
 
     private var summarySection: some View {

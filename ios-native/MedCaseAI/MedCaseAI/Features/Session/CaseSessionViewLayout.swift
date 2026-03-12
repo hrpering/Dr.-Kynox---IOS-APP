@@ -22,12 +22,13 @@ extension CaseSessionView {
         }
         .padding(12)
         .frame(maxWidth: .infinity)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     var statusStrip: some View {
@@ -46,10 +47,11 @@ extension CaseSessionView {
         .frame(maxWidth: .infinity, minHeight: 52)
         .background(statusBackground)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(statusColor.opacity(0.35), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     var transcriptArea: some View {

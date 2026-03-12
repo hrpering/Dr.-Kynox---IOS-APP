@@ -133,12 +133,13 @@ struct WeakAreaAnalysisView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var groupedHistoryRows: [(date: String, avgScore: Double)] {
@@ -198,12 +199,13 @@ struct WeakAreaAnalysisView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private func scoreMapCard(_ analysis: WeakAreaAnalysisResponse) -> some View {
@@ -229,12 +231,13 @@ struct WeakAreaAnalysisView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private func specialtyBreakdownCard(_ analysis: WeakAreaAnalysisResponse) -> some View {
@@ -253,12 +256,13 @@ struct WeakAreaAnalysisView: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private func specialtyRow(_ item: WeakAreaSpecialtyStat) -> some View {
@@ -397,12 +401,13 @@ struct WeakAreaAnalysisView: View {
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .appShadow(AppShadow.card)
         )
     }
 
