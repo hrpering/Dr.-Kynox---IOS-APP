@@ -44,13 +44,6 @@ extension AgentConversationViewModel {
         activeMode = config.mode
         transcriptBuffer = []
         resetToolAccessoryState()
-        textUserCharacterCount = 0
-        textUserMessageCount = 0
-        textAICharacterCount = 0
-        textAIMessageCount = 0
-        voiceUserTranscriptCharacterCount = 0
-        voiceUserTranscriptMessageCount = 0
-        sessionLimitReached = false
         isConversationActive = false
         didReachActiveState = false
         lastDisconnectDiagnostic = nil

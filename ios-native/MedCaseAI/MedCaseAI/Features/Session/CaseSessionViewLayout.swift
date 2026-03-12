@@ -139,67 +139,81 @@ extension CaseSessionView {
     }
 
     var textComposer: some View {
-        HStack(spacing: 8) {
-            TextField("Mesajını yaz", text: $textInput, axis: .vertical)
-                .font(AppFont.body)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .lineLimit(1...4)
-                .focused($isComposerFocused)
-                .frame(minHeight: 44, maxHeight: 120, alignment: .topLeading)
-                .background(AppColor.surfaceAlt)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(AppColor.border, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        let textCharacterLimit = 300
+        let remainingCharacters = max(0, textCharacterLimit - textInput.count)
 
-            Button {
-                let text = textInput
-                Task {
-                    guard !isSendingTextMessage else { return }
-                    guard canSendText else {
-                        vm.errorText = "Oturum şu an kapanıyor, lütfen bekle."
-                        Haptic.error()
-                        return
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                TextField("Mesajını yaz", text: $textInput, axis: .vertical)
+                    .font(AppFont.body)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .lineLimit(1...4)
+                    .focused($isComposerFocused)
+                    .frame(minHeight: 44, maxHeight: 120, alignment: .topLeading)
+                    .background(AppColor.surfaceAlt)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .onChange(of: textInput) { newValue in
+                        guard newValue.count > textCharacterLimit else { return }
+                        textInput = String(newValue.prefix(textCharacterLimit))
                     }
-                    let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !clean.isEmpty else { return }
-                    if !hasStarted || vm.connectionState == .idle || vm.connectionState == .ended || vm.connectionState == .failed {
-                        vm.errorText = "Önce vakayı başlatın."
-                        Haptic.error()
-                        return
-                    }
-                    isSendingTextMessage = true
-                    defer { isSendingTextMessage = false }
-                    do {
-                        try await vm.sendMessage(clean)
-                        await MainActor.run {
-                            textInput = ""
-                            isComposerFocused = false
+
+                Button {
+                    let text = textInput
+                    Task {
+                        guard !isSendingTextMessage else { return }
+                        guard canSendText else {
+                            vm.errorText = "Oturum şu an kapanıyor, lütfen bekle."
+                            Haptic.error()
+                            return
                         }
-                    } catch {
-                        vm.errorText = error.localizedDescription
-                        Haptic.error()
+                        let clean = String(text.prefix(textCharacterLimit)).trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard !clean.isEmpty else { return }
+                        if !hasStarted || vm.connectionState == .idle || vm.connectionState == .ended || vm.connectionState == .failed {
+                            vm.errorText = "Önce vakayı başlatın."
+                            Haptic.error()
+                            return
+                        }
+                        isSendingTextMessage = true
+                        defer { isSendingTextMessage = false }
+                        do {
+                            try await vm.sendMessage(clean)
+                            await MainActor.run {
+                                textInput = ""
+                                isComposerFocused = false
+                            }
+                        } catch {
+                            vm.errorText = error.localizedDescription
+                            Haptic.error()
+                        }
                     }
+                } label: {
+                    Image(systemName: "paperplane.fill")
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 52, height: 52)
+                        .background(AppColor.primary)
+                        .clipShape(Circle())
                 }
-            } label: {
-                Image(systemName: "paperplane.fill")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 52, height: 52)
-                    .background(AppColor.primary)
-                    .clipShape(Circle())
+                .buttonStyle(PressableButtonStyle())
+                .disabled(
+                    textInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                        || vm.isEnding
+                        || wasSessionEnded
+                        || isSendingTextMessage
+                )
+                .accessibilityLabel("Gönder")
+                .accessibilityHint("Mesajı vakaya gönderir")
             }
-            .buttonStyle(PressableButtonStyle())
-            .disabled(
-                textInput.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    || vm.isEnding
-                    || wasSessionEnded
-                    || isSendingTextMessage
-            )
-            .accessibilityLabel("Gönder")
-            .accessibilityHint("Mesajı vakaya gönderir")
+
+            Text("Kalan karakter: \(remainingCharacters)")
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+                .padding(.leading, 4)
         }
     }
 

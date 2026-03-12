@@ -293,46 +293,8 @@ extension AgentConversationViewModel {
     }
 
     func refreshUsageCounters() {
-        var nextTextUserChars = 0
-        var nextTextUserMessages = 0
-        var nextTextAIChars = 0
-        var nextTextAIMessages = 0
-        var nextVoiceUserChars = 0
-        var nextVoiceUserMessages = 0
-
-        for line in normalizedTranscript(messages.map { $0.transcriptLine }) {
-            let source = canonicalSource(line.source)
-            let length = line.message.count
-            if source == "user" {
-                nextTextUserChars += length
-                nextTextUserMessages += 1
-                nextVoiceUserChars += length
-                nextVoiceUserMessages += 1
-            } else {
-                nextTextAIChars += length
-                nextTextAIMessages += 1
-            }
-        }
-
-        textUserCharacterCount = nextTextUserChars
-        textUserMessageCount = nextTextUserMessages
-        textAICharacterCount = nextTextAIChars
-        textAIMessageCount = nextTextAIMessages
-        voiceUserTranscriptCharacterCount = nextVoiceUserChars
-        voiceUserTranscriptMessageCount = nextVoiceUserMessages
-    }
-
-    func enforceVoiceTranscriptLimitIfNeeded() {
-        guard activeMode == .voice else { return }
-        guard !sessionLimitReached else { return }
-        guard voiceUserTranscriptCharacterCount >= voiceSessionTranscriptCharacterLimit else { return }
-        sessionLimitReached = true
-        let message = "Oturum transkript limiti doldu."
-        errorText = message
-        statusLine = message
-        Task { [weak self] in
-            await self?.end()
-        }
+        // Karakter/mesaj sayaçları post-call webhook üzerinden toplandığı için
+        // istemci tarafında local sayaç tutulmuyor.
     }
 
     func dedupe(_ input: [Message]) -> [Message] {

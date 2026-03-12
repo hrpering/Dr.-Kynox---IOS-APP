@@ -146,25 +146,56 @@ struct ScoringLoadingView: View {
 
 struct MessageBubble: View {
     let row: AgentConversationViewModel.Message
+    var accessories: [MessageBubbleAccessory] = []
+    var onAccessoryTap: ((MessageBubbleAccessory) -> Void)? = nil
 
     var body: some View {
-        HStack {
-            if row.source == "user" { Spacer(minLength: 40) }
+        VStack(alignment: row.source == "user" ? .trailing : .leading, spacing: 8) {
+            HStack {
+                if row.source == "user" { Spacer(minLength: 40) }
 
-            Text(row.text)
-                .font(AppFont.body)
-                .foregroundStyle(row.source == "user" ? AppColor.textPrimary : AppColor.textPrimary)
-                .lineSpacing(4)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(row.source == "user" ? AppColor.primaryLight : AppColor.surfaceAlt)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(row.source == "user" ? AppColor.primary.opacity(0.25) : AppColor.border, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                Text(row.text)
+                    .font(AppFont.body)
+                    .foregroundStyle(row.source == "user" ? AppColor.textPrimary : AppColor.textPrimary)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .background(row.source == "user" ? AppColor.primaryLight : AppColor.surfaceAlt)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(row.source == "user" ? AppColor.primary.opacity(0.25) : AppColor.border, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            if row.source != "user" { Spacer(minLength: 40) }
+                if row.source != "user" { Spacer(minLength: 40) }
+            }
+
+            if !accessories.isEmpty {
+                HStack {
+                    if row.source == "user" { Spacer(minLength: 40) }
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(accessories) { accessory in
+                            Button {
+                                onAccessoryTap?(accessory)
+                            } label: {
+                                Label(accessory.title, systemImage: accessory.iconSystemName)
+                                    .font(AppFont.caption)
+                                    .foregroundStyle(accessory.tint)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(accessory.tint.opacity(0.12))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                            .stroke(accessory.tint.opacity(0.35), lineWidth: 1)
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    if row.source != "user" { Spacer(minLength: 40) }
+                }
+            }
         }
     }
 }
@@ -530,4 +561,3 @@ struct StethoscopeBadge: View {
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
-

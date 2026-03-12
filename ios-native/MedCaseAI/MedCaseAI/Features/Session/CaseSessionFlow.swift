@@ -5,6 +5,20 @@ import SafariServices
 import UIKit
 import Sentry
 
+enum ToolResultSheetRoute: Identifiable, Equatable {
+    case tool(toolCallId: String)
+    case imaging(anchorToolCallId: String)
+
+    var id: String {
+        switch self {
+        case .tool(let toolCallId):
+            return "tool-\(toolCallId)"
+        case .imaging(let anchorToolCallId):
+            return "imaging-\(anchorToolCallId)"
+        }
+    }
+}
+
 struct CaseSessionView: View {
     @EnvironmentObject var state: AppState
     @Environment(\.dismiss) var dismiss
@@ -28,6 +42,8 @@ struct CaseSessionView: View {
     @State var isKeyboardVisible = false
     @State var showEndSessionConfirmation = false
     @State var isMicPulsing = false
+    @State var isSendingTextMessage = false
+    @State var activeToolSheetRoute: ToolResultSheetRoute?
     @FocusState var isComposerFocused: Bool
 
     init(config: CaseLaunchConfig) {
@@ -105,23 +121,20 @@ struct CaseSessionView: View {
             .onChange(of: vm.connectionState) { newState in
                 guard (newState == .ended || newState == .failed) else { return }
                 guard !wasSessionEnded else { return }
+                activeToolSheetRoute = nil
 
-                if userRequestedEnd {
-                    Task { await finalizeCase() }
-                    return
-                }
-
-                if newState == .ended {
+                if userRequestedEnd || vm.endRequestedByUser {
                     Task { await finalizeCase() }
                     return
                 }
 
                 hasStarted = false
-                if vm.errorText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    vm.errorText = newState == .failed
-                        ? "Bağlantı kesildi. Vakayı yeniden başlatabilirsin."
-                        : "Oturum tamamlandı. Sonucu görmek için Vakayı Bitir butonunu kullanabilirsin."
-                }
+                let existingError = vm.errorText.trimmingCharacters(in: .whitespacesAndNewlines)
+                let fallbackError = newState == .failed
+                    ? "Bağlantı kesildi. Vakayı yeniden başlatabilirsin."
+                    : "Oturum beklenmedik şekilde sonlandı. Vakayı yeniden başlatabilirsin."
+                vm.cleanup()
+                vm.errorText = existingError.isEmpty ? fallbackError : existingError
             }
             .fullScreenCover(isPresented: $showResultFlow, onDismiss: {
                 dismiss()
@@ -132,6 +145,43 @@ struct CaseSessionView: View {
                     transcript: finishedTranscript,
                     mode: config.mode
                 )
+            }
+            .sheet(item: $activeToolSheetRoute, onDismiss: {
+                activeToolSheetRoute = nil
+            }) { route in
+                switch route {
+                case .tool(let toolCallId):
+                    if let sheetPayload = selectedToolSheetPayload(toolCallId: toolCallId) {
+                        ToolResultSheetView(
+                            config: config,
+                            descriptor: sheetPayload.descriptor,
+                            payload: sheetPayload.payload,
+                            onContinue: {
+                                activeToolSheetRoute = nil
+                            }
+                        )
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                    } else {
+                        EmptyView()
+                    }
+                case .imaging(let anchorToolCallId):
+                    let imagingItems = imagingSheetItems(anchorToolCallId: anchorToolCallId)
+                    if imagingItems.isEmpty {
+                        EmptyView()
+                    } else {
+                        CombinedImagingResultsSheetView(
+                            config: config,
+                            items: imagingItems,
+                            initialSegment: imagingInitialSegment(anchorToolCallId: anchorToolCallId),
+                            onContinue: {
+                                activeToolSheetRoute = nil
+                            }
+                        )
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                    }
+                }
             }
             .onDisappear {
                 isComposerFocused = false

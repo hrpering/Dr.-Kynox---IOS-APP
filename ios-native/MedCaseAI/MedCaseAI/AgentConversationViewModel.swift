@@ -147,10 +147,14 @@ enum ToolMetricStatus: String, Codable {
     case borderline
     case unknown
 
-    init(rawStatus: String?) {
-        let clean = (rawStatus ?? "")
+    static func normalizedToken(_ rawStatus: String?) -> String {
+        (rawStatus ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased(with: Locale(identifier: "tr_TR"))
+    }
+
+    init(rawStatus: String?) {
+        let clean = Self.normalizedToken(rawStatus)
         self = ToolMetricStatus(rawValue: clean) ?? .unknown
     }
 
@@ -281,6 +285,8 @@ struct ToolMetricObject {
     let valueText: String
     let unit: String
     let status: ToolMetricStatus
+    let statusProvided: Bool
+    let statusInvalid: Bool
 
     init?(object: [String: JSONValue]) {
         let value = object.firstValue(suffix: "_value")?.displayText
@@ -295,7 +301,10 @@ struct ToolMetricObject {
         unit = (object.firstValue(suffix: "_unit")?.displayText ?? object["unit"]?.displayText ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let rawStatus = object.firstValue(suffix: "_status")?.displayText ?? object["status"]?.displayText
+        let statusToken = ToolMetricStatus.normalizedToken(rawStatus)
+        statusProvided = !statusToken.isEmpty
         status = ToolMetricStatus(rawStatus: rawStatus)
+        statusInvalid = statusProvided && status == .unknown && statusToken != ToolMetricStatus.unknown.rawValue
     }
 }
 
@@ -613,221 +622,6 @@ struct ToolDescriptor {
     static let byName: [String: ToolDescriptor] = Dictionary(uniqueKeysWithValues: all.map { ($0.toolName, $0) })
 }
 
-extension ToolResultPayload {
-    static func decode(from data: Data, descriptor: ToolDescriptor) throws -> ToolResultPayload {
-        let json = try JSONDecoder().decode([String: JSONValue].self, from: data)
-        switch descriptor.category {
-        case .panel:
-            return .panel(parsePanel(json: json, descriptor: descriptor))
-        case .vitals:
-            return .vitals(parseVitals(json: json, descriptor: descriptor))
-        case .imaging:
-            return .imaging(parseImaging(json: json, descriptor: descriptor))
-        }
-    }
-
-    private static func parsePanel(json: [String: JSONValue], descriptor: ToolDescriptor) -> PanelToolResult {
-        let reserved = Set(["verbal_summary", "impression"])
-        var metrics: [PanelMetric] = []
-        for key in orderedTopKeys(from: json, order: descriptor.metricOrder) where !reserved.contains(key) {
-            guard let value = json[key] else { continue }
-            if let object = value.objectValue, let parsed = ToolMetricObject(object: object) {
-                metrics.append(
-                    PanelMetric(
-                        id: key,
-                        title: prettyLabel(for: key),
-                        valueText: parsed.valueText,
-                        unit: parsed.unit,
-                        status: parsed.status,
-                        referenceRange: descriptor.referenceRanges[key]
-                    )
-                )
-                continue
-            }
-            if let plain = value.displayText {
-                let trimmed = plain.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !trimmed.isEmpty else { continue }
-                metrics.append(
-                    PanelMetric(
-                        id: key,
-                        title: prettyLabel(for: key),
-                        valueText: trimmed,
-                        unit: "",
-                        status: .unknown,
-                        referenceRange: descriptor.referenceRanges[key]
-                    )
-                )
-            }
-        }
-        return PanelToolResult(
-            toolName: descriptor.toolName,
-            title: descriptor.displayTitle,
-            metrics: metrics,
-            verbalSummary: (json["verbal_summary"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        )
-    }
-
-    private static func parseVitals(json: [String: JSONValue], descriptor: ToolDescriptor) -> VitalsToolResult {
-        var metricsByKey: [String: VitalsMetric] = [:]
-        for key in orderedTopKeys(from: json, order: descriptor.metricOrder) {
-            guard key != "verbal_summary" else { continue }
-            guard let value = json[key] else { continue }
-            if let object = value.objectValue, let parsed = ToolMetricObject(object: object) {
-                metricsByKey[key] = VitalsMetric(
-                    id: key,
-                    title: prettyLabel(for: key),
-                    valueText: parsed.valueText,
-                    unit: parsed.unit,
-                    status: parsed.status
-                )
-                continue
-            }
-            if let plain = value.displayText {
-                let trimmed = plain.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !trimmed.isEmpty else { continue }
-                metricsByKey[key] = VitalsMetric(
-                    id: key,
-                    title: prettyLabel(for: key),
-                    valueText: trimmed,
-                    unit: "",
-                    status: .unknown
-                )
-            }
-        }
-
-        if let systolic = metricsByKey["blood_pressure_systolic"],
-           let diastolic = metricsByKey["blood_pressure_diastolic"] {
-            metricsByKey["blood_pressure"] = VitalsMetric(
-                id: "blood_pressure",
-                title: "Blood Pressure",
-                valueText: "\(systolic.valueText)/\(diastolic.valueText)",
-                unit: systolic.unit.isEmpty ? diastolic.unit : systolic.unit,
-                status: .mostSevere(systolic.status, diastolic.status)
-            )
-            metricsByKey["blood_pressure_systolic"] = nil
-            metricsByKey["blood_pressure_diastolic"] = nil
-        }
-
-        let order = ["blood_pressure", "heart_rate", "temperature", "respiratory_rate", "oxygen_saturation", "gcs", "pain_score"]
-        let ordered = order.compactMap { metricsByKey[$0] } + metricsByKey.values
-            .filter { !order.contains($0.id) }
-            .sorted { $0.title < $1.title }
-        return VitalsToolResult(
-            toolName: descriptor.toolName,
-            title: descriptor.displayTitle,
-            metrics: ordered,
-            verbalSummary: (json["verbal_summary"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        )
-    }
-
-    private static func parseImaging(json: [String: JSONValue], descriptor: ToolDescriptor) -> ImagingToolResult {
-        let textKeys = ["technique", "region", "contrast", "sequences", "type", "probability"]
-        let metadata: [ImagingMetaItem] = textKeys.compactMap { key in
-            guard let text = json[key]?.displayText?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
-                return nil
-            }
-            return ImagingMetaItem(id: key, title: prettyLabel(for: key), value: text)
-        }
-        let reserved = Set(textKeys + ["impression", "verbal_summary"])
-        var findings: [ImagingFinding] = []
-        for key in orderedTopKeys(from: json, order: descriptor.metricOrder) where !reserved.contains(key) {
-            guard let value = json[key] else { continue }
-            if let object = value.objectValue, let parsed = ToolMetricObject(object: object) {
-                let detail = [parsed.valueText, parsed.unit]
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                    .filter { !$0.isEmpty }
-                    .joined(separator: " ")
-                guard !detail.isEmpty else { continue }
-                findings.append(
-                    ImagingFinding(
-                        id: key,
-                        title: prettyLabel(for: key),
-                        detail: detail,
-                        status: parsed.status
-                    )
-                )
-                continue
-            }
-            if let plain = value.displayText {
-                let trimmed = plain.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !trimmed.isEmpty else { continue }
-                findings.append(
-                    ImagingFinding(
-                        id: key,
-                        title: prettyLabel(for: key),
-                        detail: trimmed,
-                        status: .unknown
-                    )
-                )
-            }
-        }
-        let impression = (json["impression"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        return ImagingToolResult(
-            toolName: descriptor.toolName,
-            title: descriptor.displayTitle,
-            segment: descriptor.imagingSegment ?? .all,
-            findings: findings,
-            metadata: metadata,
-            impression: impression,
-            verbalSummary: (json["verbal_summary"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        )
-    }
-
-    private static func orderedTopKeys(from json: [String: JSONValue], order: [String]) -> [String] {
-        let orderedSet = Set(order)
-        let ordered = order.filter { json[$0] != nil }
-        let extras = json.keys.filter { !orderedSet.contains($0) }.sorted()
-        return ordered + extras
-    }
-
-    private static func prettyLabel(for key: String) -> String {
-        let aliases: [String: String] = [
-            "wbc": "White Blood Cells (WBC)",
-            "rbc": "Red Blood Cells (RBC)",
-            "mcv": "Mean Corpuscular Volume (MCV)",
-            "mch": "Mean Corpuscular Hemoglobin (MCH)",
-            "mchc": "Mean Corpuscular Hemoglobin Conc. (MCHC)",
-            "rdw": "Red Cell Distribution Width (RDW)",
-            "alt": "ALT",
-            "ast": "AST",
-            "alp": "ALP",
-            "ggt": "GGT",
-            "egfr": "eGFR",
-            "bun": "BUN",
-            "ldl": "LDL",
-            "hdl": "HDL",
-            "vldl": "VLDL",
-            "anti_tpo": "Anti-TPO",
-            "anti_tg": "Anti-TG",
-            "paco2": "PaCO2",
-            "pao2": "PaO2",
-            "hco3": "HCO3",
-            "sao2": "SaO2",
-            "aptt": "aPTT",
-            "d_dimer": "D-Dimer",
-            "wbc_count": "WBC Count",
-            "rbc_count": "RBC Count",
-            "qtc_interval": "QTc Interval",
-            "pr_interval": "PR Interval",
-            "gcs": "GCS",
-            "lvef": "LVEF"
-        ]
-        if let alias = aliases[key] {
-            return alias
-        }
-        return key
-            .split(separator: "_")
-            .map { part in
-                let value = String(part)
-                if value.count <= 3 {
-                    return value.uppercased()
-                }
-                return value.prefix(1).uppercased() + value.dropFirst()
-            }
-            .joined(separator: " ")
-    }
-}
-
 extension Dictionary where Key == String, Value == JSONValue {
     func firstValue(suffix: String) -> JSONValue? {
         let exact = valuesMatching(suffix: suffix)
@@ -928,13 +722,6 @@ final class AgentConversationViewModel: ObservableObject {
     var elevenSessionReleased = false
     var heartbeatTask: Task<Void, Never>?
     var transcriptBuffer: [ConversationLine] = []
-    var textUserCharacterCount = 0
-    var textUserMessageCount = 0
-    var textAICharacterCount = 0
-    var textAIMessageCount = 0
-    var voiceUserTranscriptCharacterCount = 0
-    var voiceUserTranscriptMessageCount = 0
-    var sessionLimitReached = false
     var isConversationActive = false
     var didReachActiveState = false
     var lastDisconnectDiagnostic: String?
@@ -954,7 +741,6 @@ final class AgentConversationViewModel: ObservableObject {
     var startConversationCallCounter = 0
     var handledToolCallIds = Set<String>()
 
-    let voiceSessionTranscriptCharacterLimit = 7000
     let sessionHeartbeatIntervalSec: UInt64 = 8
     let nearTextDuplicateWindowSeconds: TimeInterval = 2.5
 

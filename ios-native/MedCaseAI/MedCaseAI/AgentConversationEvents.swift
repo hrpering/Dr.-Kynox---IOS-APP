@@ -48,13 +48,6 @@ extension AgentConversationViewModel {
         lastLocalEndSource = nil
         lastDisconnectDiagnostic = nil
         transcriptBuffer = []
-        textUserCharacterCount = 0
-        textUserMessageCount = 0
-        textAICharacterCount = 0
-        textAIMessageCount = 0
-        voiceUserTranscriptCharacterCount = 0
-        voiceUserTranscriptMessageCount = 0
-        sessionLimitReached = false
         isConversationActive = false
         didReachActiveState = false
         resetToolAccessoryState()

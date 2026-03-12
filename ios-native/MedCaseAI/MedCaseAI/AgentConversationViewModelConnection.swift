@@ -32,9 +32,6 @@ extension AgentConversationViewModel {
                 self.messages = self.dedupe(mapped)
                 self.refreshTranscriptBuffer()
                 self.refreshUsageCounters()
-                if self.activeMode == .voice {
-                    self.enforceVoiceTranscriptLimitIfNeeded()
-                }
                 let newAiMessages = self.messages.filter { row in
                     row.source == "ai" && !previousMessageIds.contains(row.id)
                 }
@@ -141,10 +138,10 @@ extension AgentConversationViewModel {
                     self.isConversationActive = false
                     self.agentState = .ended
                     self.statusLine = self.statusTextForEnd(reason)
-                    let shouldFinalize = self.endRequestedByUser
-                    self.connectionState = .ended
+                    let isUserInitiatedEnd = self.endRequestedByUser
+                    self.connectionState = isUserInitiatedEnd ? .ended : .failed
                     self.stopSessionHeartbeat()
-                    if shouldFinalize {
+                    if isUserInitiatedEnd {
                         Task {
                             await self.flushConversationMessages()
                             await self.finalizeIfNeeded()
@@ -279,7 +276,7 @@ extension AgentConversationViewModel {
             handledToolCallIds.insert(toolCallId)
 
             do {
-                let payload = try ToolResultPayload.decode(from: toolCall.parametersData, descriptor: descriptor)
+                let payload = try ToolCallHandler.decode(from: toolCall.parametersData, descriptor: descriptor)
                 pendingToolResults.append(
                     PendingToolResult(
                         toolCallId: toolCallId,
@@ -422,4 +419,256 @@ extension AgentConversationViewModel {
         heartbeatTask = nil
     }
 
+}
+
+final class ToolCallHandler {
+    static func decode(from data: Data, descriptor: ToolDescriptor) throws -> ToolResultPayload {
+        let json = try JSONDecoder().decode([String: JSONValue].self, from: data)
+        switch descriptor.category {
+        case .panel:
+            return .panel(parsePanel(json: json, descriptor: descriptor))
+        case .vitals:
+            return .vitals(parseVitals(json: json, descriptor: descriptor))
+        case .imaging:
+            return .imaging(parseImaging(json: json, descriptor: descriptor))
+        }
+    }
+
+    private static func parsePanel(json: [String: JSONValue], descriptor: ToolDescriptor) -> PanelToolResult {
+        let reserved = Set(["verbal_summary", "impression"])
+        let allowedMetricKeys = Set(descriptor.metricOrder).union(descriptor.referenceRanges.keys)
+        var metrics: [PanelMetric] = []
+        var malformedStatusKeys: [String] = []
+        var unknownMetricKeys: [String] = []
+
+        for key in orderedTopKeys(from: json, order: descriptor.metricOrder) where !reserved.contains(key) {
+            if !allowedMetricKeys.contains(key) {
+                unknownMetricKeys.append(key)
+                continue
+            }
+            guard let value = json[key] else { continue }
+            if let object = value.objectValue, let parsed = ToolMetricObject(object: object) {
+                if parsed.status == .unknown && (parsed.statusInvalid || !parsed.statusProvided) {
+                    malformedStatusKeys.append(key)
+                    continue
+                }
+                metrics.append(
+                    PanelMetric(
+                        id: key,
+                        title: prettyLabel(for: key),
+                        valueText: parsed.valueText,
+                        unit: parsed.unit,
+                        status: parsed.status,
+                        referenceRange: descriptor.referenceRanges[key]
+                    )
+                )
+                continue
+            }
+            if let plain = value.displayText {
+                let trimmed = plain.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { continue }
+                metrics.append(
+                    PanelMetric(
+                        id: key,
+                        title: prettyLabel(for: key),
+                        valueText: trimmed,
+                        unit: "",
+                        status: .unknown,
+                        referenceRange: descriptor.referenceRanges[key]
+                    )
+                )
+            }
+        }
+
+        var verbalSummary = (json["verbal_summary"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if !malformedStatusKeys.isEmpty || !unknownMetricKeys.isEmpty {
+            var warnings: [String] = []
+            if !malformedStatusKeys.isEmpty {
+                let labels = malformedStatusKeys.prefix(3).map { prettyLabel(for: $0) }.joined(separator: ", ")
+                let ellipsis = malformedStatusKeys.count > 3 ? ", ..." : ""
+                warnings.append(
+                    "Uyarı: \(malformedStatusKeys.count) metrik status alanı eksik/geçersiz olduğu için gösterilmedi (\(labels)\(ellipsis))."
+                )
+            }
+            if !unknownMetricKeys.isEmpty {
+                let labels = unknownMetricKeys.prefix(3).map { prettyLabel(for: $0) }.joined(separator: ", ")
+                let ellipsis = unknownMetricKeys.count > 3 ? ", ..." : ""
+                warnings.append(
+                    "Uyarı: \(unknownMetricKeys.count) bilinmeyen metrik anahtarı yok sayıldı (\(labels)\(ellipsis))."
+                )
+            }
+            let warning = warnings.joined(separator: "\n")
+            verbalSummary = verbalSummary.isEmpty ? warning : "\(warning)\n\n\(verbalSummary)"
+        }
+
+        return PanelToolResult(
+            toolName: descriptor.toolName,
+            title: descriptor.displayTitle,
+            metrics: metrics,
+            verbalSummary: verbalSummary
+        )
+    }
+
+    private static func parseVitals(json: [String: JSONValue], descriptor: ToolDescriptor) -> VitalsToolResult {
+        var metricsByKey: [String: VitalsMetric] = [:]
+        for key in orderedTopKeys(from: json, order: descriptor.metricOrder) {
+            guard key != "verbal_summary" else { continue }
+            guard let value = json[key] else { continue }
+            if let object = value.objectValue, let parsed = ToolMetricObject(object: object) {
+                metricsByKey[key] = VitalsMetric(
+                    id: key,
+                    title: prettyLabel(for: key),
+                    valueText: parsed.valueText,
+                    unit: parsed.unit,
+                    status: parsed.status
+                )
+                continue
+            }
+            if let plain = value.displayText {
+                let trimmed = plain.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { continue }
+                metricsByKey[key] = VitalsMetric(
+                    id: key,
+                    title: prettyLabel(for: key),
+                    valueText: trimmed,
+                    unit: "",
+                    status: .unknown
+                )
+            }
+        }
+
+        if let systolic = metricsByKey["blood_pressure_systolic"],
+           let diastolic = metricsByKey["blood_pressure_diastolic"] {
+            metricsByKey["blood_pressure"] = VitalsMetric(
+                id: "blood_pressure",
+                title: "Blood Pressure",
+                valueText: "\(systolic.valueText)/\(diastolic.valueText)",
+                unit: systolic.unit.isEmpty ? diastolic.unit : systolic.unit,
+                status: .mostSevere(systolic.status, diastolic.status)
+            )
+            metricsByKey["blood_pressure_systolic"] = nil
+            metricsByKey["blood_pressure_diastolic"] = nil
+        }
+
+        let order = ["blood_pressure", "heart_rate", "temperature", "respiratory_rate", "oxygen_saturation", "gcs", "pain_score"]
+        let ordered = order.compactMap { metricsByKey[$0] } + metricsByKey.values
+            .filter { !order.contains($0.id) }
+            .sorted { $0.title < $1.title }
+
+        return VitalsToolResult(
+            toolName: descriptor.toolName,
+            title: descriptor.displayTitle,
+            metrics: ordered,
+            verbalSummary: (json["verbal_summary"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+    }
+
+    private static func parseImaging(json: [String: JSONValue], descriptor: ToolDescriptor) -> ImagingToolResult {
+        let textKeys = ["technique", "region", "contrast", "sequences", "type", "probability"]
+        let metadata: [ImagingMetaItem] = textKeys.compactMap { key in
+            guard let text = json[key]?.displayText?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
+                return nil
+            }
+            return ImagingMetaItem(id: key, title: prettyLabel(for: key), value: text)
+        }
+        let reserved = Set(textKeys + ["impression", "verbal_summary"])
+        var findings: [ImagingFinding] = []
+
+        for key in orderedTopKeys(from: json, order: descriptor.metricOrder) where !reserved.contains(key) {
+            guard let value = json[key] else { continue }
+            if let object = value.objectValue, let parsed = ToolMetricObject(object: object) {
+                let detail = [parsed.valueText, parsed.unit]
+                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: " ")
+                guard !detail.isEmpty else { continue }
+                findings.append(
+                    ImagingFinding(
+                        id: key,
+                        title: prettyLabel(for: key),
+                        detail: detail,
+                        status: parsed.status
+                    )
+                )
+                continue
+            }
+            if let plain = value.displayText {
+                let trimmed = plain.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmed.isEmpty else { continue }
+                findings.append(
+                    ImagingFinding(
+                        id: key,
+                        title: prettyLabel(for: key),
+                        detail: trimmed,
+                        status: .unknown
+                    )
+                )
+            }
+        }
+
+        let impression = (json["impression"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return ImagingToolResult(
+            toolName: descriptor.toolName,
+            title: descriptor.displayTitle,
+            segment: descriptor.imagingSegment ?? .all,
+            findings: findings,
+            metadata: metadata,
+            impression: impression,
+            verbalSummary: (json["verbal_summary"]?.displayText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+    }
+
+    private static func orderedTopKeys(from json: [String: JSONValue], order: [String]) -> [String] {
+        let orderedSet = Set(order)
+        let ordered = order.filter { json[$0] != nil }
+        let extras = json.keys.filter { !orderedSet.contains($0) }.sorted()
+        return ordered + extras
+    }
+
+    private static func prettyLabel(for key: String) -> String {
+        let aliases: [String: String] = [
+            "wbc": "White Blood Cells (WBC)",
+            "rbc": "Red Blood Cells (RBC)",
+            "mcv": "Mean Corpuscular Volume (MCV)",
+            "mch": "Mean Corpuscular Hemoglobin (MCH)",
+            "mchc": "Mean Corpuscular Hemoglobin Conc. (MCHC)",
+            "rdw": "Red Cell Distribution Width (RDW)",
+            "alt": "ALT",
+            "ast": "AST",
+            "alp": "ALP",
+            "ggt": "GGT",
+            "egfr": "eGFR",
+            "bun": "BUN",
+            "ldl": "LDL",
+            "hdl": "HDL",
+            "vldl": "VLDL",
+            "anti_tpo": "Anti-TPO",
+            "anti_tg": "Anti-TG",
+            "paco2": "PaCO2",
+            "pao2": "PaO2",
+            "hco3": "HCO3",
+            "sao2": "SaO2",
+            "aptt": "aPTT",
+            "d_dimer": "D-Dimer",
+            "wbc_count": "WBC Count",
+            "rbc_count": "RBC Count",
+            "qtc_interval": "QTc Interval",
+            "pr_interval": "PR Interval",
+            "gcs": "GCS",
+            "lvef": "LVEF"
+        ]
+        if let alias = aliases[key] {
+            return alias
+        }
+        return key
+            .split(separator: "_")
+            .map { part in
+                let value = String(part)
+                if value.count <= 3 {
+                    return value.uppercased()
+                }
+                return value.prefix(1).uppercased() + value.dropFirst()
+            }
+            .joined(separator: " ")
+    }
 }
