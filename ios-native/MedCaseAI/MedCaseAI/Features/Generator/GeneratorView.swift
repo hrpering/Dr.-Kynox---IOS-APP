@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GeneratorView: View {
     @EnvironmentObject private var state: AppState
+    @Environment(\.dismiss) private var dismiss
     @State private var specialty = ""
     @State private var specialtySearch = ""
     @State private var difficulty = "Random"
@@ -24,20 +25,47 @@ struct GeneratorView: View {
         }
     }
 
-    private let randomDifficultyCard = DifficultyCardConfig(
-        id: "Random",
-        title: "Rastgele Zorluk",
-        subtitle: "Kim için: Kararsız kalan kullanıcılar",
-        detail: "Ne beklenir: Sistem seviyeyi otomatik atar.",
-        count: 0,
-        bg: AppColor.surfaceAlt,
-        stroke: AppColor.textSecondary
-    )
-
-    private let difficultyCards: [DifficultyCardConfig] = [
-        .init(id: "Kolay", title: "Kolay", subtitle: "Kim için: Dönem 3-4", detail: "Ne beklenir: Temel anamnez ve ilk yaklaşım", count: 48, bg: AppColor.successLight, stroke: AppColor.success),
-        .init(id: "Orta", title: "Orta", subtitle: "Kim için: İntörn / Dönem 5-6", detail: "Ne beklenir: Ayırıcı tanı ve yönetim önceliği", count: 36, bg: AppColor.warningLight, stroke: AppColor.warning),
-        .init(id: "Zor", title: "Zor", subtitle: "Kim için: Asistan / Uzman", detail: "Ne beklenir: Nadir durumlar ve kritik kararlar", count: 24, bg: AppColor.errorLight, stroke: AppColor.error)
+    private let difficultyChoices: [GeneratorDifficultyChoice] = [
+        .init(
+            id: "Random",
+            title: "Rastgele",
+            trailingLabel: "Karma",
+            description: "Sürpriz bir deneyim için tüm seviyelerden vakalar",
+            icon: "shuffle",
+            iconTint: Color(hex: "#0EA5E9"),
+            iconBackground: Color(hex: "#0EA5E9"),
+            cardBackground: Color(hex: "#F0F9FF")
+        ),
+        .init(
+            id: "Kolay",
+            title: "Kolay",
+            trailingLabel: "12 Vaka",
+            description: "Dönem 3-4: Temel semptom ve tanı yaklaşımı",
+            icon: "staroflife.fill",
+            iconTint: AppColor.success,
+            iconBackground: Color(hex: "#D1FAE5"),
+            cardBackground: AppColor.surface
+        ),
+        .init(
+            id: "Orta",
+            title: "Orta",
+            trailingLabel: "24 Vaka",
+            description: "İntörn: Ayırıcı tanı ve tedavi planlama",
+            icon: "waveform.path.ecg",
+            iconTint: AppColor.warning,
+            iconBackground: Color(hex: "#FEF3C7"),
+            cardBackground: AppColor.surface
+        ),
+        .init(
+            id: "Zor",
+            title: "Zor",
+            trailingLabel: "8 Vaka",
+            description: "Asistan/Uzman: Komplike vakalar ve nadir durumlar",
+            icon: "bolt.heart.fill",
+            iconTint: AppColor.error,
+            iconBackground: Color(hex: "#FFE4E6"),
+            cardBackground: AppColor.surface
+        )
     ]
 
     var body: some View {
@@ -197,44 +225,173 @@ struct GeneratorView: View {
 
     private var difficultyStep: some View {
         selectionPageScaffold {
-            stepHeader(
-                step: "2/3",
-                title: "Zorluk seç",
-                subtitle: "\(selectedSpecialtyLabel) odağında vaka yoğunluğunu belirle."
-            )
+            difficultyTopBar
 
-            HStack(spacing: 8) {
-                generatorMetric(icon: "stethoscope", title: "Bölüm", value: selectedSpecialtyLabel)
-                generatorMetric(icon: "target", title: "Zorluk", value: difficulty)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Seçili Bölüm Özeti")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(selectedSpecialtyLabel)
+                            .font(AppFont.bodyMedium)
+                            .foregroundStyle(AppColor.textPrimary)
+                        Text(selectedSpecialtyFocusLine)
+                            .font(AppFont.caption)
+                            .foregroundStyle(AppColor.textSecondary)
+                            .lineSpacing(3)
+                            .lineLimit(2)
+                    }
+                    Spacer(minLength: 8)
+                    difficultySummaryIllustration
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(hex: "#EEF7F7"))
+                .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
             }
 
-            LazyVStack(spacing: 8) {
-                ForEach([randomDifficultyCard] + difficultyCards) { config in
-                    Button {
-                        difficulty = config.id
-                        Haptic.selection()
-                    } label: {
-                        DifficultyCard(config: config, isSelected: difficulty == config.id)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Vaka Zorluğu")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+
+                LazyVStack(spacing: 10) {
+                    ForEach(difficultyChoices) { choice in
+                        difficultyChoiceCard(choice)
                     }
-                    .buttonStyle(PressableButtonStyle())
-                    .accessibilityLabel(config.title)
-                    .accessibilityHint("Zorluk seviyesini \(config.title) olarak seçer")
                 }
             }
         } bottom: {
             Button {
                 path.append(.mode(specialty: specialty, difficulty: difficulty))
             } label: {
-                Text("Mod seç")
-                    .appPrimaryButtonLabel()
+                HStack(spacing: 8) {
+                    Text("Mod Seç")
+                        .font(AppFont.bodyMedium)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .bold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .background(Color(hex: "#0EA5E9"))
+                .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                .shadow(color: Color(hex: "#0EA5E9").opacity(0.22), radius: 6, x: 0, y: 4)
             }
-            .frame(minHeight: 50)
             .buttonStyle(PressableButtonStyle())
             .accessibilityLabel("Mod seç")
             .accessibilityHint("Seçilen bölüm ve zorluk ile mod seçim ekranına geçer")
         }
-        .navigationTitle("Zorluk Seç")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private var difficultyTopBar: some View {
+        HStack(spacing: 10) {
+            Button {
+                dismiss()
+            } label: {
+                Circle()
+                    .fill(AppColor.surface)
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(AppColor.textPrimary)
+                    )
+            }
+            .buttonStyle(PressableButtonStyle())
+
+            Text("Zorluk Seç")
+                .font(AppFont.h3)
+                .foregroundStyle(AppColor.textPrimary)
+            Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private var difficultySummaryIllustration: some View {
+        if UIImage(named: "DifficultySummaryIcon") != nil {
+            Image("DifficultySummaryIcon")
+                .resizable()
+                .scaledToFill()
+                .frame(width: 64, height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 32, style: .continuous)
+                        .stroke(Color.white, lineWidth: 2)
+                )
+                .appShadow(AppShadow.low)
+        } else {
+            Circle()
+                .fill(AppColor.surface)
+                .frame(width: 64, height: 64)
+                .overlay(
+                    Image(systemName: "stethoscope")
+                        .font(.system(size: 25, weight: .semibold))
+                        .foregroundStyle(AppColor.primary)
+                )
+        }
+    }
+
+    private func difficultyChoiceCard(_ choice: GeneratorDifficultyChoice) -> some View {
+        let isSelected = difficulty == choice.id
+
+        return Button {
+            difficulty = choice.id
+            Haptic.selection()
+        } label: {
+            HStack(spacing: 14) {
+                Circle()
+                    .fill(choice.iconBackground)
+                    .frame(width: 48, height: 48)
+                    .overlay(
+                        Image(systemName: choice.icon)
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(choice.id == "Random" ? .white : choice.iconTint)
+                    )
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(choice.title)
+                            .font(AppFont.bodyMedium)
+                            .foregroundStyle(AppColor.textPrimary)
+                        Spacer(minLength: 8)
+                        if choice.id == "Random" {
+                            Text(choice.trailingLabel)
+                                .font(AppFont.caption)
+                                .foregroundStyle(Color(hex: "#0EA5E9"))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(Color(hex: "#0EA5E9").opacity(0.12))
+                                .clipShape(Capsule())
+                        } else {
+                            Text(choice.trailingLabel)
+                                .font(AppFont.caption)
+                                .foregroundStyle(AppColor.textTertiary)
+                        }
+                    }
+
+                    Text(choice.description)
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineSpacing(3)
+                        .lineLimit(2)
+                }
+            }
+            .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity, minHeight: choice.id == "Orta" ? 82 : 94, alignment: .leading)
+            .background(isSelected ? choice.cardBackground : AppColor.surface)
+            .overlay(
+                RoundedRectangle(cornerRadius: 32, style: .continuous)
+                    .stroke(isSelected ? choice.iconTint.opacity(0.46) : AppColor.border, lineWidth: isSelected ? 1.5 : 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        }
+        .buttonStyle(PressableButtonStyle())
+        .accessibilityLabel(choice.title)
+        .accessibilityHint("Zorluk seviyesini \(choice.title) olarak seçer")
     }
 
     private func selectionPageScaffold<Content: View, Bottom: View>(
@@ -334,4 +491,15 @@ struct GeneratorView: View {
         case difficulty
         case mode(specialty: String, difficulty: String)
     }
+}
+
+private struct GeneratorDifficultyChoice: Identifiable {
+    let id: String
+    let title: String
+    let trailingLabel: String
+    let description: String
+    let icon: String
+    let iconTint: Color
+    let iconBackground: Color
+    let cardBackground: Color
 }
