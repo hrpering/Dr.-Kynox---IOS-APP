@@ -15,56 +15,8 @@ struct ProfileView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     profileHeader
 
-                    MetricBand(
-                        items: [
-                            .init(title: "Vaka", value: "\(state.caseHistory.count)"),
-                            .init(title: "Skor", value: averageScore),
-                            .init(title: "Seri", value: "\(streakDays)")
-                        ]
-                    )
-
-                    SectionCard(title: "Çalışma", subtitle: "Hedef ve performans alanları") {
-                        NavigationLink {
-                            ProfilePerformanceView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "chart.bar.fill",
-                                title: "Performans",
-                                subtitle: "Skor trendi, grafik ve rozetler",
-                                tint: AppColor.primary
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
-                            WeeklyGoalDetailView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "target",
-                                title: "Haftalık Hedef",
-                                subtitle: "Hedef ve haftalık ilerleme",
-                                tint: AppColor.success
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
-                            StudyPlanDetailView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "doc.text.fill",
-                                title: "Study Plan",
-                                subtitle: "Sınav odağı ve çalışma döngüsü",
-                                tint: AppColor.warning
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-                    }
-
-                    SectionCard(title: "Hesap", subtitle: "Kişiselleştirme ve güvenlik") {
+                    sectionTitle("Hesap")
+                    SectionCard(title: "", subtitle: nil) {
                         NavigationLink {
                             ProfileLanguagePreferencesView()
                                 .environmentObject(state)
@@ -103,19 +55,6 @@ struct ProfileView: View {
                         .buttonStyle(PressableButtonStyle())
 
                         NavigationLink {
-                            ProfileThemePreferencesView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "paintbrush.fill",
-                                title: "Tema",
-                                subtitle: "Sistem, açık veya koyu görünüm seçimi",
-                                tint: AppColor.primaryDark
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
                             ProfileSubscriptionView()
                         } label: {
                             profileRowButton(
@@ -141,7 +80,8 @@ struct ProfileView: View {
                         .buttonStyle(PressableButtonStyle())
                     }
 
-                    SectionCard(title: "Destek ve Yasal", subtitle: "Yardım, geri bildirim ve metinler") {
+                    sectionTitle("Destek ve Yasal")
+                    SectionCard(title: "", subtitle: nil) {
                         NavigationLink {
                             ProfileSupportView()
                                 .environmentObject(state)
@@ -181,6 +121,27 @@ struct ProfileView: View {
                         }
                         .buttonStyle(PressableButtonStyle())
                     }
+
+                    NavigationLink {
+                        ProfileAccountView()
+                            .environmentObject(state)
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .font(.system(size: 18, weight: .semibold))
+                            Text("Çıkış Yap")
+                                .font(AppFont.button)
+                        }
+                        .foregroundStyle(AppColor.error)
+                        .frame(maxWidth: .infinity, minHeight: 54)
+                        .background(AppColor.surfaceElevated)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                                .stroke(AppColor.border, lineWidth: 1)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                    }
+                    .buttonStyle(PressableButtonStyle())
                 }
                 .padding(16)
                 .padding(.bottom, 14)
@@ -194,29 +155,51 @@ struct ProfileView: View {
         }
     }
 
+    private func sectionTitle(_ text: String) -> some View {
+        Text(text.uppercased(with: Locale(identifier: "tr_TR")))
+            .font(AppFont.bodyMedium)
+            .foregroundStyle(AppColor.textTertiary)
+            .kerning(2)
+            .padding(.top, 4)
+    }
+
     private var profileHeader: some View {
-        HeroHeader(
-            eyebrow: readableRole,
-            title: state.profile?.fullName.isEmpty == false ? (state.profile?.fullName ?? "") : "Kullanıcı",
-            subtitle: targetExamLabel,
-            icon: "person.crop.circle.fill"
-        ) {
-            HStack(spacing: 10) {
+        VStack(spacing: 12) {
+            ZStack(alignment: .bottomTrailing) {
                 Circle()
-                    .fill(.white.opacity(0.2))
-                    .frame(width: 44, height: 44)
+                    .fill(AppColor.primaryLight)
+                    .frame(width: 110, height: 110)
                     .overlay(
                         Text(initials)
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .font(.system(size: 38, weight: .bold, design: .rounded))
+                            .foregroundStyle(AppColor.primary)
                     )
-                Text("Klinik profil ve ayarların burada yönetilir.")
-                    .font(AppFont.caption)
-                    .foregroundStyle(.white.opacity(0.85))
-                    .lineSpacing(3)
-                Spacer()
+                Circle()
+                    .fill(AppColor.success)
+                    .frame(width: 20, height: 20)
+                    .overlay(Circle().stroke(Color.white, lineWidth: 3))
             }
+            .padding(.top, 4)
+
+            Text(state.profile?.fullName.isEmpty == false ? (state.profile?.fullName ?? "") : "Kullanıcı")
+                .font(AppFont.h1)
+                .foregroundStyle(AppColor.textPrimary)
+                .multilineTextAlignment(.center)
+            Text(readableRole)
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+                .multilineTextAlignment(.center)
+
+            Text("Premium Üye")
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.primary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(AppColor.primaryLight)
+                .clipShape(Capsule())
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
     }
 
     private func sectionCard<Content: View>(title: String,

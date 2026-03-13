@@ -67,8 +67,8 @@ struct WeakAreaAnalysisView: View {
     private var analysisHeaderBand: some View {
         HeroHeader(
             eyebrow: "Analiz Merkezi",
-            title: "Zayıf Alan Merkezi",
-            subtitle: "Branş kırılımı, trend ve AI önerilerini aynı panelde takip et.",
+            title: "Zayıf Alanların",
+            subtitle: "Klinik yetkinliklerini geliştirmek için bu odak alanlarını inceleyin ve pratik yapın.",
             icon: "chart.xyaxis.line"
         )
     }

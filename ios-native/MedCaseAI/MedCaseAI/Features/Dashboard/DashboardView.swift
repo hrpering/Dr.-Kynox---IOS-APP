@@ -27,7 +27,7 @@ struct DashboardView: View {
                 .padding(.bottom, 24)
             }
             .background(AppColor.background.ignoresSafeArea())
-            .navigationTitle("Dr.Kynox")
+            .toolbar(.hidden, for: .navigationBar)
             .refreshable {
                 await state.refreshDashboard()
             }
@@ -102,59 +102,108 @@ struct DashboardView: View {
     }
 
     private var primaryActionBlock: some View {
-        HeroHeader(
-            eyebrow: "Ana Hedef",
-            title: greetingTitle,
-            subtitle: "Bugünün ana hedefi: bir vaka başlat ve karar akışını tamamla.",
-            icon: "stethoscope.circle.fill",
-            metrics: [
-                .init(title: "Ortalama", value: averageScoreText, icon: "waveform.path.ecg"),
-                .init(title: "Seri", value: "\(streakDays) gün", icon: "flame.fill"),
-                .init(
-                    title: "Haftalık",
-                    value: "\(state.weeklyGoalSummary.completedCount)/\(state.weeklyGoalSummary.target)",
-                    icon: "target"
-                )
-            ]
-        ) {
-            VStack(spacing: 8) {
-                Button {
-                    onOpenGenerator()
-                } label: {
-                    HStack(spacing: AppSpacing.x1) {
-                        Image(systemName: "bolt.fill")
-                        Text("Rastgele Vaka Başlat")
-                        Spacer()
-                        Image(systemName: "arrow.right")
+        VStack(spacing: 14) {
+            HStack(alignment: .center, spacing: 12) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColor.primary)
+                            .frame(width: 48, height: 48)
+                        Image(systemName: "cross.case.fill")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(.white)
                     }
-                    .appPrimaryButtonLabelStyle()
+                    Text("Dr.Kynox")
+                        .font(AppFont.h2)
+                        .foregroundStyle(AppColor.textPrimary)
                 }
-                .buttonStyle(PressableButtonStyle())
-                .accessibilityLabel("Vaka başlat")
-                .accessibilityHint("Vaka akışını başlatmak için seçim ekranına gider")
-
-                Button {
-                    showQuickCase = true
-                } label: {
-                    HStack(spacing: AppSpacing.x1) {
-                        Image(systemName: "timer")
-                        Text("15sn Hızlı Vaka")
-                        Spacer()
-                        Image(systemName: "arrow.right")
-                    }
-                    .appSecondaryButtonLabelStyle()
-                }
-                .buttonStyle(PressableButtonStyle())
-                .accessibilityLabel("15 saniye hızlı vaka başlat")
-                .accessibilityHint("Code Blue hızlı vaka akışını açar")
+                Spacer()
+                Circle()
+                    .fill(AppColor.surfaceAlt)
+                    .frame(width: 48, height: 48)
+                    .overlay(
+                        Image(systemName: "bell")
+                            .font(.system(size: 21, weight: .semibold))
+                            .foregroundStyle(AppColor.textSecondary)
+                    )
             }
+            .padding(.horizontal, 10)
+            .padding(.top, 4)
 
-            if completedCaseHistory.isEmpty {
-                Text("İlk vakadan sonra skor trendin, güçlü alanların ve önerilerin burada otomatik akacak.")
-                    .font(AppFont.caption)
-                    .foregroundStyle(.white.opacity(0.84))
+            VStack(alignment: .leading, spacing: 8) {
+                Text(greetingTitle)
+                    .font(AppFont.h1)
+                    .foregroundStyle(AppColor.textPrimary)
+                    .lineLimit(2)
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(AppColor.success)
+                        .frame(width: 12, height: 12)
+                    Text("Mevcut Odak: \(SpecialtyOption.label(for: preferredSpecialty))")
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(18)
+            .background(AppColor.surface)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                    .stroke(AppColor.border, lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
+            .appShadow(AppShadow.card)
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Vaka Başlat")
+                    .font(AppFont.h1)
+                    .foregroundStyle(.white)
+                Text("Yeni bir vakaya başlayarak klinik yeteneklerini geliştir.")
+                    .font(AppFont.body)
+                    .foregroundStyle(.white.opacity(0.9))
                     .lineSpacing(4)
+
+                HStack(spacing: 10) {
+                    Button {
+                        onOpenGenerator()
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "play.fill")
+                            Text("Başlat")
+                        }
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(AppColor.primary)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    }
+                    .buttonStyle(PressableButtonStyle())
+
+                    Button {
+                        showQuickCase = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "timer")
+                            Text("15sn Hızlı Vaka")
+                        }
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(Color.white.opacity(0.16))
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    }
+                    .buttonStyle(PressableButtonStyle())
+                }
             }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppColor.primary)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                    .stroke(.white.opacity(0.14), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
+            .appShadow(AppShadow.elevated)
         }
     }
 
@@ -333,11 +382,11 @@ struct DashboardView: View {
         return VStack(alignment: .leading, spacing: AppSpacing.x1 / 2) {
             Text("\(timeGreeting)\(displayName) 👋")
                 .font(AppFont.h2)
-                .foregroundStyle(.white)
+                .foregroundStyle(AppColor.textPrimary)
 
             Text("Bugün odak bölümün: \(SpecialtyOption.label(for: preferredSpecialty))")
                 .font(AppFont.body)
-                .foregroundStyle(.white.opacity(0.85))
+                .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -426,17 +475,7 @@ struct DashboardView: View {
                     Spacer()
                     Image(systemName: "arrow.right")
                 }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 14)
-                .frame(maxWidth: .infinity, minHeight: 52)
-                .background(
-                    LinearGradient(
-                        colors: [AppColor.primaryDark, AppColor.primary],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .appPrimaryButtonLabelStyle()
             }
             .buttonStyle(PressableButtonStyle())
             .accessibilityLabel("Vaka başlat")

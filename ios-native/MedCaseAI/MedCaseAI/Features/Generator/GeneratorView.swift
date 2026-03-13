@@ -70,9 +70,9 @@ struct GeneratorView: View {
     private var specialtyStep: some View {
         selectionPageScaffold {
             stepHeader(
-                step: "1/3",
+                step: "1/4",
                 title: "Bölüm seç",
-                subtitle: "Önce klinik odağı belirle. Sonraki adımda zorluk seviyesini bağlayacağız."
+                subtitle: "Vaka başlatma için klinik odağını seç."
             )
 
             HStack(spacing: 8) {
@@ -191,14 +191,14 @@ struct GeneratorView: View {
             .accessibilityLabel("Zorluk seç")
             .accessibilityHint("Zorluk seçim ekranına gider")
         }
-        .navigationTitle("Bölüm seç")
+        .navigationTitle("Bölüm Seç")
         .navigationBarTitleDisplayMode(.inline)
     }
 
     private var difficultyStep: some View {
         selectionPageScaffold {
             stepHeader(
-                step: "2/3",
+                step: "2/4",
                 title: "Zorluk seç",
                 subtitle: "\(selectedSpecialtyLabel) odağında vaka yoğunluğunu belirle."
             )
@@ -233,7 +233,7 @@ struct GeneratorView: View {
             .accessibilityLabel("Mod seç")
             .accessibilityHint("Seçilen bölüm ve zorluk ile mod seçim ekranına geçer")
         }
-        .navigationTitle("Zorluk seç")
+        .navigationTitle("Zorluk Seç")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -271,7 +271,7 @@ struct GeneratorView: View {
         ) {
             Text(selectedSpecialtyFocusLine)
                 .font(AppFont.caption)
-                .foregroundStyle(Color.white.opacity(0.9))
+                .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
                 .lineLimit(2)
         }

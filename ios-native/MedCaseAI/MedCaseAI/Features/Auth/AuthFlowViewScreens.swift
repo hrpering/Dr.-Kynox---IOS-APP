@@ -18,13 +18,13 @@ extension AuthFlowView {
 
             HeroHeader(
                 eyebrow: "Dr.Kynox",
-                title: "Klinik pratiğinin yapay zeka asistanı",
-                subtitle: "Gerçek klinik vakalar üzerinde düşün. Tanı koy, test iste, yönetim planı oluştur.",
+                title: "Klinik Düşünmeyi Öğrenin",
+                subtitle: "Tıbbi vakalar üzerinde interaktif pratik yapın ve uzmanlığınızı gerçek hayat senaryolarıyla geliştirin.",
                 icon: "stethoscope",
                 metrics: [
                     HeroMetricItem(title: "Etkileşim", value: "Sesli + Yazılı", icon: "waveform"),
-                    HeroMetricItem(title: "Kapsam", value: "Gerçek Vakalar", icon: "cross.case"),
-                    HeroMetricItem(title: "Takip", value: "Anlık Geri Bildirim", icon: "chart.line.uptrend.xyaxis")
+                    HeroMetricItem(title: "Geri Bildirim", value: "Anlık", icon: "bolt"),
+                    HeroMetricItem(title: "İlerleme", value: "Skor Takibi", icon: "chart.line.uptrend.xyaxis")
                 ]
             )
 
@@ -69,7 +69,7 @@ extension AuthFlowView {
                     screen = .signUp
                 }
             } label: {
-                Text("Vaka başlat")
+                Text("Hesap Oluştur")
                     .appPrimaryButtonLabel()
             }
             .buttonStyle(PressableButtonStyle())
@@ -87,7 +87,7 @@ extension AuthFlowView {
                     screen = .signIn
                 }
             } label: {
-                Text("Hesabım var")
+                Text("Giriş Yap")
                     .appSecondaryButtonLabel()
                     .frame(minHeight: 44)
             }
@@ -428,8 +428,8 @@ extension AuthFlowView {
         VStack(spacing: 14) {
             HeroHeader(
                 eyebrow: isSignUp ? "Yeni Hesap" : "Tekrar Hoş Geldin",
-                title: isSignUp ? "Hesap oluştur" : "Giriş yap",
-                subtitle: isSignUp ? "Klinik pratiğine başlamak için hesap oluştur." : "Kaldığın yerden devam etmek için giriş yap.",
+                title: isSignUp ? "Yeni Hesap Oluştur" : "Giriş Yap",
+                subtitle: isSignUp ? "Sağlık yolculuğunuza bugün başlayın." : "Sağlık verilerinize güvenle erişin.",
                 icon: "stethoscope",
                 metrics: [
                     HeroMetricItem(title: "Akış", value: isSignUp ? "Kayıt" : "Giriş", icon: "arrow.triangle.branch"),
@@ -444,8 +444,10 @@ extension AuthFlowView {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(spacing: 8) {
-                socialButton(icon: "applelogo", title: "Apple ile Giriş")
-                socialButton(icon: "g.circle", title: "Google ile Giriş")
+                HStack(spacing: 10) {
+                    socialButton(icon: "g.circle", title: "Google")
+                    socialButton(icon: "applelogo", title: "Apple")
+                }
             }
 
             HStack(spacing: 10) {

@@ -44,16 +44,10 @@ struct DSPrimaryButtonStyle: ButtonStyle {
             .font(AppFont.button)
             .foregroundStyle(Color.white)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(
-                LinearGradient(
-                    colors: [AppColor.primaryDark, AppColor.primary],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            .background(AppColor.primary)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(.white.opacity(0.2), lineWidth: 1)
+                    .stroke(.white.opacity(0.16), lineWidth: 1)
             )
             .appShadow(AppShadow.elevated)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
@@ -66,12 +60,12 @@ struct DSSecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(AppFont.button)
-            .foregroundStyle(AppColor.primaryDark)
+            .foregroundStyle(AppColor.primary)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
             .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(AppColor.primary.opacity(0.34), lineWidth: 1.2)
+                    .stroke(AppColor.border, lineWidth: 1.2)
             )
             .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
@@ -111,11 +105,6 @@ struct DSInfoCard<Content: View>: View {
         }
         .padding(AppSpacing.cardPadding)
         .background(baseBackground)
-        .overlay(alignment: .topLeading) {
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .fill(accentOverlay)
-                .frame(height: 52)
-        }
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(tone.border, lineWidth: 1)
@@ -133,20 +122,7 @@ struct DSInfoCard<Content: View>: View {
         }
     }
 
-    private var accentOverlay: Color {
-        switch tone {
-        case .primary:
-            return AppColor.primaryLight.opacity(0.6)
-        case .success:
-            return AppColor.successLight.opacity(0.6)
-        case .warning:
-            return AppColor.warningLight.opacity(0.6)
-        case .danger:
-            return AppColor.errorLight.opacity(0.55)
-        case .neutral:
-            return .clear
-        }
-    }
+    private var accentOverlay: Color { .clear }
 }
 
 struct DSAlertCard<Content: View>: View {
@@ -257,6 +233,9 @@ struct DSNavigationRow<Accessory: View>: View {
             Image(systemName: icon)
                 .foregroundStyle(AppColor.primary)
                 .frame(width: 24, height: 24)
+                .padding(10)
+                .background(AppColor.primaryLight)
+                .clipShape(Circle())
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(AppFont.bodyMedium)

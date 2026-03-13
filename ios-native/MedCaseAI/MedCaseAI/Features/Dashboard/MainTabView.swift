@@ -35,15 +35,15 @@ struct MainTabView: View {
         ]
 
         let selected = appearance.stackedLayoutAppearance.selected
-        selected.iconColor = UIColor(AppColor.primaryDark)
+        selected.iconColor = UIColor(AppColor.primary)
         selected.titleTextAttributes = [
-            .foregroundColor: UIColor(AppColor.primaryDark),
+            .foregroundColor: UIColor(AppColor.primary),
             .font: UIFont.systemFont(ofSize: 11, weight: .semibold)
         ]
 
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
-        UITabBar.appearance().tintColor = UIColor(AppColor.primaryDark)
+        UITabBar.appearance().tintColor = UIColor(AppColor.primary)
         UITabBar.appearance().unselectedItemTintColor = UIColor(AppColor.textSecondary)
         UITabBar.appearance().selectionIndicatorImage = UIImage()
     }
@@ -66,7 +66,7 @@ struct MainTabView: View {
         TabView(selection: selectedTab) {
             GeneratorView()
                 .tabItem {
-                    Label("Vaka", systemImage: "cross.case")
+                    Label("Vakalar", systemImage: "cross.case")
                 }
                 .tag(Tab.generator)
 

@@ -34,124 +34,56 @@ struct OnboardingHeroIllustration: View {
 
 struct OnboardingHowItWorksStep: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Nasıl Çalışır")
-                .font(AppFont.title)
-                .foregroundStyle(AppColor.textPrimary)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text("Adım 5/5")
+                    .font(AppFont.h3)
+                    .foregroundStyle(AppColor.textPrimary)
+                Spacer()
+                Text("TAMAMLANDI")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.success)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(AppColor.successLight)
+                    .clipShape(Capsule())
+            }
 
-            Text("3 kısa adımda vaka akışına girer, sonunda net geri bildirim alırsın.")
+            Capsule()
+                .fill(AppColor.success)
+                .frame(height: 12)
+
+            Text("Tebrikler!")
+                .font(AppFont.h1)
+                .foregroundStyle(AppColor.textPrimary)
+            Text("Kurulum başarıyla tamamlandı.")
                 .font(AppFont.body)
                 .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
 
-            VStack(alignment: .leading, spacing: 7) {
-                HStack {
-                    Text("Örnek konuşma")
-                        .font(AppFont.bodyMedium)
-                        .foregroundStyle(AppColor.textPrimary)
-                    Spacer()
-                    Text("Canlı akış")
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.success)
-                }
-
-                DemoMessageBubble(
-                    sender: "Dr. Kynox",
-                    text: "35 yaşında hastada ateş ve halsizlik var. İlk yaklaşımın ne olur?",
-                    isAgent: true
-                )
-                DemoMessageBubble(
-                    sender: "Sen",
-                    text: "Önce öyküyü derinleştirir, ardından tam kan ve CRP isterim.",
-                    isAgent: false
-                )
-            }
-            .padding(12)
-            .background(AppColor.surface)
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(AppColor.border, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-
-            HStack(spacing: 7) {
-                onboardingModePill(
-                    icon: "mic.fill",
-                    title: "Sesli",
-                    subtitle: "Doğal konuşma",
-                    tint: AppColor.success,
-                    background: AppColor.successLight
-                )
-                onboardingModePill(
-                    icon: "keyboard",
-                    title: "Yazılı",
-                    subtitle: "Hızlı mesaj",
-                    tint: AppColor.primary,
-                    background: AppColor.primaryLight
-                )
-            }
-
-            VStack(spacing: 7) {
+            VStack(spacing: 10) {
                 HowItWorksCompactRow(
-                    icon: "1.circle.fill",
+                    icon: "stethoscope",
                     title: "Bölümünü seç",
-                    subtitle: "İstediğin klinik alandan başla.",
+                    subtitle: "Uzmanlık alanına en uygun vakaları belirle.",
                     tint: AppColor.primary
                 )
                 HowItWorksCompactRow(
-                    icon: "2.circle.fill",
+                    icon: "figure.walk",
                     title: "Vakayı yönet",
-                    subtitle: "Soru sor, test iste, planını kur.",
-                    tint: AppColor.success
+                    subtitle: "Simülasyon üzerinde gerçekçi tedavi adımlarını uygula.",
+                    tint: AppColor.warning
                 )
                 HowItWorksCompactRow(
-                    icon: "3.circle.fill",
+                    icon: "chart.bar.fill",
                     title: "Skorunu gör",
-                    subtitle: "Güçlü ve gelişecek alanların çıksın.",
-                    tint: AppColor.warning
+                    subtitle: "Performans analizini ve mesleki gelişimini anlık takip et.",
+                    tint: AppColor.success
                 )
             }
 
             Spacer(minLength: 0)
         }
         .frame(maxHeight: .infinity, alignment: .top)
-    }
-
-    @ViewBuilder
-    private func onboardingModePill(icon: String,
-                                    title: String,
-                                    subtitle: String,
-                                    tint: Color,
-                                    background: Color) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(tint)
-                .frame(width: 28, height: 28)
-                .background(tint.opacity(0.15))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(AppFont.bodyMedium)
-                    .foregroundStyle(AppColor.textPrimary)
-                    .lineLimit(1)
-                Text(subtitle)
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textSecondary)
-                    .lineLimit(1)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(background)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(tint.opacity(0.24), lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 

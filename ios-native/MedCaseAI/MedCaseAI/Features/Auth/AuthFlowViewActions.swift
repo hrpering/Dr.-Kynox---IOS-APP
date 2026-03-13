@@ -376,25 +376,16 @@ extension AuthFlowView {
             infoText = "\(title) yakında aktif olacak."
             Haptic.selection()
         } label: {
-            HStack(spacing: 8) {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(AppColor.surfaceAlt)
-                    .frame(width: 32, height: 32)
-                    .overlay(
-                        Image(systemName: icon)
-                            .font(.system(size: 14, weight: .semibold))
-                    )
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 19, weight: .semibold))
                 Text(title)
                     .lineLimit(1)
-                Spacer(minLength: 0)
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(AppColor.textTertiary)
             }
             .font(AppFont.bodyMedium)
             .foregroundStyle(AppColor.textPrimary)
             .frame(maxWidth: .infinity, minHeight: 52)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)

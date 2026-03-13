@@ -22,9 +22,8 @@ struct OnboardingView: View {
     @State private var isSaving = false
     @State private var errorText = ""
     @State private var legalSheetItem: LegalSheetItem?
-    @State private var introLegalAccepted = false
 
-    private let totalSteps = 7
+    private let totalSteps = 5
     private var transition: AnyTransition { reduceMotion ? .opacity : .move(edge: .trailing) }
     private var completionPercent: Int {
         Int((Double(step + 1) / Double(max(totalSteps, 1)) * 100).rounded())
@@ -38,41 +37,32 @@ struct OnboardingView: View {
                 ZStack {
                     switch step {
                     case 0:
-                        OnboardingIntroStep()
-                            .transition(transition)
-                    case 1:
-                        OnboardingHowItWorksStep()
-                            .transition(transition)
-                    case 2:
-                        OnboardingLanguageCountryStep(
-                            selectedLanguageCode: $selectedLanguageCode,
-                            selectedCountryCode: $selectedCountryCode
-                        )
-                        .transition(transition)
-                    case 3:
                         OnboardingIdentityStep(
                             firstName: $onboardingFirstName,
                             lastName: $onboardingLastName,
                             phoneNumber: $onboardingPhone
                         )
-                        .transition(transition)
-                    case 4:
+                            .transition(transition)
+                    case 1:
                         OnboardingLevelStep(selectedTrack: $selectedTrack)
                             .transition(transition)
-                    case 5:
+                    case 2:
                         OnboardingStudyPlanSetupStep(
                             selectedExamTarget: $selectedExamTarget,
                             selectedExamWindow: $selectedExamWindow,
                             dailyStudyMinutes: $dailyStudyMinutes
                         )
-                        .transition(transition)
-                    default:
+                            .transition(transition)
+                    case 3:
                         OnboardingStudyPlanReadyStep(
                             selectedExamTarget: selectedExamTarget,
                             selectedExamWindow: selectedExamWindow,
                             dailyStudyMinutes: dailyStudyMinutes
                         )
                         .transition(transition)
+                    default:
+                        OnboardingHowItWorksStep()
+                            .transition(transition)
                     }
                 }
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: step)
@@ -85,10 +75,6 @@ struct OnboardingView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
                 .appShadow(AppShadow.card)
-
-                if step == 0 {
-                    onboardingLegalLinks
-                }
             }
             .padding(.horizontal, AppSpacing.x2)
             .padding(.top, AppSpacing.x1_5)
@@ -103,23 +89,6 @@ struct OnboardingView: View {
             .task {
                 seedIdentityFromProfileIfNeeded()
             }
-            .toolbar {
-                if step < 3 {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Geç") {
-                            Haptic.selection()
-                            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
-                                step = 3
-                            }
-                        }
-                        .font(AppFont.bodyMedium)
-                        .foregroundStyle(AppColor.primary)
-                        .disabled(isSaving)
-                        .accessibilityLabel("Geç")
-                        .accessibilityHint("Onboarding adımlarını atlar")
-                    }
-                }
-            }
         }
     }
 
@@ -131,7 +100,7 @@ struct OnboardingView: View {
             icon: "person.text.rectangle",
             metrics: [
                 HeroMetricItem(title: "Tamamlanma", value: "%\(completionPercent)", icon: "chart.bar.fill"),
-                HeroMetricItem(title: "Dil", value: selectedLanguageCode.uppercased(), icon: "globe"),
+                HeroMetricItem(title: "Seviye", value: selectedTrack.title, icon: "graduationcap"),
                 HeroMetricItem(title: "Hedef", value: selectedExamTarget.title, icon: "target")
             ]
         ) {
@@ -142,7 +111,7 @@ struct OnboardingView: View {
                 HStack(spacing: 7) {
                     ForEach(0..<totalSteps, id: \.self) { idx in
                         Capsule()
-                            .fill(idx <= step ? .white : .white.opacity(0.24))
+                            .fill(idx <= step ? AppColor.primary : AppColor.border)
                             .frame(width: segmentWidth, height: 5)
                     }
                 }
@@ -155,7 +124,7 @@ struct OnboardingView: View {
         BottomCTADock {
             Button {
                 guard canAdvanceCurrentStep else {
-                    if step == 2 {
+                    if step == 0 {
                         errorText = "Ad, soyad ve telefon bilgisi zorunlu."
                     }
                     Haptic.error()
@@ -195,80 +164,16 @@ struct OnboardingView: View {
     private var onboardingStepSubtitle: String {
         switch step {
         case 0:
-            return "Uygulama kapsamını ve yasal çerçeveyi hızlıca netleştir."
+            return "Profilini tamamlayarak öğrenme planını kişiselleştir."
         case 1:
-            return "Vaka akışının nasıl ilerlediğini kısa bir turla gör."
+            return "Mesleki seviyeni seç ve önerileri doğru zorlukta al."
         case 2:
-            return "Dil ve ülke ayarlarını belirleyip deneyimi kişiselleştir."
+            return "Hedef sınavını ve günlük çalışma temposunu planla."
         case 3:
-            return "Profil bilgilerini tamamlayarak öğrenme takibini etkinleştir."
-        case 4:
-            return "Hedef seviyeni seçerek önerileri doğru zorlukta al."
-        case 5:
-            return "Sınav hedefi ve çalışma temposunu planla."
+            return "Planın hazır. Son detayları gözden geçir."
         default:
-            return "Planını onayla ve ana ekrana geçerek vaka pratiğine başla."
+            return "Kurulumu tamamla ve vaka pratiğine başla."
         }
-    }
-
-    private var onboardingLegalLinks: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            Text("Devam etmeden önce metinleri inceleyebilirsin:")
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
-
-            HStack(spacing: 8) {
-                onboardingLegalButton(title: "Tıbbi Red", page: .medicalDisclaimer)
-                onboardingLegalButton(title: "Açık Rıza", page: .consent)
-            }
-
-            Button {
-                introLegalAccepted.toggle()
-                Haptic.selection()
-            } label: {
-                HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: introLegalAccepted ? "checkmark.circle.fill" : "circle")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(introLegalAccepted ? AppColor.success : AppColor.textTertiary)
-                        .frame(width: 20, height: 20)
-                    Text("Tıbbi Sorumluluk Reddi ve Açık Rıza metinlerini okudum, kabul ediyorum.")
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.textPrimary)
-                        .lineSpacing(3)
-                        .multilineTextAlignment(.leading)
-                    Spacer(minLength: 0)
-                }
-                .padding(.horizontal, 9)
-                .padding(.vertical, 9)
-                .background(AppColor.surface)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(introLegalAccepted ? AppColor.success.opacity(0.35) : AppColor.border, lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-            }
-            .buttonStyle(PressableButtonStyle())
-            .accessibilityLabel("Yasal metinleri kabul et")
-            .accessibilityHint("Onboarding adımında devam etmek için gerekli onay")
-
-            if !introLegalAccepted {
-                Text("Devam etmek için onay kutusunu işaretle.")
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.warning)
-                    .lineSpacing(3)
-                    .padding(.leading, 4)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppSpacing.cardPadding)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.card)
     }
 
     private func onboardingLegalButton(title: String, page: LegalPageLink) -> some View {
@@ -305,7 +210,7 @@ struct OnboardingView: View {
             isSaving = false
             errorText = "Ad, soyad ve telefon bilgisi zorunlu."
             withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
-                step = 2
+                step = 0
             }
             Haptic.error()
             return
@@ -355,11 +260,6 @@ struct OnboardingView: View {
     private var canAdvanceCurrentStep: Bool {
         switch step {
         case 0:
-            return introLegalAccepted
-        case 2:
-            return !AppLanguage.normalizeBCP47(selectedLanguageCode, fallback: "").isEmpty &&
-                !AppCountry.normalize(selectedCountryCode).isEmpty
-        case 3:
             return isIdentityStepValid
         default:
             return true
@@ -395,13 +295,11 @@ struct OnboardingView: View {
 
     private var onboardingButtonTitle: String {
         switch step {
-        case 0: return "Devam et"
-        case 1: return "Anladım, Başlayalım"
-        case 2: return "Dil ve Ülke Kaydet"
-        case 3: return "Seviyeni Seç"
-        case 4: return "Çalışma Planına Geç"
-        case 5: return "Planım Hazır"
-        case 6: return "Onboarding'i Tamamla"
+        case 0: return "Seviyeni Seç"
+        case 1: return "Çalışma Planına Geç"
+        case 2: return "Planın Hazır"
+        case 3: return "Son Adım"
+        case 4: return "Onboarding'i Tamamla"
         default: return "Devam et"
         }
     }

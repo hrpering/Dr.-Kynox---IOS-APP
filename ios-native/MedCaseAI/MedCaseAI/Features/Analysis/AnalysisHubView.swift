@@ -7,6 +7,11 @@ import Sentry
 
 struct AnalysisHubView: View {
     @EnvironmentObject private var state: AppState
+    private enum AnalysisRange: String, CaseIterable {
+        case weekly = "Haftalık"
+        case monthly = "Aylık"
+        case yearly = "Yıllık"
+    }
     private enum Destination: Int, Identifiable {
         case weakArea
         case quickFavorites
@@ -17,12 +22,14 @@ struct AnalysisHubView: View {
     @State private var favoriteCardTotal = 0
     @State private var latestFavoriteLabel = "--"
     @State private var didInitialLoad = false
+    @State private var selectedRange: AnalysisRange = .monthly
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
                     analysisHeroCard
+                    analysisRangeTabs
                     summaryStatsRow
 
                     VStack(alignment: .leading, spacing: 10) {
@@ -89,7 +96,7 @@ struct AnalysisHubView: View {
                 .padding(16)
             }
             .background(AppColor.background.ignoresSafeArea())
-            .navigationTitle("Analiz")
+            .navigationTitle("Analiz Merkezi")
             .onAppear {
                 if state.selectedMainTab == "flashcards" {
                     destination = .quickFavorites
@@ -138,7 +145,7 @@ struct AnalysisHubView: View {
         HeroHeader(
             eyebrow: "Analiz",
             title: "Analiz Merkezi",
-            subtitle: "Skor trendi, branş haritası ve hızlı vaka kartlarını tek panelde yönet.",
+            subtitle: "Genel skor trendi, bölüm bazlı analiz ve üretkenlik özetini takip et.",
             icon: "waveform.path.ecg.rectangle",
             metrics: [
                 .init(title: "Skorlu vaka", value: "\(scoredSessions.count)"),
@@ -146,6 +153,29 @@ struct AnalysisHubView: View {
                 .init(title: "Favori kart", value: "\(favoriteCardTotal)")
             ]
         )
+    }
+
+    private var analysisRangeTabs: some View {
+        HStack(spacing: 10) {
+            ForEach(AnalysisRange.allCases, id: \.rawValue) { range in
+                Button {
+                    selectedRange = range
+                    Haptic.selection()
+                } label: {
+                    Text(range.rawValue)
+                        .font(AppFont.bodyMedium)
+                        .foregroundStyle(selectedRange == range ? AppColor.primary : AppColor.textSecondary)
+                        .frame(maxWidth: .infinity, minHeight: 42)
+                        .background(selectedRange == range ? AppColor.primaryLight : AppColor.surface)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(selectedRange == range ? AppColor.primary : AppColor.border, lineWidth: 1)
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(PressableButtonStyle())
+            }
+        }
     }
 
     private var completedSessions: [CaseSession] {
@@ -184,7 +214,7 @@ struct AnalysisHubView: View {
     private var scoreTrendCard: some View {
         DSInfoCard(tone: .primary) {
             sectionHeader(title: "Genel Skor Trendi")
-            Text("Son 7 gün skor ve vaka yoğunluğu")
+            Text("\(selectedRange.rawValue) görünümde skor ve vaka yoğunluğu")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
 
