@@ -1,0 +1,24 @@
+import SwiftUI
+
+@main
+struct MedCaseAIApp: App {
+    @UIApplicationDelegateAdaptor(PushNotificationBridge.self) private var pushNotificationBridge
+    @StateObject private var appState = AppState()
+
+    init() {
+        SentryRuntime.configureIfPossible(serverEnabled: false)
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            RootView()
+                .environmentObject(appState)
+                .environment(\.locale, appState.uiLocale)
+                .environment(\.layoutDirection, appState.uiLayoutDirection)
+                .preferredColorScheme(appState.preferredColorScheme)
+                .task {
+                    await appState.bootstrap()
+                }
+        }
+    }
+}

@@ -1,0 +1,6 @@
+#include "Common.xcconfig"
+
+APP_ENVIRONMENT = development
+APP_BACKEND_BASE_URL = https:$(URL_SLASH)$(URL_SLASH)www.medcase.website
+APP_SENTRY_DSN =
+APP_SENTRY_ENVIRONMENT = development

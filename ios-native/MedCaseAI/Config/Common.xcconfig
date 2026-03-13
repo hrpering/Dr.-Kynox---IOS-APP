@@ -1,0 +1,2 @@
+// Shared app configuration for all environments.
+URL_SLASH = /
