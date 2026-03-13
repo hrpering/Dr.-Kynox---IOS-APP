@@ -610,58 +610,106 @@ struct OnboardingLevelStep: View {
     @Binding var selectedTrack: UserTrack
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Seviyeni Seç")
-                .font(AppFont.largeTitle)
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Hangi seviyedesiniz?")
+                .font(AppFont.title)
                 .foregroundStyle(AppColor.textPrimary)
 
-            Text("Kime yönelik olduğunu netleştir; içerik akışı buna göre kişiselleşsin.")
+            Text("Size en uygun içerikleri ve vaka analizlerini sunabilmemiz için mesleki seviyenizi belirtin.")
                 .font(AppFont.body)
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(4)
 
             ForEach(UserTrack.allCases, id: \.self) { track in
+                let isSelected = selectedTrack == track
                 Button {
                     selectedTrack = track
                     Haptic.selection()
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: track.icon)
-                            .font(.system(size: 22, weight: .semibold))
-                            .foregroundStyle(track.color)
-                            .frame(width: 34, height: 34)
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(iconColor(for: track))
+                            .frame(width: 48, height: 48)
+                            .background(iconBackground(for: track))
+                            .clipShape(Circle())
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(track.title)
-                                .font(AppFont.title2)
+                            Text(trackLabel(for: track))
+                                .font(AppFont.bodyMedium)
                                 .foregroundStyle(AppColor.textPrimary)
-                            Text(track.subtitle)
-                                .font(AppFont.body)
+                            Text(trackDescription(for: track))
+                                .font(AppFont.secondary)
                                 .foregroundStyle(AppColor.textSecondary)
                                 .lineSpacing(4)
-                                .lineLimit(3)
+                                .lineLimit(2)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         Spacer()
-                        if selectedTrack == track {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 20))
-                                .foregroundStyle(AppColor.primary)
+                        ZStack {
+                            Circle()
+                                .fill(isSelected ? AppColor.primary : AppColor.surfaceElevated)
+                            Circle()
+                                .stroke(isSelected ? AppColor.primary : AppColor.border, lineWidth: 2)
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 8, height: 8)
+                                .opacity(isSelected ? 1 : 0)
                         }
+                        .frame(width: 24, height: 24)
                     }
-                    .padding(16)
-                    .frame(maxWidth: .infinity, minHeight: 102, alignment: .leading)
-                    .background(selectedTrack == track ? AppColor.primaryLight : AppColor.surfaceElevated)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: .infinity, minHeight: 108, alignment: .leading)
+                    .background(isSelected ? AppColor.primaryLight.opacity(0.55) : AppColor.surfaceElevated)
                     .overlay(
-                        RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                            .stroke(selectedTrack == track ? AppColor.primary : AppColor.border, lineWidth: selectedTrack == track ? 2 : 1)
+                        RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                            .stroke(isSelected ? AppColor.primary.opacity(0.22) : AppColor.border, lineWidth: 1)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
                 }
                 .buttonStyle(PressableButtonStyle())
             }
+
+            Text("GÜVENLİ TIBBİ PLATFORM")
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textTertiary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 2)
         }
         .frame(maxHeight: .infinity, alignment: .top)
         .padding(.top, 2)
+    }
+
+    private func trackLabel(for track: UserTrack) -> String {
+        switch track {
+        case .student: return "Tıp Öğrencisi"
+        case .intern: return "İntörn / Dönem"
+        case .resident: return "Asistan / Uzman"
+        }
+    }
+
+    private func trackDescription(for track: UserTrack) -> String {
+        switch track {
+        case .student: return "Temel tıp bilimleri ve klinik öncesi eğitim"
+        case .intern: return "Klinik uygulama ve aktif hastane staj dönemi"
+        case .resident: return "Uzmanlık eğitimi ve profesyonel tıp pratiği"
+        }
+    }
+
+    private func iconBackground(for track: UserTrack) -> Color {
+        switch track {
+        case .student: return AppColor.success.opacity(0.10)
+        case .intern: return AppColor.primary.opacity(0.10)
+        case .resident: return AppColor.warning.opacity(0.10)
+        }
+    }
+
+    private func iconColor(for track: UserTrack) -> Color {
+        switch track {
+        case .student: return AppColor.success
+        case .intern: return AppColor.primary
+        case .resident: return AppColor.warning
+        }
     }
 }
 
