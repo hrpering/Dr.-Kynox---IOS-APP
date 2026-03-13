@@ -1,6 +1,0 @@
-#include "Common.xcconfig"
-
-APP_ENVIRONMENT = staging
-APP_BACKEND_BASE_URL = https:$(URL_SLASH)$(URL_SLASH)www.medcase.website
-APP_SENTRY_DSN =
-APP_SENTRY_ENVIRONMENT = staging

@@ -1,6 +1,0 @@
-#include "Common.xcconfig"
-
-APP_ENVIRONMENT = production
-APP_BACKEND_BASE_URL = https:$(URL_SLASH)$(URL_SLASH)www.medcase.website
-APP_SENTRY_DSN = https:$(URL_SLASH)$(URL_SLASH)81a71c504ea49c31da6dc5f329c81f78@o4511010111225856.ingest.de.sentry.io/4511010113585232
-APP_SENTRY_ENVIRONMENT = production
