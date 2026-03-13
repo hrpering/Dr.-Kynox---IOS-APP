@@ -211,6 +211,141 @@ extension AuthFlowView {
     }
 
     var checkEmailCard: some View {
+        Group {
+            if verificationCompleted && !isPasswordResetFlow {
+                emailVerifiedCompletionCard
+            } else {
+                defaultCheckEmailCard
+            }
+        }
+    }
+
+    private var emailVerifiedCompletionCard: some View {
+        VStack(spacing: 18) {
+            VStack(spacing: 12) {
+                Text("E-posta doğrulandı")
+                    .font(AppFont.h1)
+                    .foregroundStyle(AppColor.textPrimary)
+                    .multilineTextAlignment(.center)
+
+                Text("Hesabın aktifleştirildi. Şimdi giriş yapabilirsin.")
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+            .padding(.top, 6)
+
+            ZStack(alignment: .top) {
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                    .fill(Color(hex: "#F8FAFC"))
+                    .frame(height: 280)
+                    .padding(.top, 48)
+
+                if UIImage(named: "EmailVerifiedDoctor") != nil {
+                    Image("EmailVerifiedDoctor")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 278, height: 278)
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                        .padding(.top, 49)
+                } else {
+                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                        .fill(Color(hex: "#E2E8F0"))
+                        .overlay(
+                            Image(systemName: "person.text.rectangle.fill")
+                                .font(.system(size: 56, weight: .semibold))
+                                .foregroundStyle(AppColor.textSecondary)
+                        )
+                        .frame(width: 278, height: 278)
+                        .padding(.top, 49)
+                }
+
+                ZStack {
+                    Circle()
+                        .fill(AppColor.success.opacity(0.12))
+                        .frame(width: 128, height: 128)
+                    Circle()
+                        .fill(AppColor.success)
+                        .frame(width: 96, height: 96)
+                        .overlay(
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 42, weight: .bold))
+                                .foregroundStyle(.white)
+                        )
+                        .shadow(color: AppColor.success.opacity(0.25), radius: 8, x: 0, y: 4)
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            if let remaining = signInRedirectRemaining {
+                Text("\(remaining) saniye sonra giriş ekranına yönlendiriliyorsun")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            Button {
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                    signInRedirectDeadline = nil
+                    clearAuthFieldsForSignIn()
+                    screen = .signIn
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Text("Girişe Dön")
+                        .font(AppFont.bodyMedium)
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 14, weight: .semibold))
+                }
+                .appPrimaryButtonLabelStyle()
+            }
+            .buttonStyle(PressableButtonStyle())
+
+            HStack(spacing: 4) {
+                Text("Yardıma mı ihtiyacınız var?")
+                    .foregroundStyle(AppColor.textSecondary)
+                Button {
+                    guard let url = LegalLinkResolver.url(for: .support) else { return }
+                    legalSheetItem = LegalSheetItem(title: LegalPageLink.support.title, url: url)
+                    Haptic.selection()
+                } label: {
+                    Text("Destekle iletişime geçin")
+                        .foregroundStyle(AppColor.primary)
+                }
+                .buttonStyle(.plain)
+            }
+            .font(AppFont.caption)
+            .multilineTextAlignment(.center)
+
+            if !infoText.isEmpty {
+                Text(infoText)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.success)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+
+            if !errorText.isEmpty {
+                Text(errorText)
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.error)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .top)
+        .background(AppColor.surfaceElevated)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
+    }
+
+    private var defaultCheckEmailCard: some View {
         let heroTitle = verificationCompleted
             ? "E-posta doğrulandı"
             : (isPasswordResetFlow ? (resetCodeVerified ? "Yeni şifreni belirle" : "Şifre sıfırlama kodu") : "E-postanı kontrol et")
