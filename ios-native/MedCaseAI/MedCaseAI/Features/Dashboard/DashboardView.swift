@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct DashboardView: View {
     @EnvironmentObject private var state: AppState
@@ -13,18 +14,19 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    primaryActionBlock
-                    dailyChallengeBlock
-                    weeklyGoalCard
-                    studyPlanCycleCard
-                    weakAreaInsightCard
-                    progressBlock
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
+                    dashboardHeader
+                    VStack(spacing: 12) {
+                        startCaseCard
+                        dailyChallengeBlock
+                        progressSummaryCard
+                        quickAccessRow
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 24)
+                .padding(.top, 8)
             }
             .background(AppColor.background.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
@@ -92,6 +94,57 @@ struct DashboardView: View {
         }
     }
 
+    private var dashboardHeader: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .center, spacing: 12) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(AppColor.primary)
+                            .frame(width: 40, height: 40)
+                        Image(systemName: "cross.case.fill")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
+                    Text("Dr.Kynox")
+                        .font(AppFont.h3)
+                        .foregroundStyle(AppColor.textPrimary)
+                }
+                Spacer()
+                Circle()
+                    .fill(AppColor.surfaceAlt)
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Image(systemName: "bell")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(AppColor.textSecondary)
+                    )
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(greetingTitle)
+                    .font(AppFont.h2)
+                    .foregroundStyle(AppColor.textPrimary)
+                    .lineLimit(2)
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(AppColor.success)
+                        .frame(width: 8, height: 8)
+                    Text("Mevcut Odak: \(SpecialtyOption.label(for: preferredSpecialty))")
+                        .font(AppFont.secondary)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 24)
+        .padding(.bottom, 22)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(AppColor.surface)
+        .clipShape(BottomRoundedShape(radius: 48))
+        .appShadow(AppShadow.low)
+    }
+
     private func prepareNotificationPrimerIfNeeded() {
         Task {
             let shouldShow = await state.shouldShowNotificationPrimer()
@@ -101,59 +154,8 @@ struct DashboardView: View {
         }
     }
 
-    private var primaryActionBlock: some View {
-        VStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(alignment: .center, spacing: 12) {
-                    HStack(spacing: 12) {
-                        ZStack {
-                            Circle()
-                                .fill(AppColor.primary)
-                                .frame(width: 40, height: 40)
-                            Image(systemName: "cross.case.fill")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundStyle(.white)
-                        }
-                        Text("Dr.Kynox")
-                            .font(AppFont.h3)
-                            .foregroundStyle(AppColor.textPrimary)
-                    }
-                    Spacer()
-                    Circle()
-                        .fill(AppColor.surfaceAlt)
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            Image(systemName: "bell")
-                                .font(.system(size: 17, weight: .semibold))
-                                .foregroundStyle(AppColor.textSecondary)
-                        )
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(greetingTitle)
-                        .font(AppFont.h2)
-                        .foregroundStyle(AppColor.textPrimary)
-                        .lineLimit(2)
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(AppColor.success)
-                            .frame(width: 10, height: 10)
-                        Text("Mevcut Odak: \(SpecialtyOption.label(for: preferredSpecialty))")
-                            .font(AppFont.bodyMedium)
-                            .foregroundStyle(AppColor.textSecondary)
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(18)
-            .background(AppColor.surface)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(AppColor.border, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-            .appShadow(AppShadow.low)
-
+    private var startCaseCard: some View {
+        ZStack(alignment: .bottomTrailing) {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Vaka Başlat")
                     .font(AppFont.h2)
@@ -173,9 +175,10 @@ struct DashboardView: View {
                         }
                         .font(AppFont.bodyMedium)
                         .foregroundStyle(AppColor.primary)
-                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .frame(width: 108, height: 44)
                         .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .clipShape(Capsule())
+                        .appShadow(AppShadow.low)
                     }
                     .buttonStyle(PressableButtonStyle())
 
@@ -186,140 +189,194 @@ struct DashboardView: View {
                             Image(systemName: "timer")
                             Text("15sn Hızlı Vaka")
                         }
-                        .font(AppFont.bodyMedium)
+                        .font(AppFont.secondary)
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: 44)
                         .background(Color.white.opacity(0.16))
-                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .clipShape(Capsule())
                     }
                     .buttonStyle(PressableButtonStyle())
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(18)
+            .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColor.primary)
             .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                RoundedRectangle(cornerRadius: 48, style: .continuous)
                     .stroke(.white.opacity(0.14), lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-            .appShadow(AppShadow.card)
+            .clipShape(RoundedRectangle(cornerRadius: 48, style: .continuous))
+            .shadow(color: AppColor.primary.opacity(0.2), radius: 10, x: 0, y: 8)
+
+            Image(systemName: "stethoscope")
+                .font(.system(size: 70, weight: .light))
+                .foregroundStyle(.white.opacity(0.2))
+                .offset(x: 20, y: 12)
         }
     }
 
     private var dailyChallengeBlock: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Günün Vakası")
-                .font(AppFont.h3)
-                .foregroundStyle(AppColor.textPrimary)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Günün Vakası")
+                    .font(AppFont.h3)
+                    .foregroundStyle(AppColor.textPrimary)
+                Spacer()
+                Text("Kalan: \(state.challengeTimeLeft?.label ?? "--")")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
 
             if state.isBusy && state.challenge == nil {
                 VStack(spacing: AppSpacing.x1) {
-                    ShimmerView().frame(height: 160)
-                    ShimmerView().frame(height: 52)
+                    ShimmerView()
+                        .frame(height: 120)
                 }
             } else if let challenge = state.challenge {
                 challengeCard(challenge)
             } else {
-                DSAlertCard(tone: .warning) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text("Günün vakası şu an alınamadı.")
                         .font(AppFont.bodyMedium)
                         .foregroundStyle(AppColor.textPrimary)
                     Text("Bağlantını kontrol edip tekrar deneyebilirsin.")
-                        .font(AppFont.body)
+                        .font(AppFont.secondary)
                         .foregroundStyle(AppColor.textSecondary)
-                        .lineSpacing(4)
                     Button("Yeniden Dene") {
-                        Task { await state.refreshDashboard() }
+                        Task {
+                            await state.refreshDashboard()
+                        }
                     }
-                    .dsTertiaryAction(.warning)
-                    .buttonStyle(PressableButtonStyle())
+                    .buttonStyle(DSSecondaryButtonStyle())
                 }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppColor.surface)
+                .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                .appShadow(AppShadow.low)
             }
         }
     }
 
-    private var progressBlock: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: AppSpacing.x1) {
-                Image(systemName: "chart.bar.xaxis")
-                    .foregroundStyle(AppColor.primaryDark)
-                Text("İlerlemen")
+    private var progressSummaryCard: some View {
+        let summary = state.weeklyGoalSummary
+        let progressValue = min(max(summary.progress, 0), 1)
+        let progressPercent = Int((progressValue * 100).rounded())
+        let subtitle = completedCaseHistory.isEmpty
+            ? "İlk vaka için hazırsın!"
+            : "\(completedCaseHistory.count) vaka tamamlandı, devam et."
+
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("İlerlemen")
+                        .font(AppFont.h3)
+                        .foregroundStyle(AppColor.textPrimary)
+                    Text(subtitle)
+                        .font(AppFont.secondary)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+                Spacer()
+                Text("%\(progressPercent)")
                     .font(AppFont.h3)
                     .foregroundStyle(AppColor.textPrimary)
+            }
+
+            ProgressView(value: progressValue)
+                .tint(AppColor.primary)
+
+            HStack(spacing: 8) {
+                Text("Hedef: \(summary.completedCount) / \(summary.target) vaka")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.textSecondary)
                 Spacer()
                 Button {
                     onOpenGenerator()
                 } label: {
                     Text("Yeni Vaka")
                         .font(AppFont.caption)
-                        .foregroundStyle(AppColor.primaryDark)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
+                        .foregroundStyle(AppColor.primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
                         .background(AppColor.primaryLight)
                         .clipShape(Capsule())
                 }
                 .buttonStyle(PressableButtonStyle())
             }
-
-            if completedCaseHistory.isEmpty {
-                emptyStatsState
-            } else {
-                statsScroller
-                continueBlock
-            }
-
-            quickAccessRow
-
-            if shouldShowWidgetTip {
-                widgetSuggestionCard
-            }
         }
+        .padding(20)
+        .background(AppColor.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .appShadow(AppShadow.low)
     }
 
     private var quickAccessRow: some View {
         HStack(spacing: 10) {
-            compactQuickAction(
+            statusQuickAction(
                 icon: "arrow.triangle.2.circlepath",
-                title: "Çalışma planı",
+                title: "Çalışma Planı",
                 subtitle: state.studyPlan.isConfigured ? "Aktif" : "Kurulmadı",
-                tone: .primary
+                background: AppColor.successLight.opacity(0.38),
+                iconTint: AppColor.success,
+                badgeTint: AppColor.success
             ) {
                 showStudyPlanDetail = true
             }
 
-            compactQuickAction(
+            statusQuickAction(
                 icon: "target",
-                title: "Haftalık hedef",
-                subtitle: "\(state.weeklyGoalSummary.completedCount)/\(state.weeklyGoalSummary.target)",
-                tone: state.weeklyGoalSummary.isCompleted ? .success : .warning
+                title: "Haftalık Hedef",
+                subtitle: "\(state.weeklyGoalSummary.completedCount) / \(state.weeklyGoalSummary.target) Vaka",
+                background: AppColor.primaryLight.opacity(0.32),
+                iconTint: AppColor.primary,
+                badgeTint: AppColor.primary
             ) {
                 showWeeklyGoalDetail = true
             }
         }
     }
 
-    private func compactQuickAction(icon: String,
-                                    title: String,
-                                    subtitle: String,
-                                    tone: AppSemanticTone,
-                                    action: @escaping () -> Void) -> some View {
+    private func statusQuickAction(icon: String,
+                                   title: String,
+                                   subtitle: String,
+                                   background: Color,
+                                   iconTint: Color,
+                                   badgeTint: Color,
+                                   action: @escaping () -> Void) -> some View {
         Button {
             Haptic.selection()
             action()
         } label: {
-            CompactListRow(icon: icon, title: title, subtitle: subtitle) {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(AppColor.textTertiary)
+            VStack(alignment: .center, spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(iconTint.opacity(0.2))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(iconTint)
+                }
+
+                Text(title)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(AppColor.textPrimary)
+                    .lineLimit(1)
+
+                Text(subtitle)
+                    .font(AppFont.caption)
+                    .foregroundStyle(badgeTint)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.white.opacity(0.7))
+                    .clipShape(Capsule())
+                    .lineLimit(1)
             }
-            .background(AppColor.surfaceElevated)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(tone.border, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .appShadow(AppShadow.card)
+            .frame(maxWidth: .infinity, minHeight: 130)
+            .padding(.horizontal, 8)
+            .background(background)
+            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
         }
         .buttonStyle(PressableButtonStyle())
     }
@@ -752,83 +809,62 @@ struct DashboardView: View {
     }
 
     private func challengeCard(_ challenge: DailyChallenge) -> some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                Rectangle()
-                    .fill(AppColor.primaryDark)
-                    .frame(width: 5)
+        Button {
+            modeFlow = ModeSelectionFlow(
+                context: "daily",
+                challenge: challenge,
+                specialty: challenge.specialty,
+                difficulty: challenge.difficulty
+            )
+        } label: {
+            HStack(alignment: .center, spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: "#FF6B00").opacity(0.12))
+                        .frame(width: 64, height: 64)
+                    Image(systemName: "waveform.path.ecg")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(Color(hex: "#FF6B00"))
+                }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Günün Vakası")
-                            .font(AppFont.title2)
+                VStack(alignment: .leading, spacing: 7) {
+                    HStack(alignment: .top) {
+                        Text(challenge.title)
+                            .font(AppFont.bodyMedium)
                             .foregroundStyle(AppColor.textPrimary)
-                        Spacer()
-                        Text(state.challengeTimeLeft?.label ?? "--")
+                            .lineLimit(2)
+                        Spacer(minLength: 8)
+                        Text(challenge.difficulty)
                             .font(AppFont.caption)
-                            .foregroundStyle(AppColor.textSecondary)
-                            .padding(.horizontal, 9)
-                            .padding(.vertical, 5)
-                            .background(AppColor.surfaceAlt)
+                            .foregroundStyle(Color(hex: "#FF6B00"))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(Color(hex: "#FF6B00").opacity(0.10))
                             .clipShape(Capsule())
                     }
 
-                    HStack(spacing: 7) {
-                        Badge(text: challenge.difficulty, tint: AppColor.warning, background: AppColor.warningLight)
-                        Badge(text: SpecialtyOption.label(for: challenge.specialty), tint: AppColor.primary, background: AppColor.primaryLight)
-                    }
-
-                    Text(challenge.title)
-                        .font(AppFont.title2)
-                        .foregroundStyle(AppColor.textPrimary)
-
-                    Text(challenge.summary)
-                        .font(AppFont.body)
-                        .foregroundStyle(AppColor.textSecondary)
-                        .lineSpacing(4)
-
-                    if let stats = state.challengeStats {
-                        Text(
-                            "\(stats.attemptedUsers ?? 0) kişi çözdü · Ortalama skor \(stats.averageScore != nil ? String(format: "%.1f", stats.averageScore ?? 0) : "--")"
-                        )
+                    Text("Uzmanlık: \(SpecialtyOption.label(for: challenge.specialty))")
                         .font(AppFont.caption)
                         .foregroundStyle(AppColor.textSecondary)
-                    }
+                        .lineLimit(1)
 
-                    Button {
-                        modeFlow = ModeSelectionFlow(
-                            context: "daily",
-                            challenge: challenge,
-                            specialty: challenge.specialty,
-                            difficulty: challenge.difficulty
-                        )
-                    } label: {
-                        HStack {
-                            Text("Günün Vakasını Aç")
-                                .font(AppFont.bodyMedium)
-                            Spacer()
-                            Image(systemName: "arrow.right")
-                        }
-                    }
-                    .buttonStyle(DSSecondaryButtonStyle())
-                    .accessibilityLabel("Günün Vakasını Aç")
-                    .accessibilityHint("Günün vakası için mod seçimine gider")
-
-                    Text("Her gün güncellenir · Herkes aynı vakayı çözüyor")
-                        .font(AppFont.caption)
-                        .foregroundStyle(AppColor.textTertiary)
-                        .lineSpacing(4)
+                    ProgressView(value: 0.62)
+                        .tint(AppColor.primary)
                 }
-                .padding(12)
             }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .appShadow(AppShadow.card)
+        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .appShadow(AppShadow.low)
+        .buttonStyle(PressableButtonStyle())
+        .accessibilityLabel("Günün Vakasını Aç")
+        .accessibilityHint("Günün vakası için mod seçimine gider")
     }
 
     private var preferredSpecialty: String {
@@ -917,5 +953,18 @@ struct DashboardView: View {
                 )
             }
         }
+    }
+}
+
+private struct BottomRoundedShape: Shape {
+    let radius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: [.bottomLeft, .bottomRight],
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }
