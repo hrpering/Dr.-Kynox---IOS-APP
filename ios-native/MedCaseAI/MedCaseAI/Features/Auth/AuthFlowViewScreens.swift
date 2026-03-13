@@ -10,24 +10,25 @@ import Supabase
 
 extension AuthFlowView {
     var welcomeCard: some View {
-        VStack(spacing: AppSpacing.x2) {
+        VStack(spacing: 16) {
             Text("Dr. Kynox")
-                .font(AppFont.largeTitle)
-                .foregroundStyle(AppColor.textPrimary)
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundStyle(Color(hex: "#0F172A"))
                 .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 20)
 
             IntroMotionCard(variant: .short)
-                .frame(height: 228)
+                .frame(height: 342)
                 .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .stroke(AppColor.border, lineWidth: 1)
                 )
                 .appShadow(AppShadow.low)
                 .accessibilityHidden(true)
 
-            VStack(spacing: 10) {
+            VStack(spacing: 14) {
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 12, weight: .semibold))
@@ -36,31 +37,47 @@ extension AuthFlowView {
                 }
                 .foregroundStyle(Color(hex: "#EC5B13"))
                 .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .padding(.vertical, 4)
                 .background(Color(hex: "#EC5B13").opacity(0.1))
                 .clipShape(Capsule())
 
-                Text("Klinik düşünmeyi\nhayat senaryolarıyla geliştir.")
-                    .font(AppFont.h1)
-                    .foregroundStyle(AppColor.textPrimary)
+                Text("Klinik Düşünmeyi\nÖğrenin")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color(hex: "#0F172A"))
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(3)
+
+                Text("Tıbbi vakalar üzerinde interaktif pratik\nyapın ve uzmanlığınızı gerçek hayat\nsenaryolarıyla geliştirin.")
+                    .font(AppFont.body)
+                    .foregroundStyle(Color(hex: "#475569"))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
 
-                Text("Sesli ya da yazılı ilerle, anlık geri bildirim al ve gelişimini takip et.")
-                    .font(AppFont.body)
-                    .foregroundStyle(AppColor.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
+                VStack(spacing: 10) {
+                    welcomeFeatureCard(
+                        icon: "mic.fill",
+                        title: "Sesli Etkileşim",
+                        description: "Tıbbi vakalar üzerinde sesli interaktif pratik yapın ve uzmanlığınızı gerçek hayat senaryolarıyla geliştirin.",
+                        iconTint: Color(hex: "#007BFF"),
+                        iconBg: Color(hex: "#007BFF").opacity(0.1)
+                    )
+                    welcomeFeatureCard(
+                        icon: "bolt.fill",
+                        title: "Anlık Geri Bildirim",
+                        description: "Tıbbi vakalar üzerinde interaktif pratik yapın ve uzmanlığınızı gerçek hayat senaryolarıyla geliştirin.",
+                        iconTint: Color(hex: "#F97316"),
+                        iconBg: Color(hex: "#F97316").opacity(0.1)
+                    )
+                    welcomeFeatureCard(
+                        icon: "chart.bar.fill",
+                        title: "İlerleme Takibi",
+                        description: "Tıbbi vakalar üzerinde interaktif pratik yapın ve uzmanlığınızı gerçek hayat senaryolarıyla geliştirin.",
+                        iconTint: Color(hex: "#22C55E"),
+                        iconBg: Color(hex: "#22C55E").opacity(0.1)
+                    )
+                }
             }
-            .padding(AppSpacing.cardPadding)
             .frame(maxWidth: .infinity)
-            .background(AppColor.surface)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(AppColor.border, lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-            .appShadow(AppShadow.low)
 
             Button {
                 withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
@@ -101,10 +118,49 @@ extension AuthFlowView {
 
             Text("Devam ederek Kullanım Koşullarını kabul etmiş olursunuz.")
                 .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
+                .foregroundStyle(Color(hex: "#64748B"))
                 .multilineTextAlignment(.center)
+                .padding(.top, 2)
         }
-        .frame(maxWidth: .infinity, alignment: .center)
+        .frame(maxWidth: .infinity, alignment: .top)
+    }
+
+    private func welcomeFeatureCard(icon: String,
+                                    title: String,
+                                    description: String,
+                                    iconTint: Color,
+                                    iconBg: Color) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(iconBg)
+                    .frame(width: 48, height: 48)
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(iconTint)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(Color(hex: "#0F172A"))
+                Text(description)
+                    .font(AppFont.caption)
+                    .foregroundStyle(Color(hex: "#64748B"))
+                    .lineSpacing(4)
+                    .lineLimit(3)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(hex: "#F8FAFC"))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color(hex: "#E2E8F0"), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     func refreshAmbientForScreen() {

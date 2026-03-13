@@ -68,14 +68,14 @@ struct AuthFlowView: View {
                     AppColor.background.ignoresSafeArea()
 
                     if screen == .welcome {
-                        VStack {
-                            Spacer(minLength: 0)
+                        ScrollView(showsIndicators: false) {
                             welcomeCard
                                 .transition(transition)
-                            Spacer(minLength: 0)
+                                .padding(.horizontal, 24)
+                                .padding(.top, 20)
+                                .padding(.bottom, 24)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(16)
+                        .background(Color.white.ignoresSafeArea())
                     } else if screen == .checkEmail {
                         ScrollView {
                             VStack(spacing: 14) {
