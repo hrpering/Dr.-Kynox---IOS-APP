@@ -30,7 +30,7 @@ struct ResultsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 14) {
                 resultHeroCard
                 resultMetricRow
                 scoreCard
@@ -52,9 +52,9 @@ struct ResultsView: View {
                         Image(systemName: "arrow.right")
                     }
                     .foregroundStyle(AppColor.primary)
-                    .padding(.horizontal, 12)
-                    .frame(maxWidth: .infinity, minHeight: 48)
-                    .background(AppColor.surfaceElevated)
+                    .padding(.horizontal, 14)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .background(AppColor.surface)
                     .overlay(
                         RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                             .stroke(AppColor.primary.opacity(0.25), lineWidth: 1)
@@ -68,7 +68,7 @@ struct ResultsView: View {
                 quickCaseSection
                 cblMethodCard
             }
-            .padding(14)
+            .padding(16)
             .padding(.bottom, 92)
         }
         .background(AppColor.background.ignoresSafeArea())
@@ -138,7 +138,7 @@ struct ResultsView: View {
     }
 
     private var quickCaseSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "timer")
                     .foregroundStyle(AppColor.primary)
@@ -164,8 +164,8 @@ struct ResultsView: View {
             }
             .buttonStyle(PressableButtonStyle())
         }
-        .padding(10)
-        .background(AppColor.surfaceElevated)
+        .padding(12)
+        .background(AppColor.surface)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)

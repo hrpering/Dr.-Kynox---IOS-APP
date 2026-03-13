@@ -91,12 +91,12 @@ struct GeneratorView: View {
             }
             .padding(.horizontal, 12)
             .frame(minHeight: 44)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             LazyVStack(spacing: 8) {
                 ForEach(filteredSpecialtyRows) { item in
@@ -105,7 +105,7 @@ struct GeneratorView: View {
                         Haptic.selection()
                     } label: {
                         HStack(alignment: .top, spacing: 8) {
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            RoundedRectangle(cornerRadius: 9, style: .continuous)
                                 .fill(specialty == item.value ? AppColor.primary : AppColor.surfaceAlt)
                                 .frame(width: 6, height: 40)
 
@@ -142,12 +142,12 @@ struct GeneratorView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(specialty == item.value ? AppColor.primaryLight : AppColor.surface)
+                        .background(specialty == item.value ? AppColor.primaryLight : AppColor.surfaceElevated)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(specialty == item.value ? AppColor.primary : AppColor.border, lineWidth: specialty == item.value ? 2 : 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(PressableButtonStyle())
                 }
@@ -167,14 +167,14 @@ struct GeneratorView: View {
                         .lineSpacing(3)
                         .lineLimit(2)
                 }
-                .padding(10)
+                .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(AppColor.surfaceElevated)
+                .background(AppColor.surface)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .stroke(AppColor.primary.opacity(0.28), lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .appShadow(AppShadow.card)
             }
         } bottom: {
@@ -245,9 +245,9 @@ struct GeneratorView: View {
             VStack(alignment: .leading, spacing: 14) {
                 content()
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 10)
-            .padding(.bottom, 20)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 24)
         }
         .background(AppColor.background.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {

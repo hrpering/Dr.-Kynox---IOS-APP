@@ -377,20 +377,29 @@ extension AuthFlowView {
             Haptic.selection()
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(AppColor.surfaceAlt)
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Image(systemName: icon)
+                            .font(.system(size: 14, weight: .semibold))
+                    )
                 Text(title)
                     .lineLimit(1)
+                Spacer(minLength: 0)
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(AppColor.textTertiary)
             }
             .font(AppFont.bodyMedium)
             .foregroundStyle(AppColor.textPrimary)
             .frame(maxWidth: .infinity, minHeight: 52)
             .background(AppColor.surface)
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(AppColor.primary.opacity(0.24), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
         .buttonStyle(PressableButtonStyle())
         .accessibilityLabel(title)

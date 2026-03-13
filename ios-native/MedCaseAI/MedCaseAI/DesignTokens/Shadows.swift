@@ -8,17 +8,17 @@ struct ShadowSpec {
 }
 
 enum ShadowTokens {
-    static let cardRadius: CGFloat = 10
-    static let elevatedRadius: CGFloat = 16
+    static let cardRadius: CGFloat = 14
+    static let elevatedRadius: CGFloat = 20
 }
 
 enum AppShadow {
     static var card: ShadowSpec {
-        ShadowSpec(color: AppColor.shadowSoft, radius: ShadowTokens.cardRadius, x: 0, y: 4)
+        ShadowSpec(color: AppColor.shadowSoft, radius: ShadowTokens.cardRadius, x: 0, y: 6)
     }
 
     static var elevated: ShadowSpec {
-        ShadowSpec(color: AppColor.shadowStrong, radius: ShadowTokens.elevatedRadius, x: 0, y: 8)
+        ShadowSpec(color: AppColor.shadowStrong, radius: ShadowTokens.elevatedRadius, x: 0, y: 10)
     }
 }
 

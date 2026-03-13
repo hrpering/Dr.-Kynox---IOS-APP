@@ -34,7 +34,7 @@ struct OnboardingHeroIllustration: View {
 
 struct OnboardingHowItWorksStep: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Nasıl Çalışır")
                 .font(AppFont.title)
                 .foregroundStyle(AppColor.textPrimary)
@@ -66,13 +66,13 @@ struct OnboardingHowItWorksStep: View {
                     isAgent: false
                 )
             }
-            .padding(9)
+            .padding(12)
             .background(AppColor.surface)
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             HStack(spacing: 7) {
                 onboardingModePill(
@@ -143,15 +143,15 @@ struct OnboardingHowItWorksStep: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(background)
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(tint.opacity(0.24), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -179,15 +179,15 @@ struct HowItWorksCompactRow: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -386,7 +386,7 @@ struct OnboardingIdentityStep: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             Text("Kişisel Bilgiler")
                 .font(AppFont.largeTitle)
                 .foregroundStyle(AppColor.textPrimary)
@@ -428,10 +428,10 @@ struct OnboardingIdentityStep: View {
                         .frame(minWidth: 108, minHeight: 52, alignment: .leading)
                         .background(AppColor.surfaceAlt)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(AppColor.border, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(PressableButtonStyle())
 
@@ -443,12 +443,12 @@ struct OnboardingIdentityStep: View {
                         .autocorrectionDisabled(true)
                         .padding(.horizontal, 12)
                         .frame(minHeight: 52)
-                        .background(AppColor.surface)
+                        .background(AppColor.surfaceElevated)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(AppColor.border, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .onChange(of: localPhoneText) { newValue in
                             let digits = digitsOnly(newValue)
                             let clipped = String(digits.prefix(maxLocalDigits(for: selectedDialCode)))
@@ -500,12 +500,12 @@ struct OnboardingIdentityStep: View {
                 .textContentType(contentType)
                 .padding(.horizontal, 12)
                 .frame(minHeight: 52)
-                .background(AppColor.surface)
+                .background(AppColor.surfaceElevated)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .stroke(AppColor.border, lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         }
     }
 
@@ -678,7 +678,7 @@ struct OnboardingLevelStep: View {
     @Binding var selectedTrack: UserTrack
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Seviyeni Seç")
                 .font(AppFont.largeTitle)
                 .foregroundStyle(AppColor.textPrimary)
@@ -716,14 +716,14 @@ struct OnboardingLevelStep: View {
                                 .foregroundStyle(AppColor.primary)
                         }
                     }
-                    .padding(14)
+                    .padding(16)
                     .frame(maxWidth: .infinity, minHeight: 102, alignment: .leading)
-                    .background(selectedTrack == track ? AppColor.primaryLight : AppColor.surface)
+                    .background(selectedTrack == track ? AppColor.primaryLight : AppColor.surfaceElevated)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                             .stroke(selectedTrack == track ? AppColor.primary : AppColor.border, lineWidth: selectedTrack == track ? 2 : 1)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                 }
                 .buttonStyle(PressableButtonStyle())
             }
@@ -739,7 +739,7 @@ struct OnboardingStudyPlanSetupStep: View {
     @Binding var dailyStudyMinutes: Int
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             Text("Sana özel çalışma planı oluşturalım")
                 .font(AppFont.title)
                 .foregroundStyle(AppColor.textPrimary)
@@ -787,14 +787,14 @@ struct OnboardingStudyPlanSetupStep: View {
                                     .foregroundStyle(AppColor.textTertiary)
                             }
                         }
-                        .padding(12)
+                        .padding(14)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(isSelected ? target.accentBackground.opacity(0.9) : AppColor.surface)
+                        .background(isSelected ? target.accentBackground.opacity(0.9) : AppColor.surfaceElevated)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                                 .stroke(isSelected ? target.accent : AppColor.border, lineWidth: isSelected ? 2 : 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
                     }
                     .buttonStyle(PressableButtonStyle())
                 }
@@ -821,12 +821,12 @@ struct OnboardingStudyPlanSetupStep: View {
                         }
                         .foregroundStyle(selectedExamWindow == window ? AppColor.primaryDark : AppColor.textPrimary)
                         .frame(maxWidth: .infinity, minHeight: 64)
-                        .background(selectedExamWindow == window ? AppColor.primaryLight : AppColor.surface)
+                        .background(selectedExamWindow == window ? AppColor.primaryLight : AppColor.surfaceElevated)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(selectedExamWindow == window ? AppColor.primary : AppColor.border, lineWidth: selectedExamWindow == window ? 2 : 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(PressableButtonStyle())
                 }
@@ -861,13 +861,13 @@ struct OnboardingStudyPlanSetupStep: View {
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(AppColor.textTertiary)
             }
-            .padding(12)
-            .background(AppColor.surface)
+            .padding(14)
+            .background(AppColor.surfaceElevated)
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
         }
         .frame(maxHeight: .infinity, alignment: .top)
     }

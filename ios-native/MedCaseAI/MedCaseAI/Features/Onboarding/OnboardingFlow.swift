@@ -32,7 +32,7 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: AppSpacing.x1) {
+            VStack(spacing: AppSpacing.x1_5) {
                 header
 
                 ZStack {
@@ -76,22 +76,22 @@ struct OnboardingView: View {
                     }
                 }
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: step)
-                .padding(12)
+                .padding(14)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .background(AppColor.surfaceElevated)
+                .background(AppColor.surface)
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                    RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
                         .stroke(AppColor.border, lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
                 .appShadow(AppShadow.card)
 
                 if step == 0 {
                     onboardingLegalLinks
                 }
             }
-            .padding(.horizontal, AppSpacing.x1_5)
-            .padding(.top, AppSpacing.x1)
+            .padding(.horizontal, AppSpacing.x2)
+            .padding(.top, AppSpacing.x1_5)
             .padding(.bottom, AppSpacing.x1)
             .background(AppColor.background.ignoresSafeArea())
             .safeAreaInset(edge: .bottom) {

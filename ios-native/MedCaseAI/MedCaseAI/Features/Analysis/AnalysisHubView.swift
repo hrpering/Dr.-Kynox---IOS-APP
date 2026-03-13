@@ -21,11 +21,11 @@ struct AnalysisHubView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 14) {
                     analysisHeroCard
                     summaryStatsRow
 
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 10) {
                         Text("Analiz Araçları")
                             .font(AppFont.title2)
                             .foregroundStyle(AppColor.textPrimary)
@@ -86,7 +86,7 @@ struct AnalysisHubView: View {
                     quickCaseFavoriteStatusCard
                     aiRecommendationPreviewCard
                 }
-                .padding(14)
+                .padding(16)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Analiz")

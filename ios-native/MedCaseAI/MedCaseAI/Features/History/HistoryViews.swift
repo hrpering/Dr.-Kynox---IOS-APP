@@ -12,7 +12,7 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     historyHeroCard
 
                     if state.caseHistory.isEmpty {
@@ -50,8 +50,8 @@ struct HistoryView: View {
                         }
                     }
                 }
-                .padding(14)
-                .padding(.bottom, 10)
+                .padding(16)
+                .padding(.bottom, 12)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Vaka Geçmişi")

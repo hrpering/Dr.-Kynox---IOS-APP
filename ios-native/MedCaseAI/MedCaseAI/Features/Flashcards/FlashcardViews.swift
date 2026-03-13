@@ -336,7 +336,7 @@ struct CodeBlueSessionView: View {
     private let ticker = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             headerCard
 
             if loading {
@@ -373,7 +373,7 @@ struct CodeBlueSessionView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(16)
+        .padding(18)
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle("15sn Hızlı Vaka")
         .navigationBarTitleDisplayMode(.inline)
@@ -401,7 +401,7 @@ struct CodeBlueSessionView: View {
     }
 
     private var headerCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("Code Blue")
                     .font(AppFont.title2)
@@ -438,14 +438,15 @@ struct CodeBlueSessionView: View {
                     .tint(remainingSeconds > 0 ? AppColor.warning : AppColor.error)
             }
         }
-        .padding(12)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     private var progressLabel: String {

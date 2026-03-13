@@ -12,7 +12,7 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 14) {
                     profileHeader
 
                     MetricBand(
@@ -182,8 +182,8 @@ struct ProfileView: View {
                         .buttonStyle(PressableButtonStyle())
                     }
                 }
-                .padding(14)
-                .padding(.bottom, 12)
+                .padding(16)
+                .padding(.bottom, 14)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Profil")
@@ -201,7 +201,7 @@ struct ProfileView: View {
             subtitle: targetExamLabel,
             icon: "person.crop.circle.fill"
         ) {
-            HStack(spacing: 8) {
+            HStack(spacing: 10) {
                 Circle()
                     .fill(.white.opacity(0.2))
                     .frame(width: 44, height: 44)

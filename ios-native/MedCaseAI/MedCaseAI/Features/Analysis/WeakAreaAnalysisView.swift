@@ -10,7 +10,7 @@ struct WeakAreaAnalysisView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 14) {
                 analysisHeaderBand
 
                 if loading && state.weakAreaAnalysis == nil {
@@ -46,7 +46,7 @@ struct WeakAreaAnalysisView: View {
                     .accessibilityHint("Vaka seçim ekranına döner")
                 }
             }
-            .padding(14)
+            .padding(16)
         }
         .background(AppColor.background.ignoresSafeArea())
         .navigationTitle("Zayıf Alan Analizi")
@@ -106,7 +106,7 @@ struct WeakAreaAnalysisView: View {
     }
 
     private var trendHistoryCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 sectionHeader(title: "Zaman Trendi")
                 Spacer()
@@ -153,14 +153,14 @@ struct WeakAreaAnalysisView: View {
                 }
             }
         }
-        .padding(12)
+        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceElevated)
+        .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .appShadow(AppShadow.card)
     }
 

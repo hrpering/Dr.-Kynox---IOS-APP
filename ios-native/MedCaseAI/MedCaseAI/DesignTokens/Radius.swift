@@ -1,10 +1,10 @@
 import SwiftUI
 
 enum RadiusTokens {
-    static let sm: CGFloat = 12
-    static let md: CGFloat = 16
-    static let lg: CGFloat = 20
-    static let xl: CGFloat = 28
+    static let sm: CGFloat = 14
+    static let md: CGFloat = 18
+    static let lg: CGFloat = 22
+    static let xl: CGFloat = 30
 }
 
 enum AppRadius {

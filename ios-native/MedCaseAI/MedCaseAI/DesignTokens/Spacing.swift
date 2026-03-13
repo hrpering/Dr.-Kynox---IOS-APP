@@ -1,18 +1,18 @@
 import SwiftUI
 
 enum SpacingTokens {
-    static let x1: CGFloat = 8
-    static let x1_5: CGFloat = 12
-    static let x2: CGFloat = 16
-    static let x3: CGFloat = 24
-    static let x4: CGFloat = 32
-    static let x5: CGFloat = 40
+    static let x1: CGFloat = 10
+    static let x1_5: CGFloat = 14
+    static let x2: CGFloat = 18
+    static let x3: CGFloat = 26
+    static let x4: CGFloat = 34
+    static let x5: CGFloat = 42
 
     static let cardPadding: CGFloat = x2
-    static let sectionSpacing: CGFloat = 20
+    static let sectionSpacing: CGFloat = 22
     static let elementSpacing: CGFloat = x2
-    static let buttonHeight: CGFloat = 56
-    static let listRowHeight: CGFloat = 58
+    static let buttonHeight: CGFloat = 54
+    static let listRowHeight: CGFloat = 62
 }
 
 enum AppSpacing {

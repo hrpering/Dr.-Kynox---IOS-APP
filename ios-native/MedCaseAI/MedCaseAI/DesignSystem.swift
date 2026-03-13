@@ -47,11 +47,15 @@ struct DSPrimaryButtonStyle: ButtonStyle {
             .background(
                 LinearGradient(
                     colors: [AppColor.primaryDark, AppColor.primary],
-                    startPoint: .leading,
-                    endPoint: .trailing
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
                 )
             )
-            .appShadow(AppShadow.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                    .stroke(.white.opacity(0.2), lineWidth: 1)
+            )
+            .appShadow(AppShadow.elevated)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
@@ -62,12 +66,12 @@ struct DSSecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(AppFont.button)
-            .foregroundStyle(AppColor.primary)
+            .foregroundStyle(AppColor.primaryDark)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.surfaceElevated)
+            .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(AppColor.primary.opacity(0.42), lineWidth: 1)
+                    .stroke(AppColor.primary.opacity(0.34), lineWidth: 1.2)
             )
             .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
@@ -106,13 +110,42 @@ struct DSInfoCard<Content: View>: View {
             content
         }
         .padding(AppSpacing.cardPadding)
-        .background(tone.background)
+        .background(baseBackground)
+        .overlay(alignment: .topLeading) {
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .fill(accentOverlay)
+                .frame(height: 52)
+        }
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(tone.border, lineWidth: 1)
         )
         .appShadow(AppShadow.card)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+    }
+
+    private var baseBackground: Color {
+        switch tone {
+        case .neutral:
+            return AppColor.surface
+        default:
+            return AppColor.surfaceElevated
+        }
+    }
+
+    private var accentOverlay: Color {
+        switch tone {
+        case .primary:
+            return AppColor.primaryLight.opacity(0.6)
+        case .success:
+            return AppColor.successLight.opacity(0.6)
+        case .warning:
+            return AppColor.warningLight.opacity(0.6)
+        case .danger:
+            return AppColor.errorLight.opacity(0.55)
+        case .neutral:
+            return .clear
+        }
     }
 }
 
@@ -239,7 +272,7 @@ struct DSNavigationRow<Accessory: View>: View {
         }
         .padding(.horizontal, AppSpacing.cardPadding)
         .frame(minHeight: AppSpacing.listRowHeight)
-        .background(AppColor.surfaceElevated)
+        .background(AppColor.surface)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)

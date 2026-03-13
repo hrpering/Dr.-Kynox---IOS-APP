@@ -125,10 +125,10 @@ struct ModeSelectionPage: View {
             .frame(maxWidth: .infinity, minHeight: 52)
             .background(hasSelection ? AppColor.primary : AppColor.primaryLight)
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(hasSelection ? AppColor.primary : AppColor.primary.opacity(0.22), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                    .stroke(hasSelection ? .white.opacity(0.2) : AppColor.primary.opacity(0.22), lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
             .opacity(hasSelection ? 1 : 0.78)
         }
         .buttonStyle(PressableButtonStyle())
@@ -187,12 +187,12 @@ struct ModeSelectionPage: View {
             }
             .padding(12)
             .frame(maxWidth: .infinity, minHeight: 122, alignment: .leading)
-            .background(selectedMode == mode ? background : AppColor.surface)
+            .background(selectedMode == mode ? background : AppColor.surfaceElevated)
             .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(selectedMode == mode ? accent : AppColor.border, lineWidth: selectedMode == mode ? 2.2 : 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
             .shadow(color: selectedMode == mode ? accent.opacity(0.18) : .clear, radius: 9, x: 0, y: 4)
         }
         .buttonStyle(PressableButtonStyle())
@@ -211,12 +211,12 @@ struct ModeSelectionPage: View {
         }
         .padding(10)
         .frame(maxWidth: .infinity)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var selectedModeInfo: (duration: String, recommendation: String) {
@@ -317,7 +317,7 @@ struct DifficultyCard: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 102, alignment: .leading)
-        .background(isSelected ? config.bg : AppColor.surface)
+        .background(isSelected ? config.bg : AppColor.surfaceElevated)
         .overlay(alignment: .leading) {
             Rectangle()
                 .fill(config.stroke)
@@ -833,22 +833,26 @@ extension View {
             .background(
                 LinearGradient(
                     colors: [AppColor.primaryDark, AppColor.primary],
-                    startPoint: .leading,
-                    endPoint: .trailing
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
                 )
             )
-            .appShadow(AppShadow.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                    .stroke(.white.opacity(0.18), lineWidth: 1)
+            )
+            .appShadow(AppShadow.elevated)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 
     func appSecondaryButtonLabelStyle() -> some View {
         self
-            .foregroundStyle(AppColor.primary)
+            .foregroundStyle(AppColor.primaryDark)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.surfaceElevated)
+            .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(AppColor.primary.opacity(0.4), lineWidth: 1)
+                    .stroke(AppColor.primary.opacity(0.34), lineWidth: 1.2)
             )
             .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
@@ -864,23 +868,27 @@ extension Text {
             .background(
                 LinearGradient(
                     colors: [AppColor.primaryDark, AppColor.primary],
-                    startPoint: .leading,
-                    endPoint: .trailing
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
                 )
             )
-            .appShadow(AppShadow.card)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                    .stroke(.white.opacity(0.18), lineWidth: 1)
+            )
+            .appShadow(AppShadow.elevated)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 
     func appSecondaryButtonLabel() -> some View {
         self
             .font(AppFont.button)
-            .foregroundStyle(AppColor.primary)
+            .foregroundStyle(AppColor.primaryDark)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.surfaceElevated)
+            .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(AppColor.primary.opacity(0.4), lineWidth: 1)
+                    .stroke(AppColor.primary.opacity(0.34), lineWidth: 1.2)
             )
             .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
@@ -1074,13 +1082,13 @@ struct HeroHeader<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            HStack(alignment: .top, spacing: 10) {
-                VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
                     if let eyebrow, !eyebrow.isEmpty {
                         Text(eyebrow)
                             .font(AppFont.caption)
-                            .foregroundStyle(.white.opacity(0.85))
+                            .foregroundStyle(.white.opacity(0.82))
                     }
                     Text(title)
                         .font(AppFont.title)
@@ -1093,9 +1101,14 @@ struct HeroHeader<Content: View>: View {
                 }
                 Spacer(minLength: 0)
                 if let icon, !icon.isEmpty {
-                    Image(systemName: icon)
-                        .font(.system(size: 28, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.95))
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(.white.opacity(0.18))
+                            .frame(width: 44, height: 44)
+                        Image(systemName: icon)
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.95))
+                    }
                 }
             }
 
@@ -1105,20 +1118,27 @@ struct HeroHeader<Content: View>: View {
 
             content
         }
-        .padding(12)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            LinearGradient(
-                colors: [AppColor.primaryDark, AppColor.primary],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            ZStack {
+                LinearGradient(
+                    colors: [AppColor.primaryDark, AppColor.primary],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                LinearGradient(
+                    colors: [.white.opacity(0.06), .clear],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
         )
         .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(.white.opacity(0.2), lineWidth: 1)
+            RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                .stroke(.white.opacity(0.24), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
         .appShadow(AppShadow.elevated)
     }
 }
@@ -1138,7 +1158,7 @@ struct MetricBand: View {
     }
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             ForEach(items) { item in
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 4) {
@@ -1156,15 +1176,15 @@ struct MetricBand: View {
                         .foregroundStyle(valueColor)
                         .lineLimit(1)
                 }
-                .padding(.horizontal, 9)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 9)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(itemBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    RoundedRectangle(cornerRadius: 13, style: .continuous)
                         .stroke(itemBorder, lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
             }
         }
     }
@@ -1178,7 +1198,7 @@ struct MetricBand: View {
     }
 
     private var itemBackground: Color {
-        style == .hero ? .white.opacity(0.14) : AppColor.surfaceElevated
+        style == .hero ? .white.opacity(0.15) : AppColor.surface
     }
 
     private var itemBorder: Color {
@@ -1200,7 +1220,7 @@ struct SectionCard<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
+        VStack(alignment: .leading, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(AppFont.title2)
@@ -1214,9 +1234,9 @@ struct SectionCard<Content: View>: View {
             }
             content
         }
-        .padding(10)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceElevated)
+        .background(AppColor.surface)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
@@ -1239,15 +1259,24 @@ struct StateCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 8) {
             content
         }
-        .padding(10)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(tone.background)
+        .background(backgroundColor)
         .overlay(
             RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(tone.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
         .appShadow(AppShadow.card)
+    }
+
+    private var backgroundColor: Color {
+        switch tone {
+        case .neutral:
+            return AppColor.surface
+        default:
+            return tone.background
+        }
     }
 }
 
@@ -1268,7 +1297,7 @@ struct CompactListRow<Accessory: View>: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 9) {
+        HStack(alignment: .top, spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(AppColor.primary)
@@ -1288,15 +1317,15 @@ struct CompactListRow<Accessory: View>: View {
             Spacer(minLength: 0)
             accessory
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 }
 
@@ -1311,18 +1340,18 @@ struct BottomCTADock<Primary: View, Secondary: View>: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             primary
             secondary
         }
-        .padding(.horizontal, 14)
-        .padding(.top, 8)
-        .padding(.bottom, 6)
-        .background(AppColor.surface)
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(AppColor.surfaceElevated)
         .overlay(alignment: .top) {
-            Rectangle().fill(AppColor.border).frame(height: 1)
+            Rectangle().fill(AppColor.border.opacity(0.9)).frame(height: 1)
         }
-        .appShadow(AppShadow.card)
+        .appShadow(AppShadow.elevated)
     }
 }
 

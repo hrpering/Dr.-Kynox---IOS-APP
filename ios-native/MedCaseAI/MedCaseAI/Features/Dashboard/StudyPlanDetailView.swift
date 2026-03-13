@@ -18,6 +18,7 @@ struct StudyPlanDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.x2) {
+                planHeroCard
                 planSummaryCard
                 loopProgressCard
                 loopTimelineCard
@@ -34,6 +35,20 @@ struct StudyPlanDetailView: View {
         .task {
             await refreshLoopState()
         }
+    }
+
+    private var planHeroCard: some View {
+        HeroHeader(
+            eyebrow: "Plan Özeti",
+            title: "Çalışma Döngün",
+            subtitle: "Hedef sınav, haftalık ritim ve gelişim adımlarını tek panelde takip et.",
+            icon: "target",
+            metrics: [
+                .init(title: "Hedef", value: state.studyPlan.examTarget),
+                .init(title: "Günlük", value: "\(state.studyPlan.dailyMinutes) dk"),
+                .init(title: "Haftalık", value: "\(state.weeklyGoalTarget)")
+            ]
+        )
     }
 
     private var planSummaryCard: some View {

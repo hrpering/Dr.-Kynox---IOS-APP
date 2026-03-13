@@ -12,7 +12,7 @@ extension AuthFlowView {
     var welcomeCard: some View {
         VStack(spacing: AppSpacing.x2) {
             IntroMotionCard(variant: .short)
-                .frame(height: 214)
+                .frame(height: 228)
                 .frame(maxWidth: .infinity)
                 .accessibilityHidden(true)
 
@@ -49,7 +49,7 @@ extension AuthFlowView {
                 )
             }
             .padding(AppSpacing.cardPadding)
-            .background(AppColor.surfaceElevated)
+            .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
@@ -88,16 +88,8 @@ extension AuthFlowView {
                 }
             } label: {
                 Text("Hesabım var")
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.primaryDark)
-                    .padding(.horizontal, AppSpacing.x3)
-                    .frame(minWidth: 168, minHeight: 44)
-                    .background(AppColor.primaryLight.opacity(0.45))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
-                            .stroke(AppColor.primary.opacity(0.45), lineWidth: 1)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                    .appSecondaryButtonLabel()
+                    .frame(minHeight: 44)
             }
             .buttonStyle(PressableButtonStyle())
             .accessibilityLabel("Hesabım var")
@@ -165,7 +157,7 @@ extension AuthFlowView {
                   : "Şifre sıfırlama kodunu \(pendingVerificationEmail.isEmpty ? "e-posta adresine" : pendingVerificationEmail) gönderdik.")
                : "Doğrulama kodunu \(pendingVerificationEmail.isEmpty ? "e-posta adresine" : pendingVerificationEmail) gönderdik. Gelen kutunu ve spam klasörünü kontrol et.")
 
-        return VStack(spacing: 12) {
+        return VStack(spacing: 14) {
             HeroHeader(
                 eyebrow: isPasswordResetFlow ? "Şifre Kurtarma" : "E-posta Doğrulama",
                 title: heroTitle,
@@ -366,14 +358,15 @@ extension AuthFlowView {
             }
             .buttonStyle(PressableButtonStyle())
         }
-        .padding(16)
+        .padding(18)
         .frame(maxWidth: .infinity, alignment: .top)
-        .background(AppColor.surface)
+        .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     var otpCodeInput: some View {
@@ -432,7 +425,7 @@ extension AuthFlowView {
     }
 
     var authForm: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             HeroHeader(
                 eyebrow: isSignUp ? "Yeni Hesap" : "Tekrar Hoş Geldin",
                 title: isSignUp ? "Hesap oluştur" : "Giriş yap",
@@ -568,14 +561,15 @@ extension AuthFlowView {
                 }
             }
         }
-        .padding(14)
+        .padding(18)
         .frame(maxWidth: .infinity, alignment: .top)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.card)
     }
 
     var authBottomActions: some View {

@@ -14,7 +14,7 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 20) {
                     primaryActionBlock
                     dailyChallengeBlock
                     weeklyGoalCard
@@ -22,9 +22,9 @@ struct DashboardView: View {
                     weakAreaInsightCard
                     progressBlock
                 }
-                .padding(.horizontal, 14)
-                .padding(.top, 14)
-                .padding(.bottom, 20)
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                .padding(.bottom, 24)
             }
             .background(AppColor.background.ignoresSafeArea())
             .navigationTitle("Dr.Kynox")
@@ -159,7 +159,7 @@ struct DashboardView: View {
     }
 
     private var dailyChallengeBlock: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             Text("Günün Vakası")
                 .font(AppFont.h3)
                 .foregroundStyle(AppColor.textPrimary)
@@ -191,7 +191,7 @@ struct DashboardView: View {
     }
 
     private var progressBlock: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: AppSpacing.x1) {
                 Image(systemName: "chart.bar.xaxis")
                     .foregroundStyle(AppColor.primaryDark)
@@ -229,7 +229,7 @@ struct DashboardView: View {
     }
 
     private var quickAccessRow: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             compactQuickAction(
                 icon: "arrow.triangle.2.circlepath",
                 title: "Çalışma planı",
