@@ -103,60 +103,60 @@ struct DashboardView: View {
 
     private var primaryActionBlock: some View {
         VStack(spacing: 14) {
-            HStack(alignment: .center, spacing: 12) {
-                HStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(AppColor.primary)
-                            .frame(width: 48, height: 48)
-                        Image(systemName: "cross.case.fill")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(.white)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .center, spacing: 12) {
+                    HStack(spacing: 12) {
+                        ZStack {
+                            Circle()
+                                .fill(AppColor.primary)
+                                .frame(width: 40, height: 40)
+                            Image(systemName: "cross.case.fill")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+                        Text("Dr.Kynox")
+                            .font(AppFont.h3)
+                            .foregroundStyle(AppColor.textPrimary)
                     }
-                    Text("Dr.Kynox")
+                    Spacer()
+                    Circle()
+                        .fill(AppColor.surfaceAlt)
+                        .frame(width: 40, height: 40)
+                        .overlay(
+                            Image(systemName: "bell")
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(AppColor.textSecondary)
+                        )
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(greetingTitle)
                         .font(AppFont.h2)
                         .foregroundStyle(AppColor.textPrimary)
-                }
-                Spacer()
-                Circle()
-                    .fill(AppColor.surfaceAlt)
-                    .frame(width: 48, height: 48)
-                    .overlay(
-                        Image(systemName: "bell")
-                            .font(.system(size: 21, weight: .semibold))
+                        .lineLimit(2)
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(AppColor.success)
+                            .frame(width: 10, height: 10)
+                        Text("Mevcut Odak: \(SpecialtyOption.label(for: preferredSpecialty))")
+                            .font(AppFont.bodyMedium)
                             .foregroundStyle(AppColor.textSecondary)
-                    )
-            }
-            .padding(.horizontal, 10)
-            .padding(.top, 4)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(greetingTitle)
-                    .font(AppFont.h1)
-                    .foregroundStyle(AppColor.textPrimary)
-                    .lineLimit(2)
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(AppColor.success)
-                        .frame(width: 12, height: 12)
-                    Text("Mevcut Odak: \(SpecialtyOption.label(for: preferredSpecialty))")
-                        .font(AppFont.bodyMedium)
-                        .foregroundStyle(AppColor.textSecondary)
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(18)
             .background(AppColor.surface)
             .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
-            .appShadow(AppShadow.card)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+            .appShadow(AppShadow.low)
 
             VStack(alignment: .leading, spacing: 12) {
                 Text("Vaka Başlat")
-                    .font(AppFont.h1)
+                    .font(AppFont.h2)
                     .foregroundStyle(.white)
                 Text("Yeni bir vakaya başlayarak klinik yeteneklerini geliştir.")
                     .font(AppFont.body)
@@ -199,11 +199,11 @@ struct DashboardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColor.primary)
             .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(.white.opacity(0.14), lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
-            .appShadow(AppShadow.elevated)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+            .appShadow(AppShadow.card)
         }
     }
 

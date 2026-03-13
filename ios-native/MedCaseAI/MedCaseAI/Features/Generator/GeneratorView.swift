@@ -70,7 +70,7 @@ struct GeneratorView: View {
     private var specialtyStep: some View {
         selectionPageScaffold {
             stepHeader(
-                step: "1/4",
+                step: "1/3",
                 title: "Bölüm seç",
                 subtitle: "Vaka başlatma için klinik odağını seç."
             )
@@ -198,7 +198,7 @@ struct GeneratorView: View {
     private var difficultyStep: some View {
         selectionPageScaffold {
             stepHeader(
-                step: "2/4",
+                step: "2/3",
                 title: "Zorluk seç",
                 subtitle: "\(selectedSpecialtyLabel) odağında vaka yoğunluğunu belirle."
             )

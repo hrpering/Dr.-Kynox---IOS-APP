@@ -11,8 +11,8 @@ enum SpacingTokens {
     static let cardPadding: CGFloat = x2
     static let sectionSpacing: CGFloat = 20
     static let elementSpacing: CGFloat = x2
-    static let buttonHeight: CGFloat = 56
-    static let listRowHeight: CGFloat = 64
+    static let buttonHeight: CGFloat = 52
+    static let listRowHeight: CGFloat = 60
 }
 
 enum AppSpacing {

@@ -70,11 +70,11 @@ struct OnboardingView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(AppColor.surface)
                 .overlay(
-                    RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous)
+                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                         .stroke(AppColor.border, lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.xl, style: .continuous))
-                .appShadow(AppShadow.card)
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                .appShadow(AppShadow.low)
             }
             .padding(.horizontal, AppSpacing.x2)
             .padding(.top, AppSpacing.x1_5)

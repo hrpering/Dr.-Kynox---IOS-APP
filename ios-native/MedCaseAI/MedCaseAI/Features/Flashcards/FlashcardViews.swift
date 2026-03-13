@@ -403,23 +403,29 @@ struct CodeBlueSessionView: View {
     private var headerCard: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
+                Text("Acil Durum")
+                    .font(AppFont.caption)
+                    .foregroundStyle(AppColor.error)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 4)
+                    .background(AppColor.errorLight)
+                    .clipShape(Capsule())
                 Text("Code Blue")
-                    .font(AppFont.title2)
+                    .font(AppFont.h3)
                     .foregroundStyle(AppColor.textPrimary)
                 Spacer()
                 Text(progressLabel)
                     .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textSecondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(AppColor.surfaceAlt)
-                    .clipShape(Capsule())
+                        .foregroundStyle(AppColor.textSecondary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(AppColor.surfaceAlt)
+                        .clipShape(Capsule())
             }
 
-            Text("Süre cihaz saatine göre ilerler. Arka plan veya telefon çağrısı sırasında durmaz.")
+            Text("Vaka İlerlemesi")
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
 
             if let question, completionSummary == nil, reviewState == nil {
                 HStack(spacing: 8) {
@@ -438,15 +444,15 @@ struct CodeBlueSessionView: View {
                     .tint(remainingSeconds > 0 ? AppColor.warning : AppColor.error)
             }
         }
-        .padding(14)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surfaceElevated)
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .appShadow(AppShadow.card)
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.low)
     }
 
     private var progressLabel: String {
@@ -494,6 +500,9 @@ struct CodeBlueSessionView: View {
 
     private func questionCard(_ question: CodeBlueQuestion) -> some View {
         VStack(alignment: .leading, spacing: 12) {
+            Text("HASTA BULGULARI")
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
             Text(question.question)
                 .font(AppFont.bodyMedium)
                 .foregroundStyle(AppColor.textPrimary)
@@ -518,7 +527,7 @@ struct CodeBlueSessionView: View {
                     }
                     .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AppColor.surface)
+                    .background(AppColor.surfaceElevated)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
                             .stroke(AppColor.border, lineWidth: 1)
@@ -534,17 +543,21 @@ struct CodeBlueSessionView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.low)
     }
 
     private func reviewCard(_ review: CodeBlueReviewState) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Soru Sonucu")
-                .font(AppFont.title2)
-                .foregroundStyle(AppColor.textPrimary)
+            HStack {
+                Text(review.answer.isCorrect == true ? "TEBRİKLER! DOĞRU CEVAP" : "Sonuç Değerlendirmesi")
+                    .font(AppFont.bodyMedium)
+                    .foregroundStyle(review.answer.isCorrect == true ? AppColor.success : AppColor.warning)
+                Spacer()
+            }
 
             ZStack {
                 reviewFace(
@@ -596,10 +609,11 @@ struct CodeBlueSessionView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.low)
     }
 
     private func reviewOutcomeText(_ review: CodeBlueReviewState) -> String {
@@ -642,8 +656,8 @@ struct CodeBlueSessionView: View {
 
     private func completionCard(_ summary: CodeBlueSummary) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Oturum Tamamlandı")
-                .font(AppFont.title2)
+            Text("15sn Hızlı Vaka Sonucu")
+                .font(AppFont.h3)
                 .foregroundStyle(AppColor.textPrimary)
 
             HStack(spacing: 10) {
@@ -652,7 +666,7 @@ struct CodeBlueSessionView: View {
                 statPill(title: "Timeout", value: "\(summary.timeoutCount ?? 0)")
             }
 
-            Text("Skor: \(Int((summary.scorePercent ?? 0).rounded()))")
+            Text("Skor: \(Int((summary.scorePercent ?? 0).rounded())) / 100")
                 .font(AppFont.bodyMedium)
                 .foregroundStyle(AppColor.textPrimary)
 
@@ -672,10 +686,11 @@ struct CodeBlueSessionView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColor.surface)
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .appShadow(AppShadow.low)
     }
 
     private func statPill(title: String, value: String) -> some View {

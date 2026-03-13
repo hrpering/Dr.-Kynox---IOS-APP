@@ -164,25 +164,25 @@ struct ProfileView: View {
     }
 
     private var profileHeader: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             ZStack(alignment: .bottomTrailing) {
                 Circle()
-                    .fill(AppColor.primaryLight)
-                    .frame(width: 110, height: 110)
+                    .fill(AppColor.surfaceAlt)
+                    .frame(width: 112, height: 112)
                     .overlay(
                         Text(initials)
-                            .font(.system(size: 38, weight: .bold, design: .rounded))
-                            .foregroundStyle(AppColor.primary)
+                            .font(.system(size: 36, weight: .bold, design: .rounded))
+                            .foregroundStyle(AppColor.primaryDark)
                     )
                 Circle()
                     .fill(AppColor.success)
-                    .frame(width: 20, height: 20)
-                    .overlay(Circle().stroke(Color.white, lineWidth: 3))
+                    .frame(width: 24, height: 24)
+                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
             }
-            .padding(.top, 4)
+            .padding(.top, 2)
 
             Text(state.profile?.fullName.isEmpty == false ? (state.profile?.fullName ?? "") : "Kullanıcı")
-                .font(AppFont.h1)
+                .font(AppFont.h2)
                 .foregroundStyle(AppColor.textPrimary)
                 .multilineTextAlignment(.center)
             Text(readableRole)
@@ -191,15 +191,22 @@ struct ProfileView: View {
                 .multilineTextAlignment(.center)
 
             Text("Premium Üye")
-                .font(AppFont.bodyMedium)
+                .font(AppFont.secondary)
                 .foregroundStyle(AppColor.primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
                 .background(AppColor.primaryLight)
                 .clipShape(Capsule())
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
+        .padding(.vertical, 14)
+        .background(AppColor.surface)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                .stroke(AppColor.border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+        .appShadow(AppShadow.low)
     }
 
     private func sectionCard<Content: View>(title: String,

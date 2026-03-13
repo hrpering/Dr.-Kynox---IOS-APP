@@ -44,12 +44,18 @@ struct DSPrimaryButtonStyle: ButtonStyle {
             .font(AppFont.button)
             .foregroundStyle(Color.white)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.primary)
+            .background(
+                LinearGradient(
+                    colors: [AppColor.primary, AppColor.primary.opacity(0.92)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(.white.opacity(0.16), lineWidth: 1)
+                    .stroke(.white.opacity(0.22), lineWidth: 1)
             )
-            .appShadow(AppShadow.elevated)
+            .appShadow(AppShadow.card)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
@@ -60,14 +66,14 @@ struct DSSecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(AppFont.button)
-            .foregroundStyle(AppColor.primary)
+            .foregroundStyle(AppColor.primaryDark)
             .frame(maxWidth: .infinity, minHeight: AppSpacing.buttonHeight)
-            .background(AppColor.surface)
+            .background(AppColor.surfaceElevated)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                    .stroke(AppColor.border, lineWidth: 1.2)
+                    .stroke(AppColor.border, lineWidth: 1)
             )
-            .appShadow(AppShadow.card)
+            .appShadow(AppShadow.low)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
@@ -109,7 +115,7 @@ struct DSInfoCard<Content: View>: View {
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(tone.border, lineWidth: 1)
         )
-        .appShadow(AppShadow.card)
+        .appShadow(AppShadow.low)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 
@@ -173,7 +179,7 @@ struct DSStatCard: View {
             RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                 .stroke(tone == .neutral ? AppColor.border : tone.border, lineWidth: 1)
         )
-        .appShadow(AppShadow.card)
+        .appShadow(AppShadow.low)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
     }
 }
@@ -256,7 +262,7 @@ struct DSNavigationRow<Accessory: View>: View {
             RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                 .stroke(AppColor.border, lineWidth: 1)
         )
-        .appShadow(AppShadow.card)
+        .appShadow(AppShadow.low)
         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
     }
 }

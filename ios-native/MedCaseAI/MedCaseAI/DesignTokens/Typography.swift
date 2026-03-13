@@ -39,14 +39,14 @@ private enum TokenFontFactory {
 }
 
 enum TypographyTokens {
-    static let display = TokenFontFactory.lexendBold(size: 48)
-    static let h1 = TokenFontFactory.lexendBold(size: 40)
-    static let h2 = TokenFontFactory.lexendSemibold(size: 24)
-    static let h3 = TokenFontFactory.lexendSemibold(size: 18)
-    static let body = TokenFontFactory.publicSansRegular(size: 16)
-    static let bodyMedium = TokenFontFactory.publicSansSemibold(size: 16)
-    static let secondary = TokenFontFactory.publicSansMedium(size: 14)
-    static let caption = TokenFontFactory.publicSansMedium(size: 12)
+    static let display = TokenFontFactory.lexendBold(size: 36)
+    static let h1 = TokenFontFactory.lexendBold(size: 30)
+    static let h2 = TokenFontFactory.lexendBold(size: 24)
+    static let h3 = TokenFontFactory.lexendSemibold(size: 20)
+    static let body = TokenFontFactory.lexendRegular(size: 16)
+    static let bodyMedium = TokenFontFactory.lexendSemibold(size: 16)
+    static let secondary = TokenFontFactory.lexendMedium(size: 14)
+    static let caption = TokenFontFactory.lexendMedium(size: 12)
     static let button = TokenFontFactory.lexendSemibold(size: 18)
 }
 

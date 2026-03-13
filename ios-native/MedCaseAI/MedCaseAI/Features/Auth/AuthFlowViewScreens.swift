@@ -11,52 +11,56 @@ import Supabase
 extension AuthFlowView {
     var welcomeCard: some View {
         VStack(spacing: AppSpacing.x2) {
+            Text("Dr. Kynox")
+                .font(AppFont.largeTitle)
+                .foregroundStyle(AppColor.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .center)
+
             IntroMotionCard(variant: .short)
                 .frame(height: 228)
                 .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                        .stroke(AppColor.border, lineWidth: 1)
+                )
+                .appShadow(AppShadow.low)
                 .accessibilityHidden(true)
 
-            HeroHeader(
-                eyebrow: "Dr.Kynox",
-                title: "Klinik Düşünmeyi Öğrenin",
-                subtitle: "Tıbbi vakalar üzerinde interaktif pratik yapın ve uzmanlığınızı gerçek hayat senaryolarıyla geliştirin.",
-                icon: "stethoscope",
-                metrics: [
-                    HeroMetricItem(title: "Etkileşim", value: "Sesli + Yazılı", icon: "waveform"),
-                    HeroMetricItem(title: "Geri Bildirim", value: "Anlık", icon: "bolt"),
-                    HeroMetricItem(title: "İlerleme", value: "Skor Takibi", icon: "chart.line.uptrend.xyaxis")
-                ]
-            )
+            VStack(spacing: 10) {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 12, weight: .semibold))
+                    Text("Yapay Zeka Destekli")
+                        .font(AppFont.caption)
+                }
+                .foregroundStyle(Color(hex: "#EC5B13"))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color(hex: "#EC5B13").opacity(0.1))
+                .clipShape(Capsule())
 
-            VStack(spacing: AppSpacing.x1) {
-                FeatureHighlightRow(
-                    icon: "mic.fill",
-                    title: "Sesli etkileşim",
-                    subtitle: "Doğal konuşma ile vaka yönetimi",
-                    tint: AppColor.primary
-                )
-                FeatureHighlightRow(
-                    icon: "waveform.path.ecg",
-                    title: "Gerçek zamanlı geri bildirim",
-                    subtitle: "Karar zincirini adım adım gör",
-                    tint: AppColor.success
-                )
-                FeatureHighlightRow(
-                    icon: "chart.bar.xaxis",
-                    title: "İlerleme takibi",
-                    subtitle: "Skorlarını ve gelişimini izle",
-                    tint: AppColor.warning
-                )
+                Text("Klinik düşünmeyi\nhayat senaryolarıyla geliştir.")
+                    .font(AppFont.h1)
+                    .foregroundStyle(AppColor.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+
+                Text("Sesli ya da yazılı ilerle, anlık geri bildirim al ve gelişimini takip et.")
+                    .font(AppFont.body)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
             }
             .padding(AppSpacing.cardPadding)
+            .frame(maxWidth: .infinity)
             .background(AppColor.surface)
             .overlay(
                 RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-            .appShadow(AppShadow.card)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .appShadow(AppShadow.low)
 
             Button {
                 withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
@@ -94,6 +98,11 @@ extension AuthFlowView {
             .buttonStyle(PressableButtonStyle())
             .accessibilityLabel("Hesabım var")
             .accessibilityHint("Giriş ekranına geçer")
+
+            Text("Devam ederek Kullanım Koşullarını kabul etmiş olursunuz.")
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+                .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, alignment: .center)
     }
