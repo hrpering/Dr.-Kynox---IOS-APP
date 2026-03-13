@@ -504,31 +504,34 @@ enum StudyCadence {
 }
 
 enum StudyExamWindow: String, CaseIterable {
-    case zeroToThreeMonths
+    case underThreeMonths
     case threeToSixMonths
-    case overSixMonths
+    case sixToTwelveMonths
+    case overOneYear
 
     var title: String {
         switch self {
-        case .zeroToThreeMonths: return "0-3 ay"
-        case .threeToSixMonths: return "3-6 ay"
-        case .overSixMonths: return "6+ ay"
+        case .underThreeMonths: return "3 aydan az"
+        case .threeToSixMonths: return "3 - 6 ay"
+        case .sixToTwelveMonths: return "6 - 12 ay"
+        case .overOneYear: return "1 yıldan fazla"
         }
     }
 
     var detail: String {
         switch self {
-        case .zeroToThreeMonths: return "Sınava yakın dönem"
+        case .underThreeMonths: return "Sınava yakın dönem"
         case .threeToSixMonths: return "Orta hazırlık dönemi"
-        case .overSixMonths: return "Uzun hazırlık dönemi"
+        case .sixToTwelveMonths: return "Dengeli hazırlık dönemi"
+        case .overOneYear: return "Uzun hazırlık dönemi"
         }
     }
 
     var recommendedCadence: StudyCadence {
         switch self {
-        case .zeroToThreeMonths: return .intense
+        case .underThreeMonths: return .intense
         case .threeToSixMonths: return .balanced
-        case .overSixMonths: return .regular
+        case .sixToTwelveMonths, .overOneYear: return .regular
         }
     }
 }

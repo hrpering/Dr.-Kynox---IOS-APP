@@ -669,96 +669,97 @@ struct OnboardingStudyPlanSetupStep: View {
     @Binding var selectedExamTarget: StudyExamTarget
     @Binding var selectedExamWindow: StudyExamWindow
     @Binding var dailyStudyMinutes: Int
+    private let examGridColumns = [
+        GridItem(.flexible(), spacing: 10),
+        GridItem(.flexible(), spacing: 10)
+    ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 18) {
             Text("Sana özel çalışma planı oluşturalım")
                 .font(AppFont.title)
                 .foregroundStyle(AppColor.textPrimary)
 
-            Text("Hedef sınavını, sınava kalan süreni ve günlük ayırabileceğin zamanı seç.")
-                .font(AppFont.body)
-                .foregroundStyle(AppColor.textSecondary)
-                .lineSpacing(4)
+            VStack(spacing: 8) {
+                HStack {
+                    Text("İlerleme Durumu")
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.textSecondary)
+                    Spacer()
+                    Text("%60")
+                        .font(AppFont.caption)
+                        .foregroundStyle(AppColor.textPrimary)
+                }
 
-            Text("Hedef sınav")
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(AppColor.border.opacity(0.45))
+                        Capsule()
+                            .fill(AppColor.success)
+                            .frame(width: max(0, geo.size.width * 0.60))
+                    }
+                }
+                .frame(height: 8)
+            }
 
-            VStack(spacing: 10) {
+            sectionHeader(icon: "target", title: "Hedef sınav")
+
+            LazyVGrid(columns: examGridColumns, spacing: 10) {
                 ForEach(StudyExamTarget.allCases, id: \.self) { target in
                     let isSelected = selectedExamTarget == target
                     Button {
                         selectedExamTarget = target
                         Haptic.selection()
                     } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: target.icon)
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundStyle(target.accent)
-                                .frame(width: 32, height: 32)
-                                .background(target.accentBackground)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(target.title)
-                                    .font(AppFont.bodyMedium)
-                                    .foregroundStyle(AppColor.textPrimary)
-                                Text(target.subtitle)
-                                    .font(AppFont.caption)
-                                    .foregroundStyle(isSelected ? AppColor.textPrimary : AppColor.textSecondary)
-                                    .lineSpacing(3)
-                                    .lineLimit(2)
-                            }
-                            Spacer()
-                            if isSelected {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(target.accent)
-                            } else {
-                                Image(systemName: "circle")
-                                    .foregroundStyle(AppColor.textTertiary)
-                            }
-                        }
-                        .padding(14)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(isSelected ? target.accentBackground.opacity(0.9) : AppColor.surfaceElevated)
+                        Text(displayTitle(for: target))
+                            .font(AppFont.bodyMedium)
+                            .foregroundStyle(isSelected ? AppColor.primaryDark : AppColor.textPrimary)
+                            .frame(maxWidth: .infinity, minHeight: 52)
+                            .background(isSelected ? AppColor.primaryLight : AppColor.surfaceElevated)
                         .overlay(
-                            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                                .stroke(isSelected ? target.accent : AppColor.border, lineWidth: isSelected ? 2 : 1)
+                            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                                .stroke(isSelected ? AppColor.primary.opacity(0.45) : AppColor.border, lineWidth: isSelected ? 1.5 : 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
                     }
                     .buttonStyle(PressableButtonStyle())
                 }
             }
 
-            Text("Sınava ne kadar var?")
-                .font(AppFont.bodyMedium)
-                .foregroundStyle(AppColor.textPrimary)
-                .padding(.top, 2)
+            sectionHeader(icon: "calendar", title: "Sınava ne kadar var?")
 
-            HStack(spacing: 10) {
+            VStack(spacing: 10) {
                 ForEach(StudyExamWindow.allCases, id: \.self) { window in
+                    let isSelected = selectedExamWindow == window
                     Button {
                         selectedExamWindow = window
                         Haptic.selection()
                     } label: {
-                        VStack(spacing: 3) {
+                        HStack(spacing: 12) {
+                            Circle()
+                                .stroke(isSelected ? AppColor.primary : AppColor.border, lineWidth: 2)
+                                .frame(width: 20, height: 20)
+                                .overlay(
+                                    Circle()
+                                        .fill(AppColor.primary)
+                                        .frame(width: 10, height: 10)
+                                        .opacity(isSelected ? 1 : 0)
+                                )
+
                             Text(window.title)
                                 .font(AppFont.bodyMedium)
-                            Text(window.detail)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(AppColor.textSecondary)
-                                .lineLimit(1)
+                                .foregroundStyle(AppColor.textPrimary)
+                            Spacer()
                         }
-                        .foregroundStyle(selectedExamWindow == window ? AppColor.primaryDark : AppColor.textPrimary)
-                        .frame(maxWidth: .infinity, minHeight: 64)
-                        .background(selectedExamWindow == window ? AppColor.primaryLight : AppColor.surfaceElevated)
+                        .padding(.horizontal, 14)
+                        .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+                        .background(isSelected ? AppColor.primaryLight.opacity(0.7) : AppColor.surfaceElevated)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(selectedExamWindow == window ? AppColor.primary : AppColor.border, lineWidth: selectedExamWindow == window ? 2 : 1)
+                            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
+                                .stroke(isSelected ? AppColor.primary.opacity(0.45) : AppColor.border, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
                     }
                     .buttonStyle(PressableButtonStyle())
                 }
@@ -766,13 +767,13 @@ struct OnboardingStudyPlanSetupStep: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("Günde kaç dakika ayırabilirsin?")
+                    Text("Günde kaç dakika?")
                         .font(AppFont.bodyMedium)
                         .foregroundStyle(AppColor.textPrimary)
                     Spacer()
                     Text("\(dailyStudyMinutes) dk")
                         .font(AppFont.bodyMedium)
-                        .foregroundStyle(AppColor.primaryDark)
+                        .foregroundStyle(AppColor.primary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
                         .background(AppColor.primaryLight)
@@ -782,13 +783,13 @@ struct OnboardingStudyPlanSetupStep: View {
                 Slider(value: Binding(
                     get: { Double(dailyStudyMinutes) },
                     set: { dailyStudyMinutes = Int($0.rounded()) }
-                ), in: 15...180, step: 15)
+                ), in: 15...300, step: 15)
                 .tint(AppColor.primary)
 
                 HStack {
                     Text("15 dk")
                     Spacer()
-                    Text("180 dk")
+                    Text("300 dk")
                 }
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(AppColor.textTertiary)
@@ -796,12 +797,43 @@ struct OnboardingStudyPlanSetupStep: View {
             .padding(14)
             .background(AppColor.surfaceElevated)
             .overlay(
-                RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
+                RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
                     .stroke(AppColor.border, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+
+            Text("Ayarlarınızı daha sonra değiştirebilirsiniz.")
+                .font(AppFont.caption)
+                .foregroundStyle(AppColor.textSecondary)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .frame(maxHeight: .infinity, alignment: .top)
+    }
+
+    private func sectionHeader(icon: String, title: String) -> some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(AppColor.primaryLight)
+                .frame(width: 22, height: 22)
+                .overlay(
+                    Image(systemName: icon)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(AppColor.primary)
+                )
+            Text(title)
+                .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.textPrimary)
+        }
+    }
+
+    private func displayTitle(for target: StudyExamTarget) -> String {
+        switch target {
+        case .tus: return "TUS"
+        case .ydus: return "YDUS"
+        case .usmleStep2: return "USMLE"
+        case .europe: return "DUS"
+        case .rotation: return "Genel Pratik"
+        }
     }
 }
 
