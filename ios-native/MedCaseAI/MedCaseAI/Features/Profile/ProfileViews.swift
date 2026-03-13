@@ -11,143 +11,22 @@ struct ProfileView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    profileHeader
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 18) {
+                    profileTopBar
 
-                    sectionTitle("Hesap")
-                    SectionCard(title: "", subtitle: nil) {
-                        NavigationLink {
-                            ProfileLanguagePreferencesView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "globe",
-                                title: "Dil ve Bölge",
-                                subtitle: "Uygulama dili, ülke ve RTL ayarları",
-                                tint: AppColor.primaryDark
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
-                            ProfileNotificationPreferencesView()
-                        } label: {
-                            profileRowButton(
-                                icon: "bell.fill",
-                                title: "Bildirimler",
-                                subtitle: "Hatırlatma ve bildirim tercihleri",
-                                tint: AppColor.primary
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
-                            ProfileAudioPreferencesView()
-                        } label: {
-                            profileRowButton(
-                                icon: "mic.fill",
-                                title: "Ses / Mikrofon Tercihleri",
-                                subtitle: "Varsayılan mod ve mikrofon davranışı",
-                                tint: AppColor.primaryDark
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
-                            ProfileSubscriptionView()
-                        } label: {
-                            profileRowButton(
-                                icon: "creditcard.fill",
-                                title: "Abonelik",
-                                subtitle: "Plan, faturalama ve kullanım özeti",
-                                tint: AppColor.warning
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
-                            ProfileAccountView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "person.crop.circle.badge.exclamationmark",
-                                title: "Hesap ve Veri",
-                                subtitle: "Çıkış, veri temizleme ve hesap silme",
-                                tint: AppColor.error
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
+                    VStack(spacing: 16) {
+                        profileHeaderCard
+                        accountSection
+                        supportSection
+                        logoutButton
                     }
-
-                    sectionTitle("Destek ve Yasal")
-                    SectionCard(title: "", subtitle: nil) {
-                        NavigationLink {
-                            ProfileSupportView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "lifepreserver.fill",
-                                title: "Yardım Merkezi",
-                                subtitle: "Destek ve içerik raporu",
-                                tint: AppColor.primary
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        Button {
-                            showFeedbackSheet = true
-                            Haptic.selection()
-                        } label: {
-                            profileRowButton(
-                                icon: "bubble.left.and.bubble.right.fill",
-                                title: "Geri Bildirim",
-                                subtitle: "Ürün ve deneyim geri bildirimi gönder",
-                                tint: AppColor.success
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-
-                        NavigationLink {
-                            ProfileLegalView()
-                                .environmentObject(state)
-                        } label: {
-                            profileRowButton(
-                                icon: "doc.text.fill",
-                                title: "Gizlilik / Koşullar",
-                                subtitle: "Yasal metinler ve aydınlatma içerikleri",
-                                tint: AppColor.textSecondary
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle())
-                    }
-
-                    NavigationLink {
-                        ProfileAccountView()
-                            .environmentObject(state)
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                                .font(.system(size: 18, weight: .semibold))
-                            Text("Çıkış Yap")
-                                .font(AppFont.button)
-                        }
-                        .foregroundStyle(AppColor.error)
-                        .frame(maxWidth: .infinity, minHeight: 54)
-                        .background(AppColor.surfaceElevated)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                                .stroke(AppColor.border, lineWidth: 1)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-                    }
-                    .buttonStyle(PressableButtonStyle())
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 20)
                 }
-                .padding(16)
-                .padding(.bottom, 14)
             }
             .background(AppColor.background.ignoresSafeArea())
-            .navigationTitle("Profil")
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showFeedbackSheet) {
                 UserFeedbackSheet()
                     .environmentObject(state)
@@ -155,29 +34,64 @@ struct ProfileView: View {
         }
     }
 
-    private func sectionTitle(_ text: String) -> some View {
-        Text(text.uppercased(with: Locale(identifier: "tr_TR")))
-            .font(AppFont.bodyMedium)
-            .foregroundStyle(AppColor.textTertiary)
-            .kerning(2)
-            .padding(.top, 4)
+    private var profileTopBar: some View {
+        HStack {
+            ZStack {
+                Circle()
+                    .fill(AppColor.surface)
+                    .frame(width: 32, height: 32)
+                Image(systemName: "person.fill")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AppColor.textPrimary)
+            }
+            .opacity(0.92)
+
+            Spacer()
+
+            Text("Profil")
+                .font(AppFont.h3)
+                .foregroundStyle(AppColor.textPrimary)
+
+            Spacer()
+
+            Circle()
+                .fill(Color.clear)
+                .frame(width: 32, height: 32)
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, 24)
+        .padding(.bottom, 16)
+        .background(AppColor.surface.opacity(0.82))
     }
 
-    private var profileHeader: some View {
-        VStack(spacing: 10) {
+    private var profileHeaderCard: some View {
+        VStack(spacing: 8) {
             ZStack(alignment: .bottomTrailing) {
                 Circle()
                     .fill(AppColor.surfaceAlt)
                     .frame(width: 112, height: 112)
-                    .overlay(
+
+                Group {
+                    if UIImage(named: "ProfileRefAvatar") != nil {
+                        Image("ProfileRefAvatar")
+                            .resizable()
+                            .scaledToFill()
+                    } else {
                         Text(initials)
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
                             .foregroundStyle(AppColor.primaryDark)
-                    )
+                    }
+                }
+                .frame(width: 96, height: 96)
+                .clipShape(Circle())
+
                 Circle()
                     .fill(AppColor.success)
                     .frame(width: 24, height: 24)
-                    .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white, lineWidth: 4)
+                    )
             }
             .padding(.top, 2)
 
@@ -193,102 +107,222 @@ struct ProfileView: View {
             Text("Premium Üye")
                 .font(AppFont.secondary)
                 .foregroundStyle(AppColor.primary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
                 .background(AppColor.primaryLight)
                 .clipShape(Capsule())
+                .padding(.top, 2)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 14)
-        .background(AppColor.surface)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.low)
+        .padding(.vertical, 16)
     }
 
-    private func sectionCard<Content: View>(title: String,
-                                            subtitle: String,
-                                            @ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(AppFont.title2)
-                    .foregroundStyle(AppColor.textPrimary)
-                Text(subtitle)
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textSecondary)
-                    .lineSpacing(3)
+    private var accountSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("Hesap")
+
+            VStack(spacing: 0) {
+                NavigationLink {
+                    ProfileLanguagePreferencesView()
+                        .environmentObject(state)
+                } label: {
+                    profileRowButton(
+                        icon: "globe",
+                        iconTint: AppColor.primary,
+                        iconBackground: AppColor.primaryLight,
+                        title: "Dil ve Bölge",
+                        trailingText: preferredLanguageLabel
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
+
+                rowDivider
+
+                NavigationLink {
+                    ProfileNotificationPreferencesView()
+                        .environmentObject(state)
+                } label: {
+                    profileRowButton(
+                        icon: "bell.fill",
+                        iconTint: Color(hex: "#F97316"),
+                        iconBackground: Color(hex: "#FFEDD5"),
+                        title: "Bildirimler"
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
+
+                rowDivider
+
+                NavigationLink {
+                    ProfileAudioPreferencesView()
+                } label: {
+                    profileRowButton(
+                        icon: "mic.fill",
+                        iconTint: Color(hex: "#475569"),
+                        iconBackground: Color(hex: "#E2E8F0"),
+                        title: "Ses / Mikrofon Tercihleri"
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
+
+                rowDivider
+
+                NavigationLink {
+                    ProfileSubscriptionView()
+                } label: {
+                    profileRowButton(
+                        icon: "creditcard.fill",
+                        iconTint: AppColor.success,
+                        iconBackground: AppColor.successLight,
+                        title: "Abonelik"
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
+
+                rowDivider
+
+                NavigationLink {
+                    ProfileAccountView()
+                        .environmentObject(state)
+                } label: {
+                    profileRowButton(
+                        icon: "person.crop.circle.badge.exclamationmark",
+                        iconTint: AppColor.error,
+                        iconBackground: AppColor.errorLight,
+                        title: "Hesap ve Veri"
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
             }
-
-            content()
+            .background(AppColor.background)
+            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+            .appShadow(AppShadow.low)
         }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.lg, style: .continuous))
-        .appShadow(AppShadow.card)
     }
 
-    private func profileRowButton(icon: String, title: String, subtitle: String, tint: Color) -> some View {
-        HStack(alignment: .top, spacing: 10) {
+    private var supportSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            sectionTitle("Destek ve Yasal")
+
+            VStack(spacing: 0) {
+                NavigationLink {
+                    ProfileSupportView()
+                        .environmentObject(state)
+                } label: {
+                    profileRowButton(
+                        icon: "lifepreserver.fill",
+                        iconTint: AppColor.primary,
+                        iconBackground: AppColor.primaryLight,
+                        title: "Yardım Merkezi"
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
+
+                rowDivider
+
+                Button {
+                    showFeedbackSheet = true
+                    Haptic.selection()
+                } label: {
+                    profileRowButton(
+                        icon: "bubble.left.and.bubble.right.fill",
+                        iconTint: AppColor.warning,
+                        iconBackground: AppColor.warningLight,
+                        title: "Geri Bildirim"
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
+
+                rowDivider
+
+                NavigationLink {
+                    ProfileLegalView()
+                        .environmentObject(state)
+                } label: {
+                    profileRowButton(
+                        icon: "doc.text.fill",
+                        iconTint: Color(hex: "#475569"),
+                        iconBackground: Color(hex: "#E2E8F0"),
+                        title: "Gizlilik / Koşullar"
+                    )
+                }
+                .buttonStyle(PressableButtonStyle())
+            }
+            .background(AppColor.background)
+            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+            .appShadow(AppShadow.low)
+        }
+    }
+
+    private var logoutButton: some View {
+        NavigationLink {
+            ProfileAccountView()
+                .environmentObject(state)
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+                    .font(.system(size: 16, weight: .semibold))
+                Text("Çıkış Yap")
+                    .font(AppFont.bodyMedium)
+            }
+            .foregroundStyle(AppColor.error)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background(AppColor.surfaceAlt)
+            .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        }
+        .buttonStyle(PressableButtonStyle())
+    }
+
+    private func sectionTitle(_ text: String) -> some View {
+        Text(text)
+            .font(AppFont.secondary)
+            .foregroundStyle(AppColor.textTertiary)
+    }
+
+    private var rowDivider: some View {
+        Divider()
+            .overlay(AppColor.border)
+            .padding(.leading, 72)
+    }
+
+    private func profileRowButton(icon: String,
+                                  iconTint: Color,
+                                  iconBackground: Color,
+                                  title: String,
+                                  trailingText: String? = nil) -> some View {
+        HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(tint)
-                .frame(width: 34, height: 34)
-                .background(tint.opacity(0.14))
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .foregroundStyle(iconTint)
+                .frame(width: 40, height: 40)
+                .background(iconBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(AppFont.bodyMedium)
-                    .foregroundStyle(AppColor.textPrimary)
-                Text(subtitle)
-                    .font(AppFont.caption)
-                    .foregroundStyle(AppColor.textSecondary)
-                    .lineSpacing(4)
-                    .lineLimit(2)
-            }
+            Text(title)
+                .font(AppFont.body)
+                .foregroundStyle(AppColor.textPrimary)
+                .lineLimit(1)
 
             Spacer(minLength: 0)
+
+            if let trailingText {
+                Text(trailingText)
+                    .font(AppFont.secondary)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
+
             Image(systemName: "chevron.right")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(AppColor.textTertiary)
-                .padding(.top, 3)
         }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-        .appShadow(AppShadow.card)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, minHeight: 72, alignment: .leading)
+        .contentShape(Rectangle())
     }
 
-    private var targetExamLabel: String {
-        if state.studyPlan.isConfigured {
-            return "Hedef sınav: \(state.studyPlan.examTarget)"
-        }
-        return "Hedef sınav: Henüz seçilmedi"
-    }
-
-    private var averageScore: String {
-        let values = state.caseHistory.compactMap { $0.score?.overallScore }
-        guard !values.isEmpty else { return "--" }
-        let avg = values.reduce(0, +) / Double(values.count)
-        return String(format: "%.0f", avg)
-    }
-
-    private var streakDays: Int {
-        WeeklyGoalCalculator.currentStreakDays(from: state.caseHistory)
+    private var preferredLanguageLabel: String {
+        let normalized = AppLanguage.normalizeBCP47(state.profile?.preferredLanguageCode, fallback: "tr")
+        return AppLanguage.supported.first(where: { $0.code == normalized })?.nativeName ?? "Türkçe"
     }
 
     private var initials: String {
@@ -313,26 +347,5 @@ struct ProfileView: View {
             return "Uzman"
         }
         return state.profile?.role.isEmpty == false ? (state.profile?.role ?? "Tıp Öğrencisi") : "Tıp Öğrencisi"
-    }
-
-    private func miniStat(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title)
-                .font(AppFont.caption)
-                .foregroundStyle(AppColor.textSecondary)
-            Text(value)
-                .font(AppFont.title2)
-                .foregroundStyle(AppColor.textPrimary)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 9)
-        .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
-        .background(AppColor.surfaceElevated)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous)
-                .stroke(AppColor.border, lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-        .appShadow(AppShadow.card)
     }
 }
